@@ -1,0 +1,2664 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="warm" data-font="heiti" data-size="normal">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <title>小雅全能助手 · 个人工作台</title>
+  <style>
+    /* ==========================================================================
+       TechFunWay/notepad 完整设计精髓落实：
+       1. 侧边栏导航 + 顶部检索筛选 + 网格展示
+       2. 查看模式 (Note View)：详情查看、标题、标签高亮、元数据 (创建/修改时间)、原始文件附件下载、直接删除
+       3. 编辑模式 (Note Edit)：直接在界面中修改标题、正文内容、标签，保存并立即同步
+       4. 随想 Memos 全面配备 88px 麦克风录音语音录入功能！
+       ========================================================================== */
+    :root {
+      /* TechFunWay/notepad 大地温暖色系 (Warm Walnut) */
+      --primary-color: #b45309;
+      --primary-strong: #8f3f08;
+      --primary-hover: #9a470a;
+      --primary-light: #f8eadb;
+      --accent-color: #c55d27;
+      --success-color: #28745a;
+      --warning-color: #b45309;
+      --danger-color: #c2413b;
+      
+      --text-primary: #1c1917;
+      --text-secondary: #625c56;
+      --text-muted: #948c83;
+      
+      --border-color: #e6e1db;
+      --border-strong: #d6cfc7;
+      --border-light: #eeeae5;
+      
+      --bg-primary: #fffdfa;
+      --bg-secondary: #f6f3ef;
+      --bg-tertiary: #f0ece7;
+      --surface-elevated: #fffdfa;
+      
+      --card-shadow: 0 1px 3px rgba(44, 36, 29, 0.05), 0 1px 2px rgba(44, 36, 29, 0.03);
+      --card-shadow-hover: 0 12px 30px rgba(44, 36, 29, 0.1), 0 4px 10px rgba(44, 36, 29, 0.05);
+      --card-shadow-lg: 0 24px 70px rgba(44, 36, 29, 0.13);
+      
+      --app-sidebar-width: 232px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --font-scale: 1;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    /* 商务现代 (Business Slate) */
+    html[data-theme="business"], body[data-theme="business"] {
+      --primary-color: #1e293b;
+      --primary-strong: #0f172a;
+      --primary-hover: #334155;
+      --primary-light: rgba(30, 41, 59, 0.08);
+      --accent-color: #0284c7;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --surface-elevated: #ffffff;
+      --card-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+    }
+
+    /* 活泼珊瑚 (Vibrant Sunset) */
+    html[data-theme="vibrant"], body[data-theme="vibrant"] {
+      --primary-color: #ea580c;
+      --primary-strong: #c2410c;
+      --primary-hover: #f97316;
+      --primary-light: rgba(234, 88, 12, 0.09);
+      --accent-color: #d97706;
+      --bg-primary: #ffffff;
+      --bg-secondary: #fffbf9;
+      --bg-tertiary: #fff4ed;
+      --text-primary: #292524;
+      --text-secondary: #78716c;
+      --border-color: #fed7aa;
+      --border-strong: #fdba74;
+    }
+
+    /* 暗夜黑夜 / 赛博模式 (Dark Slate - 对应 notepad dark theme) */
+    html[data-theme="cyber"], body[data-theme="cyber"] {
+      --primary-color: #e6a15f;
+      --primary-strong: #f0b87d;
+      --primary-hover: #efad6d;
+      --primary-light: rgba(230, 161, 95, 0.14);
+      --accent-color: #dd7b49;
+      --success-color: #72b49d;
+      --warning-color: #e6a15f;
+      --danger-color: #e88782;
+      --text-primary: #f2ede7;
+      --text-secondary: #bdb4aa;
+      --text-muted: #8f857b;
+      --border-color: #37312c;
+      --border-strong: #4b433c;
+      --border-light: #2e2925;
+      --bg-primary: #1d1a17;
+      --bg-secondary: #151311;
+      --bg-tertiary: #26211d;
+      --surface-elevated: #1d1a17;
+      --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    }
+
+    /* 字体与字号 */
+    html[data-font="simsun"], body[data-font="simsun"] { --font-family: "Songti SC", "SimSun", "STSong", serif; }
+    html[data-font="heiti"], body[data-font="heiti"] { --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+    html[data-font="fangsong"], body[data-font="fangsong"] { --font-family: "FangSong", "STFangsong", "仿宋", serif; }
+
+    html[data-size="small"], body[data-size="small"] { --font-scale: 0.92; }
+    html[data-size="normal"], body[data-size="normal"] { --font-scale: 1; }
+    html[data-size="large"], body[data-size="large"] { --font-scale: 1.14; }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100dvh;
+      background: var(--bg-secondary);
+      font-family: var(--font-family);
+      color: var(--text-primary);
+      font-size: calc(14px * var(--font-scale));
+      line-height: 1.5;
+    }
+
+    .app-shell {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--bg-secondary);
+    }
+
+    /* 1. 电脑端侧边栏 (232px) */
+    .app-sidebar {
+      width: var(--app-sidebar-width);
+      flex: 0 0 var(--app-sidebar-width);
+      background: var(--bg-primary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px 16px;
+      z-index: 50;
+      transition: width 0.25s ease, padding 0.25s ease;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 8px 24px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 12px;
+    }
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-strong));
+      border-radius: 10px;
+      box-shadow: 0 6px 16px var(--primary-light);
+      font-size: 19px;
+      font-weight: 800;
+    }
+    .brand-copy {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .brand-copy strong {
+      font-size: calc(15px * var(--font-scale));
+      color: var(--text-primary);
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      white-space: nowrap;
+    }
+    .brand-copy small {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .primary-nav {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .nav-label {
+      margin: 16px 10px 8px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .nav-item {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 0 12px;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 0;
+      border-radius: var(--radius-md);
+      font: inherit;
+      font-size: calc(13.5px * var(--font-scale));
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      margin-bottom: 3px;
+      text-align: left;
+    }
+    .nav-item:hover {
+      color: var(--primary-color);
+      background: var(--primary-light);
+    }
+    .nav-item.active {
+      color: var(--primary-color);
+      background: var(--primary-light);
+      font-weight: 600;
+    }
+    .nav-icon {
+      font-size: 17px;
+      flex: 0 0 20px;
+      display: grid;
+      place-items: center;
+    }
+
+    .sidebar-footer {
+      padding-top: 14px;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-md);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-light);
+    }
+    .user-avatar-mini {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--primary-color);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* 2. 主工作区 */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 顶部导航 Header */
+    .notes-list-header {
+      padding: 20px 32px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-light);
+      flex: none;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .page-heading {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .page-eyebrow {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--primary-color);
+      text-transform: uppercase;
+    }
+    .page-title {
+      font-size: calc(22px * var(--font-scale));
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notes-count {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      padding: 3px 10px;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    .create-btn {
+      height: 38px;
+      padding: 0 18px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-strong));
+      border: none;
+      box-shadow: 0 4px 14px var(--primary-light);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      font-size: calc(13px * var(--font-scale));
+    }
+    .create-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(180, 83, 9, 0.25);
+    }
+
+    /* 搜索与筛选工具栏 */
+    .notes-list-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 32px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      flex: none;
+    }
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 260px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      height: 40px;
+      padding-left: 40px;
+      padding-right: 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      outline: none;
+      font-size: calc(13px * var(--font-scale));
+      transition: all 0.2s ease;
+    }
+    .search-input:focus {
+      background: var(--bg-primary);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+    .filter-group {
+      display: flex;
+      gap: 10px;
+    }
+    .toolbar-select {
+      height: 40px;
+      padding: 0 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-size: calc(13px * var(--font-scale));
+      outline: none;
+    }
+
+    /* 内容滚动容器 */
+    .content-scroller {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .content-container {
+      max-width: 1260px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* 3. 卡片与网格系统 */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+      gap: 16px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    /* 核心 Note 卡片 (对齐 Notepad .note-card) */
+    .note-card {
+      background: var(--surface-elevated);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .note-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--primary-color);
+    }
+    .note-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+    .note-title {
+      font-size: calc(15.5px * var(--font-scale));
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+    .note-preview {
+      font-size: calc(13px * var(--font-scale));
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .note-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-light);
+    }
+    .note-time {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .note-tag-chip {
+      color: var(--primary-color);
+      background: var(--primary-light);
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    /* 金刚区卡片 */
+    .action-tile {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--card-shadow);
+    }
+    .action-tile:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--primary-color);
+    }
+    .tile-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--primary-light);
+      color: var(--primary-color);
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+    }
+
+    /* 表单组件 */
+    .field-group { margin-bottom: 16px; }
+    .field-label {
+      display: block;
+      font-size: calc(12.5px * var(--font-scale));
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .select-box, input[type="text"], input[type="password"], input[type="number"], textarea {
+      width: 100%;
+      height: 42px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0 14px;
+      font-size: calc(13.5px * var(--font-scale));
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+    textarea {
+      height: 96px;
+      padding: 10px 14px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .select-box:focus, input:focus, textarea:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    /* 按钮规范 */
+    .btn {
+      height: 40px;
+      padding: 0 18px;
+      border-radius: var(--radius-md);
+      font-size: calc(13px * var(--font-scale));
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 0;
+      transition: all 0.18s ease;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--primary-color);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-strong);
+    }
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    .btn-secondary:hover {
+      background: var(--border-light);
+    }
+    .btn-pill {
+      height: 28px;
+      padding: 0 11px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    /* 88px 麦克风录音按键 (收件箱/记账/现场/随想全部统一配备) */
+    .voice-control-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 0 10px;
+    }
+    .btn-record-mic {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      border: 6px solid var(--primary-light);
+      background: var(--primary-color);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 36px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(180, 83, 9, 0.25);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      user-select: none;
+    }
+    .btn-record-mic:active, .btn-record-mic.recording {
+      transform: scale(1.12);
+      background: var(--danger-color);
+      border-color: rgba(194, 65, 59, 0.25);
+      box-shadow: 0 0 35px rgba(194, 65, 59, 0.6);
+      animation: pulseMic 1.2s infinite alternate;
+    }
+    @keyframes pulseMic {
+      from { box-shadow: 0 0 15px rgba(194, 65, 59, 0.4); }
+      to { box-shadow: 0 0 35px rgba(194, 65, 59, 0.8); }
+    }
+    .voice-hint {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    /* ==========================================================================
+       4. 查看模式 (Note View) 与 编辑模式 (Note Edit) 对齐 Notepad NotesView.vue
+       ========================================================================== */
+    .note-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(5px);
+      z-index: 1200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .note-modal {
+      width: min(840px, 100%);
+      max-height: 90vh;
+      background: var(--surface-elevated);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--card-shadow-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: zoomIn 0.2s ease-out;
+    }
+    @keyframes zoomIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex: none;
+    }
+    .modal-title-area {
+      flex: 1;
+      min-width: 0;
+    }
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-light);
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex: none;
+    }
+
+    .view-content-box {
+      font-size: calc(14px * var(--font-scale));
+      line-height: 1.7;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      word-break: break-all;
+      background: var(--bg-primary);
+      padding: 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+    }
+    .view-meta-bar {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* 手机端适配 (≤768px) */
+    .mobile-header { display: none; }
+    .mobile-bottom-nav { display: none; }
+
+    @media (max-width: 1120px) and (min-width: 769px) {
+      .app-sidebar {
+        width: 72px;
+        flex: 0 0 72px;
+        padding: 18px 8px;
+        align-items: center;
+      }
+      .brand-copy, .nav-label, .nav-item span, .user-profile-badge span {
+        display: none;
+      }
+      .brand { padding: 0 0 16px 0; justify-content: center; }
+      .nav-item { justify-content: center; padding: 0; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .app-sidebar { display: none; }
+      .notes-list-header { display: none; }
+      .notes-list-toolbar { padding: 10px 14px; }
+
+      .app-shell {
+        flex-direction: column;
+        padding-top: calc(56px + env(safe-area-inset-top, 0px));
+        padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+      }
+
+      .mobile-header {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 100;
+        height: calc(56px + env(safe-area-inset-top, 0px));
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-left: 16px;
+        padding-right: 16px;
+        background: rgba(255, 253, 250, 0.94);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      html[data-theme="cyber"] .mobile-header, body[data-theme="cyber"] .mobile-header {
+        background: rgba(29, 26, 23, 0.94);
+      }
+
+      .content-scroller { padding: 12px; }
+      .grid-4, .grid-2 { grid-template-columns: 1fr; gap: 12px; }
+      .notes-grid { grid-template-columns: 1fr; gap: 12px; }
+
+      .mobile-bottom-nav {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        z-index: 100;
+        height: calc(64px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        background: rgba(255, 253, 250, 0.96);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid var(--border-color);
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        align-items: center;
+        box-shadow: 0 -4px 20px rgba(44, 36, 29, 0.05);
+      }
+      html[data-theme="cyber"] .mobile-bottom-nav, body[data-theme="cyber"] .mobile-bottom-nav {
+        background: rgba(29, 26, 23, 0.96);
+      }
+      .m-nav-item {
+        border: 0;
+        background: none;
+        color: var(--text-muted);
+        font-size: 10.5px;
+        font-weight: 600;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        cursor: pointer;
+        padding: 6px 0;
+      }
+      .m-nav-item.active { color: var(--primary-color); }
+      .m-nav-item .m-icon { font-size: 19px; }
+
+      .note-modal-overlay { padding: 0; }
+      .note-modal {
+        width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+    }
+
+    .sheet-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .sheet-modal {
+      width: min(100vw, 500px);
+      background: var(--bg-primary);
+      border-radius: 20px 20px 0 0;
+      padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+      animation: slideUp 0.22s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%);
+      background: rgba(28, 25, 23, 0.94);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: calc(12.5px * var(--font-scale));
+      font-weight: 500;
+      z-index: 2000;
+      box-shadow: var(--card-shadow-lg);
+    }
+
+    .log-box {
+      background: #1c1917;
+      color: #e6a15f;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.6;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      max-height: 260px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body data-theme="warm" data-font="heiti" data-size="normal">
+
+  <div class="app-shell">
+    <!-- 1. 电脑端侧边栏 -->
+    <aside class="app-sidebar" aria-label="侧边主导航">
+      <div class="brand" onclick="switchNav('dash')">
+        <span class="brand-mark">小</span>
+        <span class="brand-copy">
+          <strong>小雅全能助手</strong>
+          <small>AI 灵感与工作台</small>
+        </span>
+      </div>
+
+      <nav class="primary-nav">
+        <p class="nav-label">工作空间</p>
+        <button class="nav-item active" id="pc-nav-dash" onclick="switchNav('dash')">
+          <span class="nav-icon">⌂</span><span>工作台首页</span>
+        </button>
+        <button class="nav-item" id="pc-nav-inbox" onclick="switchNav('inbox')">
+          <span class="nav-icon">📥</span><span>智能收件箱</span>
+        </button>
+        <button class="nav-item" id="pc-nav-money" onclick="switchNav('money')">
+          <span class="nav-icon">📊</span><span>记账凭证</span>
+        </button>
+        <button class="nav-item" id="pc-nav-proj" onclick="switchNav('proj')">
+          <span class="nav-icon">🏢</span><span>项目档案</span>
+        </button>
+        <button class="nav-item" id="pc-nav-ideas" onclick="switchNav('ideas')">
+          <span class="nav-icon">✦</span><span>随想 Memos</span>
+        </button>
+
+        <p class="nav-label" style="margin-top:20px;">系统管理</p>
+        <button class="nav-item" id="pc-nav-sett" onclick="switchNav('sett')">
+          <span class="nav-icon">⚙</span><span>系统设置</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar-mini">雅</div>
+          <div style="min-width:0;flex:1;">
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">管理员空间</div>
+            <div style="font-size:10.5px;color:var(--text-muted);">飞牛私有化存储</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. 手机端顶部 Header -->
+    <header class="mobile-header">
+      <div style="display:flex;align-items:center;gap:10px;" onclick="switchNav('dash')">
+        <span class="brand-mark" style="width:34px;height:34px;font-size:17px;border-radius:9px;">小</span>
+        <strong style="font-size:15.5px;">小雅全能助手</strong>
+      </div>
+      <button class="btn-pill" onclick="switchNav('sett')">⚙ 设置</button>
+    </header>
+
+    <!-- 3. 主工作区 -->
+    <main class="app-main">
+      <!-- 电脑端顶部 Header -->
+      <div class="notes-list-header">
+        <div class="header-left">
+          <div class="page-heading">
+            <span class="page-eyebrow" id="viewEyebrow">WORKSPACE</span>
+            <h1 class="page-title" id="viewTitle">工作台首页</h1>
+          </div>
+          <span class="notes-count" id="headerCountBadge">就绪</span>
+        </div>
+        <div class="header-right">
+          <button class="create-btn" onclick="quickCreateAction()">
+            <span>+ 快速新建</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 搜索与筛选工具栏 -->
+      <div class="notes-list-toolbar" id="mainToolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="globalFilterInput" placeholder="全局搜索便签、事项、现场、凭证..." oninput="onGlobalFilterInput()">
+        </div>
+        <div class="filter-group">
+          <select class="toolbar-select" id="quickTagFilter" onchange="onTagFilterChange()">
+            <option value="">全部标签 / 路由</option>
+            <option value="随想">随想 Memos</option>
+            <option value="inbox">收件箱</option>
+            <option value="记账">记账凭证</option>
+            <option value="#想法">#想法</option>
+            <option value="#工作">#工作</option>
+            <option value="#灵感">#灵感</option>
+          </select>
+          <select class="toolbar-select" id="quickSortFilter" onchange="onSortFilterChange()">
+            <option value="recent">最近更新</option>
+            <option value="created">创建时间</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 内容滚动区 -->
+      <div class="content-scroller">
+        <div class="content-container">
+
+          <!-- 1. 工作台首页 -->
+          <div id="section-dash">
+            <div class="grid-4" style="margin-bottom:20px;">
+              <div class="action-tile" onclick="switchNav('inbox')">
+                <div class="tile-badge">📥</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px;">智能收件箱</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">信息随手记与多模态落盘</div>
+                </div>
+              </div>
+              <div class="action-tile" onclick="switchNav('money')">
+                <div class="tile-badge">📊</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px;">记账与凭证</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">单据拍照 · 语音要素提取</div>
+                </div>
+              </div>
+              <div class="action-tile" onclick="switchNav('proj')">
+                <div class="tile-badge">🏢</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px;">项目现场档案</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">施工巡检 · 口播与进度归档</div>
+                </div>
+              </div>
+              <div class="action-tile" onclick="switchNav('ideas')">
+                <div class="tile-badge">✦</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px;">随想 Memos</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">即时便签 · 语音录音 · #标签</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 我的工程档案看板 -->
+            <div class="note-card" style="cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">我的工程与项目档案</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">点击直达专属项目现场，支持随时新增与调序</div>
+                </div>
+                <button class="btn btn-primary" style="height:32px;font-size:12px;" onclick="promptAddProjectDirect()">+ 新增项目</button>
+              </div>
+              <div id="homeProjectContainer">
+                <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">暂未创建项目，点击右上角「+ 新增项目」开始使用</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 智能收件箱 (Inbox) -->
+          <div id="section-inbox" class="hidden">
+            <div class="note-card" style="cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">快速信息捕获与归档</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">交代、琐事或资料原件，支持 AI 解析要素并确认归档</div>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <textarea id="inboxInput" placeholder="输入待办事项、工作交代或随手记..."></textarea>
+              </div>
+
+              <div style="display:flex;gap:10px;margin-bottom:12px;">
+                <button class="btn btn-secondary" type="button" style="flex:1;" onclick="openPhotoPicker('inbox')">
+                  <span>📷</span><span>拍照 / 相册</span>
+                </button>
+                <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
+                  <span>📁</span><span>选择文件</span>
+                  <input type="file" id="inboxFileGeneral" style="display:none;" onchange="onFileSelected(this, 'inboxFileName')">
+                </label>
+              </div>
+              <div id="inboxFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
+
+              <div class="voice-control-box">
+                <button class="btn-record-mic" id="inboxRecordBtn" 
+                  onmousedown="startRecording('inbox')" onmouseup="stopRecording('inbox')" 
+                  ontouchstart="startRecording('inbox')" ontouchend="stopRecording('inbox')">
+                  🎙
+                </button>
+                <div class="voice-hint" id="inboxRecordHint">按住说话 · 松开完成录音</div>
+              </div>
+
+              <div style="display:flex;gap:12px;margin-top:16px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="submitInboxCapture()">保存并让 AI 分析</button>
+                <button class="btn btn-secondary" onclick="switchNav('dash')">返回工作台</button>
+              </div>
+            </div>
+
+            <!-- 分析结果面板 -->
+            <div class="note-card hidden" id="analysisResultCard" style="margin-top:16px;cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">AI 智能分析结论</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);" id="analysisModelTag">候选归档与要素推断</div>
+                </div>
+              </div>
+              <div id="analysisDetails" style="font-size:13px;line-height:1.6;"></div>
+              <div style="display:flex;gap:10px;margin-top:16px;" id="confirmButtons"></div>
+            </div>
+          </div>
+
+          <!-- 3. 记账凭证 (Money) -->
+          <div id="section-money" class="hidden">
+            <div class="note-card" style="cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">记账凭证录入</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择类目上传发票单据或进行语音记账</div>
+                </div>
+                <button class="btn-pill" onclick="toggleAccountManager()">⚙ 类目管理</button>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">记账类目</label>
+                <select id="accountCategorySelector" class="select-box"></select>
+              </div>
+
+              <div id="accountManagerPanel" class="hidden" style="margin-bottom:14px;padding:14px;background:var(--bg-tertiary);border-radius:var(--radius-md);">
+                <div style="font-size:11.5px;font-weight:700;margin-bottom:8px;">自定义类目增删</div>
+                <div style="display:flex;gap:8px;margin-bottom:10px;">
+                  <input type="text" id="newAccountCatInput" placeholder="输入新类目 (如：工程备用金)">
+                  <button class="btn btn-primary" style="height:42px;" onclick="addAccountCategoryAction()">+ 添加</button>
+                </div>
+                <div id="accountCatChips" style="display:flex;flex-direction:column;gap:6px;max-height:140px;overflow-y:auto;"></div>
+              </div>
+
+              <div class="field-group">
+                <textarea id="moneyInput" placeholder="例如：下午在五金市场买水管花费120元微信付款"></textarea>
+              </div>
+
+              <div style="display:flex;gap:10px;margin-bottom:12px;">
+                <button class="btn btn-secondary" type="button" style="flex:1;" onclick="openPhotoPicker('money')">
+                  <span>🧾</span><span>拍照 / 发票凭证</span>
+                </button>
+                <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
+                  <span>📁</span><span>上传文件</span>
+                  <input type="file" id="moneyFileGeneral" style="display:none;" onchange="onFileSelected(this, 'moneyFileName')">
+                </label>
+              </div>
+              <div id="moneyFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
+
+              <div class="voice-control-box">
+                <button class="btn-record-mic" id="moneyRecordBtn" 
+                  onmousedown="startRecording('money')" onmouseup="stopRecording('money')" 
+                  ontouchstart="startRecording('money')" ontouchend="stopRecording('money')">
+                  🎙
+                </button>
+                <div class="voice-hint" id="moneyRecordHint">按住语音记账 · 松开完成</div>
+              </div>
+
+              <div style="display:flex;gap:12px;margin-top:16px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="submitMoneyFast()">提取并确认</button>
+                <button class="btn btn-secondary" onclick="switchNav('dash')">返回工作台</button>
+              </div>
+            </div>
+
+            <!-- 记账要素核实卡片 -->
+            <div class="note-card hidden" id="moneyConfirmCard" style="margin-top:16px;border-color:var(--warning-color);cursor:default;">
+              <div class="note-card-header">
+                <div class="note-title" style="color:var(--warning-color);">核实账目要素</div>
+              </div>
+              <div class="grid-2">
+                <div class="field-group">
+                  <label class="field-label">金额 (元)</label>
+                  <input type="number" step="0.01" id="mAmount">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">收支方向</label>
+                  <select id="mDirection" class="select-box">
+                    <option value="expense">支出</option>
+                    <option value="income">收入</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">商户 / 事由</label>
+                  <input type="text" id="mMerchant">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">支付渠道</label>
+                  <select id="mPayment" class="select-box">
+                    <option value="微信">微信支付</option>
+                    <option value="支付宝">支付宝</option>
+                    <option value="银行卡">银行卡</option>
+                    <option value="现金">现金</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:10px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="confirmMoneySave()">确认保存凭证</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('moneyConfirmCard').classList.add('hidden')">取消</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. 项目现场 (Projects) -->
+          <div id="section-proj" class="hidden">
+            <div class="note-card" style="cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">现场档案采集</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择目标工程项目，上传现场巡查照片或口播</div>
+                </div>
+                <button class="btn-pill" onclick="toggleProjectManager()">⚙ 管理项目</button>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">当前作业项目</label>
+                <select id="projectSelector" class="select-box" onchange="onProjectChanged()"></select>
+              </div>
+
+              <div id="projectManagerPanel" class="hidden" style="margin-bottom:14px;padding:14px;background:var(--bg-tertiary);border-radius:var(--radius-md);">
+                <div style="font-size:11.5px;font-weight:700;margin-bottom:8px;">项目名称管理</div>
+                <div style="display:flex;gap:8px;margin-bottom:10px;">
+                  <input type="text" id="newProjectNameInput" placeholder="输入新项目名称">
+                  <button class="btn btn-primary" style="height:42px;" onclick="addProjectAction()">+ 新建</button>
+                </div>
+                <div id="projectListChips" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;"></div>
+              </div>
+
+              <div class="field-group">
+                <textarea id="projInput" placeholder="施工进度、隐蔽工程巡视、现场交代..."></textarea>
+              </div>
+
+              <div style="display:flex;gap:10px;margin-bottom:12px;">
+                <button class="btn btn-secondary" type="button" style="flex:1;" onclick="openPhotoPicker('proj')">
+                  <span>📷</span><span>拍照 / 现场照片</span>
+                </button>
+                <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
+                  <span>📁</span><span>图纸/资料</span>
+                  <input type="file" id="projFileGeneral" style="display:none;" onchange="onFileSelected(this, 'projFileName')">
+                </label>
+              </div>
+              <div id="projFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
+
+              <div class="voice-control-box">
+                <button class="btn-record-mic" id="projRecordBtn" 
+                  onmousedown="startRecording('proj')" onmouseup="stopRecording('proj')" 
+                  ontouchstart="startRecording('proj')" ontouchend="stopRecording('proj')">
+                  🎙
+                </button>
+                <div class="voice-hint" id="projRecordHint">按住现场口播 · 松开完成</div>
+              </div>
+
+              <div style="display:flex;gap:12px;margin-top:16px;">
+                <button class="btn btn-primary" style="flex:1;" id="btnSaveProj" onclick="submitProjectDirect()">保存至项目档案</button>
+                <button class="btn btn-secondary" onclick="switchNav('dash')">返回工作台</button>
+              </div>
+            </div>
+
+            <div style="margin-top:20px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h3 style="font-size:15px;font-weight:700;" id="projectArchiveHeader">项目专属档案库</h3>
+              </div>
+              <div id="projectList" class="notes-grid">
+                <div style="color:var(--text-muted);font-size:12px;">暂无该项目归档</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. 随想 Memos (落实语音录音录入 + 瀑布流笔记卡片) -->
+          <div id="section-ideas" class="hidden">
+            <div class="note-card" style="cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">随想 Memos · 即时便签</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">支持文字、语音口述录入与 #标签 自动分类聚合</div>
+                </div>
+                <button class="btn-pill" onclick="insertMemoTag('#灵感 ')">+ #标签</button>
+              </div>
+
+              <div class="field-group">
+                <textarea id="ideaInput" placeholder="写下闪烁的点子... 或使用下方语音录制口述，输入 #想法 #灵感 #工作 自动分类聚合"></textarea>
+              </div>
+
+              <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;">
+                <span class="note-tag-chip" style="cursor:pointer;" onclick="insertMemoTag('#想法 ')">#想法</span>
+                <span class="note-tag-chip" style="cursor:pointer;" onclick="insertMemoTag('#工作 ')">#工作</span>
+                <span class="note-tag-chip" style="cursor:pointer;" onclick="insertMemoTag('#灵感 ')">#灵感</span>
+                <span class="note-tag-chip" style="cursor:pointer;" onclick="insertMemoTag('#备忘 ')">#备忘</span>
+              </div>
+
+              <div style="display:flex;gap:10px;margin-bottom:8px;">
+                <button class="btn btn-secondary" type="button" style="flex:1;" onclick="openPhotoPicker('ideas')">
+                  <span>📷</span><span>拍照 / 附图</span>
+                </button>
+                <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
+                  <span>📁</span><span>添加文件</span>
+                  <input type="file" id="ideasFileGeneral" style="display:none;" onchange="onFileSelected(this, 'ideasFileName')">
+                </label>
+              </div>
+              <div id="ideasFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:4px;"></div>
+
+              <!-- 随想 Memos 专属 88px 麦克风语音录入按键 -->
+              <div class="voice-control-box">
+                <button class="btn-record-mic" id="ideasRecordBtn" 
+                  onmousedown="startRecording('ideas')" onmouseup="stopRecording('ideas')" 
+                  ontouchstart="startRecording('ideas')" ontouchend="stopRecording('ideas')">
+                  🎙
+                </button>
+                <div class="voice-hint" id="ideasRecordHint">按住口述随想 · 松开完成录制</div>
+              </div>
+
+              <div style="display:flex;gap:12px;margin-top:12px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="submitMemoAction()">发布一条 Memo</button>
+                <button class="btn btn-secondary" onclick="switchNav('dash')">返回工作台</button>
+              </div>
+            </div>
+
+            <!-- Memos 笔记卡片瀑布流 (Notes Grid) -->
+            <div style="margin-top:20px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h3 style="font-size:15px;font-weight:700;">Memos 灵感瀑布流</h3>
+                <button class="btn-pill" onclick="loadByRoute('随想', 'ideasList')">刷新列表</button>
+              </div>
+              <div id="ideasList" class="notes-grid">
+                <div style="color:var(--text-muted);font-size:12px;">暂无 Memos 记录</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. 系统设置 (Settings) -->
+          <div id="section-sett" class="hidden">
+            <div class="grid-2">
+              <div class="note-card" style="cursor:default;">
+                <div class="note-title">界面主题配色</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择符合使用习惯的主题风格（含 Notepad 经典大地色）</div>
+                <div style="margin-top:12px;">
+                  <select id="settingTheme" class="select-box" onchange="onThemeDropdownChange()">
+                    <option value="warm" selected>🍂 温暖胡桃 (Warm Walnut - 经典)</option>
+                    <option value="business">💼 商务现代 (Business Slate)</option>
+                    <option value="vibrant">🎈 活泼落日 (Vibrant Coral)</option>
+                    <option value="cyber">⚡ 赛博暗黑 (Cyber Dark)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="note-card" style="cursor:default;">
+                <div class="note-title">显示字体</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择正文字体排版规范</div>
+                <div style="margin-top:12px;">
+                  <select id="settingFont" class="select-box" onchange="onFontDropdownChange()">
+                    <option value="heiti">🔤 现代黑体 (清晰锐利)</option>
+                    <option value="simsun">📖 经典宋体 (典雅工整)</option>
+                    <option value="fangsong">✍ 文艺仿宋 (秀丽挺拔)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="note-card" style="cursor:default;">
+                <div class="note-title">字号缩放</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">调整整体文字大小与屏幕占比</div>
+                <div style="margin-top:12px;">
+                  <select id="settingFontSize" class="select-box" onchange="onSizeDropdownChange()">
+                    <option value="small">小号 (紧凑精细)</option>
+                    <option value="normal" selected>中号 (标准默认)</option>
+                    <option value="large">大号 (清晰大字)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="note-card" style="cursor:default;">
+                <div class="note-title">系统语言</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">切换界面提示语言</div>
+                <div style="margin-top:12px;">
+                  <select id="settingLang" class="select-box" onchange="onLangDropdownChange()">
+                    <option value="zh" selected>简体中文 (Chinese)</option>
+                    <option value="en">English (英文)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid-2" style="margin-top:16px;">
+              <div class="note-card" style="cursor:default;">
+                <div class="note-title">模型服务</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择常用 AI 服务提供商</div>
+                <div style="margin-top:12px;">
+                  <select id="aiServiceProvider" class="select-box" onchange="onAiProviderChanged()">
+                    <option value="sensenova">SenseNova 商汤日日新</option>
+                    <option value="bailian">Bailian Coding (阿里云百炼)</option>
+                    <option value="openai">OpenAI Official</option>
+                    <option value="deepseek">DeepSeek 官方 API</option>
+                    <option value="custom">自定义 OpenAI 兼容接口</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="note-card" style="cursor:default;">
+                <div class="note-title">模型列表</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择当前激活的模型</div>
+                <div style="margin-top:12px;">
+                  <select id="aiModelSelector" class="select-box" onchange="onAiModelSelected()">
+                    <option value="SenseChat-5">SenseChat-5 (日日新旗舰)</option>
+                    <option value="SenseChat-5-Vision">SenseChat-5-Vision (多模态)</option>
+                    <option value="qwen2.5-coder-32b-instruct">qwen2.5-coder-32b-instruct</option>
+                    <option value="deepseek-v3">deepseek-v3</option>
+                  </select>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                  <input type="text" id="customModelInput" placeholder="手动添加模型并回车..." onkeydown="if(event.key==='Enter') addCustomModelAction()">
+                  <button class="btn btn-secondary" style="height:42px;" onclick="addCustomModelAction()">+ 添加</button>
+                </div>
+              </div>
+
+              <div class="note-card" style="cursor:default;">
+                <div class="note-title">连接地址</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="aiEndpointSubtitle">默认: https://token.sensenova.cn/v1</div>
+                <div style="margin-top:12px;">
+                  <input type="text" id="cfgAiUrl" value="https://token.sensenova.cn/v1" oninput="markSettingDirty()">
+                </div>
+              </div>
+
+              <div class="note-card" style="cursor:default;">
+                <div class="note-title">认证凭据</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">API Key 安全密钥（飞牛端加密留存）</div>
+                <div style="display:flex;gap:8px;margin-top:12px;">
+                  <input type="password" id="cfgAiKey" placeholder="请输入 API Key" oninput="markSettingDirty()" style="flex:1;">
+                  <button class="btn btn-secondary" style="height:42px;" onclick="togglePasswordVisibility('cfgAiKey', this)">👁</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid-2" style="margin-top:16px;">
+              <div class="note-card" style="cursor:default;">
+                <div class="note-card-header">
+                  <div>
+                    <div class="note-title">全域记录与归档流</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">所有分类的历史明细与全文检索</div>
+                  </div>
+                  <button class="btn-pill" onclick="toggleArchivesPanel()">展开 / 刷新</button>
+                </div>
+                <div id="settingsArchivePanel" class="hidden">
+                  <input type="text" id="globalSearchInput" placeholder="模糊检索任意历史记录..." oninput="debounceSearch()" style="margin-bottom:10px;">
+                  <div id="recentList" style="max-height:280px;overflow-y:auto;"><div style="color:var(--text-muted);font-size:12px;">加载中...</div></div>
+                </div>
+              </div>
+
+              <div class="note-card" style="cursor:default;">
+                <div class="note-card-header">
+                  <div>
+                    <div class="note-title">系统运行日志</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">容器底层采集、存储与分析事件</div>
+                  </div>
+                  <button class="btn-pill" onclick="toggleLogsPanel()">实时日志</button>
+                </div>
+                <div id="settingsLogsPanel" class="hidden">
+                  <div class="log-box" id="logTerminalContent">正在读取服务器实时日志...</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="note-card" style="margin-top:16px;cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">支持与关于</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">小雅全能助手 · 纯净版 v0.8.0 Pro</div>
+                </div>
+              </div>
+              <div class="grid-2">
+                <div style="border:1px dashed var(--border-color);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toast('👩‍💼 官方客服顾问通道正在接入中...')">
+                  <div style="font-size:28px;">👩‍💼</div>
+                  <div>
+                    <div style="font-weight:700;font-size:13px;">联系客服</div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">技术顾问 / 咨询答疑</div>
+                  </div>
+                </div>
+                <div style="border:1px dashed var(--border-color);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toast('☕ 感谢您的心意，请作者喝杯咖啡打赏通道即将开放！')">
+                  <div style="font-size:28px;">☕</div>
+                  <div>
+                    <div style="font-weight:700;font-size:13px;">支持与打赏</div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">请作者喝杯咖啡 · 完全自愿</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:20px;padding-bottom:30px;">
+              <button class="btn btn-secondary" onclick="resetSettings()">取消更改</button>
+              <button class="btn btn-primary" onclick="saveAllSettings()">保存配置并生效</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- 4. 手机端底部毛玻璃 Tab 导航条 -->
+    <nav class="mobile-bottom-nav">
+      <button class="m-nav-item active" id="m-nav-dash" onclick="switchNav('dash')">
+        <span class="m-icon">⌂</span><span>首页</span>
+      </button>
+      <button class="m-nav-item" id="m-nav-inbox" onclick="switchNav('inbox')">
+        <span class="m-icon">📥</span><span>收件箱</span>
+      </button>
+      <button class="m-nav-item" id="m-nav-money" onclick="switchNav('money')">
+        <span class="m-icon">📊</span><span>记账</span>
+      </button>
+      <button class="m-nav-item" id="m-nav-proj" onclick="switchNav('proj')">
+        <span class="m-icon">🏢</span><span>项目</span>
+      </button>
+      <button class="m-nav-item" id="m-nav-ideas" onclick="switchNav('ideas')">
+        <span class="m-icon">✦</span><span>随想</span>
+      </button>
+      <button class="m-nav-item" id="m-nav-sett" onclick="switchNav('sett')">
+        <span class="m-icon">⚙</span><span>设置</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ==========================================================================
+       5. 模态窗口：落到实处的「查看详情 (Note View)」与「实时编辑 (Note Edit)」
+       ========================================================================== -->
+  <div class="note-modal-overlay hidden" id="noteDetailModal" onclick="closeNoteModal(event)">
+    <div class="note-modal" onclick="event.stopPropagation()">
+      
+      <!-- 模态顶部 -->
+      <div class="modal-header">
+        <div class="modal-title-area">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="note-tag-chip" id="modalRouteBadge">随想</span>
+            <span style="font-size:12px;color:var(--text-muted);" id="modalRecordIdTag"></span>
+          </div>
+          <h2 style="margin:6px 0 0;font-size:17px;font-weight:700;" id="modalDisplayTitle">查看详情</h2>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary" style="height:34px;padding:0 12px;font-size:12px;" id="modalToggleEditBtn" onclick="toggleModalEditMode()">
+            ✏️ 编辑
+          </button>
+          <button class="btn-pill" style="height:34px;width:34px;padding:0;display:grid;place-items:center;font-size:16px;" onclick="closeNoteModalDirect()">✕</button>
+        </div>
+      </div>
+
+      <!-- 模态正文 -->
+      <div class="modal-body">
+        <!-- 查看态 -->
+        <div id="modalViewContainer">
+          <div class="view-meta-bar" id="modalMetaBar"></div>
+          <div class="view-content-box" id="modalViewContent"></div>
+          <div id="modalAttachmentBox" style="margin-top:14px;"></div>
+        </div>
+
+        <!-- 编辑态 (支持修改正文、标题、路由分类) -->
+        <div id="modalEditContainer" class="hidden">
+          <div class="field-group">
+            <label class="field-label">归属分类 / 路由</label>
+            <input type="text" id="editModalRoute" placeholder="例如：随想、项目:阳光花园、inbox、记账">
+          </div>
+          <div class="field-group">
+            <label class="field-label">笔记正文内容 (支持 #标签)</label>
+            <textarea id="editModalContent" style="height:180px;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 模态底部 -->
+      <div class="modal-footer">
+        <div>
+          <button class="btn-pill" style="color:var(--danger-color);height:34px;" onclick="deleteCurrentModalRecord()">🗑 删除此项</button>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary" style="height:36px;" onclick="closeNoteModalDirect()">关闭</button>
+          <button class="btn btn-primary hidden" id="modalSaveBtn" style="height:36px;" onclick="saveModalEditChanges()">💾 保存修改</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 隐藏文件/相机输入 -->
+  <input type="file" id="hiddenCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="onPhotoSelected(this)">
+  <input type="file" id="hiddenAlbumInput" accept="image/*" style="display:none;" onchange="onPhotoSelected(this)">
+
+  <!-- 拍照/相册 Action Sheet -->
+  <div class="sheet-overlay hidden" id="photoActionSheet" onclick="closePhotoPicker(event)">
+    <div class="sheet-modal" onclick="event.stopPropagation()">
+      <div style="font-size:12.5px;color:var(--text-muted);text-align:center;margin-bottom:14px;">选择照片来源</div>
+      <button class="btn btn-secondary" style="width:100%;height:46px;margin-bottom:8px;" onclick="triggerDirectCamera()">
+        <span>📸</span><span>直接拍照 (调起手机相机)</span>
+      </button>
+      <button class="btn btn-secondary" style="width:100%;height:46px;margin-bottom:8px;" onclick="triggerDirectAlbum()">
+        <span>🖼</span><span>从手机相册选择</span>
+      </button>
+      <button class="btn btn-secondary" style="width:100%;height:42px;background:var(--bg-secondary);" onclick="closePhotoPicker()">取消</button>
+    </div>
+  </div>
+
+  <script>
+    let currentRecordId = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordedAudioBlob = null;
+    let activeTarget = null;
+    let selectedFilesMap = {};
+    let searchDebounceTimer = null;
+
+    let projectList = [];
+    let currentSelectedProject = "";
+    let accountCategoryList = ["日常餐饮", "差旅交通", "工程采购", "办公开销"];
+    let isSettingDirty = false;
+
+    // 当前模态正在查看/编辑的记录对象与状态
+    let activeModalRecord = null;
+    let isModalEditMode = false;
+    let cachedRecordsMap = {};
+
+    const AI_PROVIDERS = {
+      sensenova: {
+        name: "SenseNova 商汤日日新",
+        endpoint: "https://token.sensenova.cn/v1",
+        models: ["SenseChat-5", "SenseChat-5-Vision", "SenseChat-Lite"]
+      },
+      bailian: {
+        name: "Bailian Coding",
+        endpoint: "https://coding.dashscope.aliyuncs.com/v1",
+        models: ["qwen2.5-coder-32b-instruct", "qwen-max", "qwen-plus"]
+      },
+      openai: {
+        name: "OpenAI Official",
+        endpoint: "https://api.openai.com/v1",
+        models: ["gpt-4o", "gpt-4o-mini", "o3-mini"]
+      },
+      deepseek: {
+        name: "DeepSeek Official",
+        endpoint: "https://api.deepseek.com/v1",
+        models: ["deepseek-chat", "deepseek-reasoner"]
+      },
+      custom: {
+        name: "自定义服务",
+        endpoint: "",
+        models: []
+      }
+    };
+
+    function toast(msg) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.innerText = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2200);
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerText = '🔒';
+      } else {
+        input.type = 'password';
+        btn.innerText = '👁';
+      }
+    }
+
+    function markSettingDirty() { isSettingDirty = true; }
+
+    function onThemeDropdownChange() {
+      const val = document.getElementById('settingTheme').value;
+      applyDomAppearance(val, document.getElementById('settingFont').value, document.getElementById('settingFontSize').value);
+      markSettingDirty();
+      toast('主题预览已生效：' + val);
+    }
+    function onFontDropdownChange() {
+      const val = document.getElementById('settingFont').value;
+      applyDomAppearance(document.getElementById('settingTheme').value, val, document.getElementById('settingFontSize').value);
+      markSettingDirty();
+    }
+    function onSizeDropdownChange() {
+      const val = document.getElementById('settingFontSize').value;
+      applyDomAppearance(document.getElementById('settingTheme').value, document.getElementById('settingFont').value, val);
+      markSettingDirty();
+    }
+    function onLangDropdownChange() { markSettingDirty(); }
+
+    function applyDomAppearance(theme, font, size) {
+      document.documentElement.setAttribute('data-theme', theme);
+      document.body.setAttribute('data-theme', theme);
+      document.documentElement.setAttribute('data-font', font);
+      document.body.setAttribute('data-font', font);
+      document.documentElement.setAttribute('data-size', size);
+      document.body.setAttribute('data-size', size);
+    }
+
+    /* 视图导航 */
+    function switchNav(key) {
+      const sections = ['dash', 'inbox', 'money', 'proj', 'ideas', 'sett'];
+      sections.forEach(s => {
+        const el = document.getElementById('section-' + s);
+        if (el) el.classList.toggle('hidden', s !== key);
+
+        const pcBtn = document.getElementById('pc-nav-' + s);
+        if (pcBtn) pcBtn.classList.toggle('active', s === key);
+
+        const mBtn = document.getElementById('m-nav-' + s);
+        if (mBtn) mBtn.classList.toggle('active', s === key);
+      });
+
+      const meta = {
+        dash: { eyebrow: 'WORKSPACE', title: '工作台首页', count: '就绪' },
+        inbox: { eyebrow: 'CAPTURE', title: '智能收件箱', count: '快速采集' },
+        money: { eyebrow: 'ACCOUNTING', title: '记账凭证', count: '发票单据' },
+        proj: { eyebrow: 'PROJECTS', title: '项目现场档案', count: '施工巡检' },
+        ideas: { eyebrow: 'MEMOS', title: '随想 Memos', count: '灵感便签' },
+        sett: { eyebrow: 'SETTINGS', title: '系统设置与管理', count: '偏好配置' }
+      };
+
+      const cur = meta[key] || meta.dash;
+      const eyeEl = document.getElementById('viewEyebrow');
+      const titEl = document.getElementById('viewTitle');
+      const countEl = document.getElementById('headerCountBadge');
+      if (eyeEl) eyeEl.innerText = cur.eyebrow;
+      if (titEl) titEl.innerText = cur.title;
+      if (countEl) countEl.innerText = cur.count;
+
+      if (key === 'ideas') loadByRoute('随想', 'ideasList');
+      if (key === 'proj') {
+        loadProjects();
+        if (currentSelectedProject) loadByRoute(currentSelectedProject, 'projectList');
+      }
+      if (key === 'money') loadAccountCategories();
+    }
+
+    function quickCreateAction() {
+      switchNav('inbox');
+      document.getElementById('inboxInput').focus();
+    }
+
+    function onGlobalFilterInput() {
+      const kw = document.getElementById('globalFilterInput').value.trim();
+      loadRecent(kw);
+      const sPanel = document.getElementById('settingsArchivePanel');
+      if (sPanel && sPanel.classList.contains('hidden')) {
+        toggleArchivesPanel();
+      }
+    }
+    function onTagFilterChange() {
+      const tag = document.getElementById('quickTagFilter').value;
+      if (tag) {
+        if (tag === '随想') switchNav('ideas');
+        else if (tag === 'inbox') switchNav('inbox');
+        else if (tag === '记账') switchNav('money');
+        else {
+          switchNav('ideas');
+          loadRecent(tag);
+        }
+      }
+    }
+    function onSortFilterChange() {
+      toast('已按时间顺序排列');
+    }
+
+    /* 拍照/相册 Action Sheet */
+    function openPhotoPicker(target) {
+      activeTarget = target;
+      document.getElementById('photoActionSheet').classList.remove('hidden');
+    }
+    function closePhotoPicker() {
+      document.getElementById('photoActionSheet').classList.add('hidden');
+    }
+    function triggerDirectCamera() {
+      closePhotoPicker();
+      document.getElementById('hiddenCameraInput').click();
+    }
+    function triggerDirectAlbum() {
+      closePhotoPicker();
+      document.getElementById('hiddenAlbumInput').click();
+    }
+    function onPhotoSelected(input) {
+      if (input.files && input.files[0] && activeTarget) {
+        const file = input.files[0];
+        selectedFilesMap[activeTarget] = file;
+        const el = document.getElementById(activeTarget + 'FileName');
+        if (el) el.innerText = '📷 已添加照片: ' + file.name;
+        toast('照片已添加: ' + file.name);
+      }
+    }
+    function onFileSelected(input, labelId) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const target = labelId.replace('FileName', '');
+        selectedFilesMap[target] = file;
+        document.getElementById(labelId).innerText = '📁 已选文件: ' + file.name;
+        toast('文件已添加: ' + file.name);
+      }
+    }
+
+    /* 录音逻辑 (收件箱/记账/现场/随想全部统一配备) */
+    async function startRecording(target) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        activeTarget = target;
+
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          selectedFilesMap[target] = recordedAudioBlob;
+          const el = document.getElementById(target + 'FileName');
+          if (el) el.innerText = '🎙 录音就绪 (' + Math.round(recordedAudioBlob.size / 1024) + ' KB)';
+          const hint = document.getElementById(target + 'RecordHint');
+          if (hint) hint.innerText = '✓ 录音就绪，点击下方保存提交';
+          toast('录音已捕获，原件安全留存');
+        };
+
+        mediaRecorder.start();
+        const btn = document.getElementById(target + 'RecordBtn');
+        if (btn) btn.classList.add('recording');
+        const hint = document.getElementById(target + 'RecordHint');
+        if (hint) hint.innerText = '🔴 正在录音... 松开即结束';
+      } catch (err) {
+        toast('麦克风权限提示: ' + err.message);
+      }
+    }
+    function stopRecording(target) {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      }
+      const btn = document.getElementById(target + 'RecordBtn');
+      if (btn) btn.classList.remove('recording');
+    }
+
+    /* Memos 标签插入与提交 (支持语音、照片与文字) */
+    function insertMemoTag(tag) {
+      const input = document.getElementById('ideaInput');
+      input.value = tag + input.value;
+      input.focus();
+    }
+    async function submitMemoAction() {
+      const txt = document.getElementById('ideaInput').value.trim();
+      const file = selectedFilesMap['ideas'];
+      if (!txt && !file) return toast('请输入随想内容或录音/上传照片');
+
+      const fd = new FormData();
+      if (txt) fd.append('text', txt);
+      if (file) fd.append('file', file, file.name || (file instanceof Blob ? 'voice-memo.webm' : 'memo-attachment.jpg'));
+      fd.append('route', '随想');
+
+      try {
+        toast('正在保存 Memo...');
+        const res = await fetch('/api/capture', {
+          method: 'POST',
+          headers: { 'X-Secretary-Route': '随想' },
+          body: fd
+        });
+        const d = await res.json();
+        if (d.ok) {
+          toast('🎉 已沉淀为一条 Memo！');
+          document.getElementById('ideaInput').value = '';
+          document.getElementById('ideasFileName').innerText = '';
+          document.getElementById('ideasRecordHint').innerText = '按住口述随想 · 松开完成录制';
+          delete selectedFilesMap['ideas'];
+          loadByRoute('随想', 'ideasList');
+        }
+      } catch (e) {
+        toast('发布失败: ' + e.message);
+      }
+    }
+
+    /* ==========================================================================
+       6. 查看与编辑功能的深度落实 (对齐 Notepad 查看与编辑)
+       ========================================================================== */
+    function openNoteDetailModal(recordId) {
+      const record = cachedRecordsMap[recordId];
+      if (!record) return toast('未找到记录详情');
+
+      activeModalRecord = record;
+      isModalEditMode = false;
+      renderModalState();
+      document.getElementById('noteDetailModal').classList.remove('hidden');
+    }
+
+    function closeNoteModal(event) {
+      if (event.target === document.getElementById('noteDetailModal')) {
+        closeNoteModalDirect();
+      }
+    }
+    function closeNoteModalDirect() {
+      document.getElementById('noteDetailModal').classList.add('hidden');
+      activeModalRecord = null;
+      isModalEditMode = false;
+    }
+
+    function toggleModalEditMode() {
+      isModalEditMode = !isModalEditMode;
+      renderModalState();
+    }
+
+    function renderModalState() {
+      const r = activeModalRecord;
+      if (!r) return;
+
+      const editBtn = document.getElementById('modalToggleEditBtn');
+      const saveBtn = document.getElementById('modalSaveBtn');
+      const viewArea = document.getElementById('modalViewContainer');
+      const editArea = document.getElementById('modalEditContainer');
+
+      document.getElementById('modalRouteBadge').innerText = r.route || '随想';
+      document.getElementById('modalRecordIdTag').innerText = 'ID: ' + (r.id ? r.id.substring(0, 8) : '-');
+
+      if (!isModalEditMode) {
+        // 查看模式 (Note View)
+        editBtn.innerText = '✏️ 编辑';
+        saveBtn.classList.add('hidden');
+        viewArea.classList.remove('hidden');
+        editArea.classList.add('hidden');
+        document.getElementById('modalDisplayTitle').innerText = '查看详情';
+
+        const timeStr = r.received_at ? r.received_at.replace('T', ' ').substring(0, 19) : '-';
+        document.getElementById('modalMetaBar').innerHTML = `
+          <span>📅 创建: ${timeStr}</span>
+          <span>📂 归属: <b>${r.route || '随想'}</b></span>
+        `;
+
+        let content = r.original_text || '(多媒体原件存档)';
+        let highlighted = content.replace(/(#[^\s#]+)/g, '<span class="note-tag-chip">$1</span>');
+        document.getElementById('modalViewContent').innerHTML = highlighted;
+
+        let attachHtml = '';
+        if (r.raw_file) {
+          const isAudio = r.raw_file.endsWith('.webm') || r.raw_file.endsWith('.mp3') || r.raw_file.endsWith('.wav');
+          if (isAudio) {
+            attachHtml = `
+              <div style="background:var(--bg-tertiary);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+                <div style="font-weight:700;font-size:12px;margin-bottom:8px;">🎙 原始语音录音:</div>
+                <audio controls src="/api/files/${r.raw_file}" style="width:100%;height:36px;"></audio>
+                <div style="margin-top:6px;font-size:11px;color:var(--text-muted);"><a href="/api/files/${r.raw_file}" target="_blank" style="color:var(--primary-color);">下载音频原件 (${r.original_filename || 'voice.webm'})</a></div>
+              </div>
+            `;
+          } else {
+            attachHtml = `
+              <div style="background:var(--bg-tertiary);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+                <div style="font-weight:700;font-size:12px;margin-bottom:6px;">📎 原始多模态附件:</div>
+                <div><a href="/api/files/${r.raw_file}" target="_blank" style="color:var(--primary-color);font-weight:600;text-decoration:none;">查看/下载原始文件 (${r.original_filename || 'attachment'})</a></div>
+              </div>
+            `;
+          }
+        }
+        document.getElementById('modalAttachmentBox').innerHTML = attachHtml;
+
+      } else {
+        // 编辑模式 (Note Edit)
+        editBtn.innerText = '👁 预览';
+        saveBtn.classList.remove('hidden');
+        viewArea.classList.add('hidden');
+        editArea.classList.remove('hidden');
+        document.getElementById('modalDisplayTitle').innerText = '编辑笔记内容';
+
+        document.getElementById('editModalRoute').value = r.route || '随想';
+        document.getElementById('editModalContent').value = r.original_text || '';
+      }
+    }
+
+    async function saveModalEditChanges() {
+      if (!activeModalRecord) return;
+      const newRoute = document.getElementById('editModalRoute').value.trim() || '随想';
+      const newText = document.getElementById('editModalContent').value;
+
+      try {
+        toast('正在保存更改...');
+        const res = await fetch(`/api/records/${activeModalRecord.id}/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ route: newRoute, text: newText })
+        });
+        const d = await res.json();
+        if (d.ok) {
+          toast('✅ 更改已成功保存生效！');
+          activeModalRecord.route = newRoute;
+          activeModalRecord.original_text = newText;
+          cachedRecordsMap[activeModalRecord.id] = activeModalRecord;
+          isModalEditMode = false;
+          renderModalState();
+
+          // 局部无缝刷新页面列表
+          loadByRoute('随想', 'ideasList');
+          if (currentSelectedProject) loadByRoute(currentSelectedProject, 'projectList');
+        } else {
+          toast('保存失败: ' + d.error);
+        }
+      } catch (e) {
+        toast('网络异常: ' + e.message);
+      }
+    }
+
+    async function deleteCurrentModalRecord() {
+      if (!activeModalRecord) return;
+      if (!confirm(`确定要彻底删除该条记录吗？\n（原件与分析档案将同步移除）`)) return;
+
+      try {
+        const res = await fetch(`/api/records/${activeModalRecord.id}/delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const d = await res.json();
+        if (d.ok) {
+          toast('已成功删除');
+          closeNoteModalDirect();
+          loadByRoute('随想', 'ideasList');
+          if (currentSelectedProject) loadByRoute(currentSelectedProject, 'projectList');
+          loadRecent();
+        } else {
+          toast('删除失败: ' + d.error);
+        }
+      } catch (e) {
+        toast('异常: ' + e.message);
+      }
+    }
+
+    /* 渲染 Notepad 风格笔记卡片 (点击卡片直达「查看与编辑」模态窗口) */
+    function renderNoteCardItem(r) {
+      cachedRecordsMap[r.id] = r;
+      let routeName = r.route || '随想';
+      let metaInfo = '';
+      if (r.analysis && r.analysis.confirmed_fields) {
+        const f = r.analysis.confirmed_fields;
+        metaInfo = `<span>¥${f.amount||'-'} (${f.merchant||'未备注'})</span>`;
+      } else if (r.analysis && r.analysis.candidate_fields && r.analysis.candidate_fields.amount) {
+        metaInfo = `<span>AI金额: ¥${r.analysis.candidate_fields.amount}</span>`;
+      }
+
+      let fileBadge = '';
+      if (r.raw_file) {
+        const isAudio = r.raw_file.endsWith('.webm') || r.raw_file.endsWith('.mp3');
+        fileBadge = `<span style="font-size:11px;color:var(--primary-color);margin-left:6px;">${isAudio?'🎙 语音':'📎 附件'}</span>`;
+      }
+
+      let content = r.original_text || '(多媒体原件存档)';
+      let highlighted = content.replace(/(#[^\s#]+)/g, '<span class="note-tag-chip">$1</span>');
+      const timeStr = r.received_at ? r.received_at.substring(5, 16).replace('T', ' ') : '';
+      const titleStr = content.length > 20 ? content.substring(0, 20) + '...' : content;
+
+      return `
+        <div class="note-card" onclick="openNoteDetailModal('${r.id}')">
+          <div>
+            <div class="note-card-header">
+              <h3 class="note-title">${titleStr}</h3>
+              <span class="note-tag-chip">${routeName}</span>
+            </div>
+            <div class="note-preview">${highlighted}</div>
+          </div>
+          <div class="note-footer">
+            <span class="note-time">🕒 ${timeStr} ${fileBadge}</span>
+            <div style="font-size:11px;color:var(--text-muted);">${metaInfo || '点击查看/编辑'}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* 其它原有业务功能保留 */
+    async function loadProjects() {
+      try {
+        const res = await fetch('/api/projects');
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.projects)) {
+          projectList = data.projects;
+          if (projectList.length > 0 && !projectList.includes(currentSelectedProject)) {
+            currentSelectedProject = projectList[0];
+          }
+          renderHomeProjects();
+          renderProjectSelector();
+          renderProjectManagerChips();
+        }
+      } catch(e) {}
+    }
+    function renderHomeProjects() {
+      const c = document.getElementById('homeProjectContainer');
+      if (!c) return;
+      if (!projectList || projectList.length === 0) {
+        c.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">暂未创建项目，点击右上角「+ 新增项目」开始使用</div>';
+        return;
+      }
+      c.innerHTML = projectList.map((name, idx) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:14px;margin-bottom:8px;">
+          <div style="flex:1;cursor:pointer;" onclick="selectAndEnterProject('${name}')">
+            <div style="font-weight:700;font-size:14px;color:var(--text-primary);">🏢 ${name}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">点击进入专属档案与现场录入</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            ${idx > 0 ? `<button class="btn-pill" onclick="moveProjectOrder(${idx}, -1)">▲</button>` : ''}
+            ${idx < projectList.length - 1 ? `<button class="btn-pill" onclick="moveProjectOrder(${idx}, 1)">▼</button>` : ''}
+            <button class="btn-pill" onclick="promptEditProject('${name}')">重命名</button>
+            <button class="btn-pill" style="color:var(--danger-color);" onclick="deleteProjectAction('${name}')">删除</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    function selectAndEnterProject(name) {
+      currentSelectedProject = name;
+      switchNav('proj');
+      const sel = document.getElementById('projectSelector');
+      if (sel) sel.value = name;
+      onProjectChanged();
+    }
+    function renderProjectSelector() {
+      const sel = document.getElementById('projectSelector');
+      if (!sel) return;
+      if (projectList.length === 0) {
+        sel.innerHTML = '<option value="">(暂无项目，请先新建)</option>';
+        updateProjectUI();
+        return;
+      }
+      sel.innerHTML = projectList.map(p => `<option value="${p}" ${p === currentSelectedProject ? 'selected' : ''}>🏢 项目：${p}</option>`).join('');
+      updateProjectUI();
+    }
+    function onProjectChanged() {
+      const sel = document.getElementById('projectSelector');
+      if (sel && sel.value) {
+        currentSelectedProject = sel.value;
+        updateProjectUI();
+        loadByRoute(currentSelectedProject, 'projectList');
+      }
+    }
+    function updateProjectUI() {
+      const cur = currentSelectedProject || '未选项目';
+      const hdr = document.getElementById('projectArchiveHeader');
+      if (hdr) hdr.innerText = `[${cur}] 专属档案库`;
+      const btn = document.getElementById('btnSaveProj');
+      if (btn) btn.innerText = `保存至 [${cur}]`;
+    }
+    function toggleProjectManager() {
+      const p = document.getElementById('projectManagerPanel');
+      if (p) {
+        p.classList.toggle('hidden');
+        renderProjectManagerChips();
+      }
+    }
+    function renderProjectManagerChips() {
+      const container = document.getElementById('projectListChips');
+      if (!container) return;
+      if (projectList.length === 0) {
+        container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px;">暂无项目</div>';
+        return;
+      }
+      container.innerHTML = projectList.map((name, idx) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-primary);padding:8px 12px;border-radius:8px;border:1px solid var(--border-color);font-size:12px;">
+          <span style="font-weight:700;">${name}</span>
+          <div style="display:flex;gap:6px;">
+            ${idx > 0 ? `<button class="btn-pill" onclick="moveProjectOrder(${idx}, -1)">▲</button>` : ''}
+            ${idx < projectList.length - 1 ? `<button class="btn-pill" onclick="moveProjectOrder(${idx}, 1)">▼</button>` : ''}
+            <button class="btn-pill" onclick="promptEditProject('${name}')">修改</button>
+            <button class="btn-pill" style="color:var(--danger-color);" onclick="deleteProjectAction('${name}')">删除</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    async function promptAddProjectDirect() {
+      const name = prompt('请输入新项目名称 (如：阳光花园二期、滨州物流园)：');
+      if (name && name.trim()) await executeAddProject(name.trim());
+    }
+    async function addProjectAction() {
+      const input = document.getElementById('newProjectNameInput');
+      const val = (input ? input.value : '').trim();
+      if (!val) return toast('请输入新项目名称');
+      await executeAddProject(val);
+      if (input) input.value = '';
+    }
+    async function executeAddProject(name) {
+      try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'add', name: name })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('✅ 已创建新项目: ' + name);
+          currentSelectedProject = name;
+          await loadProjects();
+        }
+      } catch(e) {}
+    }
+    async function promptEditProject(oldName) {
+      const newName = prompt(`修改项目 [${oldName}] 的名称为：`, oldName);
+      if (!newName || newName.trim() === oldName) return;
+      try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'edit', old_name: oldName, name: newName.trim() })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('✅ 项目已更名');
+          if (currentSelectedProject === oldName) currentSelectedProject = newName.trim();
+          await loadProjects();
+        }
+      } catch(e) {}
+    }
+    async function deleteProjectAction(name) {
+      if (!confirm(`确定要移除项目 [${name}] 吗？\n（已保存的工程原始文件安全保留）`)) return;
+      try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'delete', name: name })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('已移除项目: ' + name);
+          await loadProjects();
+        }
+      } catch(e) {}
+    }
+    async function moveProjectOrder(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= projectList.length) return;
+      const copy = [...projectList];
+      const item = copy.splice(index, 1)[0];
+      copy.splice(targetIndex, 0, item);
+      try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'reorder', projects: copy })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          projectList = copy;
+          renderHomeProjects();
+          renderProjectSelector();
+          renderProjectManagerChips();
+          toast('排序已调整');
+        }
+      } catch(e) {}
+    }
+
+    /* 记账分类 */
+    async function loadAccountCategories() {
+      try {
+        const res = await fetch('/api/accounts');
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.categories)) {
+          accountCategoryList = data.categories;
+          renderAccountCategorySelector();
+          renderAccountCategoryChips();
+        }
+      } catch(e) {}
+    }
+    function renderAccountCategorySelector() {
+      const sel = document.getElementById('accountCategorySelector');
+      if (!sel) return;
+      sel.innerHTML = accountCategoryList.map(c => `<option value="${c}">📑 分类：${c}</option>`).join('');
+    }
+    function toggleAccountManager() {
+      const p = document.getElementById('accountManagerPanel');
+      if (p) {
+        p.classList.toggle('hidden');
+        renderAccountCategoryChips();
+      }
+    }
+    function renderAccountCategoryChips() {
+      const container = document.getElementById('accountCatChips');
+      if (!container) return;
+      container.innerHTML = accountCategoryList.map(name => `
+        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-primary);padding:8px 12px;border-radius:8px;border:1px solid var(--border-color);font-size:12px;">
+          <span style="font-weight:700;">${name}</span>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-pill" onclick="promptEditAccountCat('${name}')">修改</button>
+            <button class="btn-pill" style="color:var(--danger-color);" onclick="deleteAccountCatAction('${name}')">删除</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    async function addAccountCategoryAction() {
+      const input = document.getElementById('newAccountCatInput');
+      const val = (input ? input.value : '').trim();
+      if (!val) return toast('请输入类目名称');
+      try {
+        const res = await fetch('/api/accounts', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'add', name: val })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('✅ 已增加类目: ' + val);
+          input.value = '';
+          await loadAccountCategories();
+        }
+      } catch(e) {}
+    }
+    async function promptEditAccountCat(oldName) {
+      const newName = prompt(`修改记账类目 [${oldName}] 为：`, oldName);
+      if (!newName || newName.trim() === oldName) return;
+      try {
+        const res = await fetch('/api/accounts', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'edit', old_name: oldName, name: newName.trim() })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('✅ 类目已修改');
+          await loadAccountCategories();
+        }
+      } catch(e) {}
+    }
+    async function deleteAccountCatAction(name) {
+      if (!confirm(`确定要移除类目 [${name}] 吗？`)) return;
+      try {
+        const res = await fetch('/api/accounts', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'delete', name: name })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('已移除类目: ' + name);
+          await loadAccountCategories();
+        }
+      } catch(e) {}
+    }
+
+    /* 数据捕获 */
+    async function submitInboxCapture() {
+      const txt = document.getElementById('inboxInput').value.trim();
+      const file = selectedFilesMap['inbox'];
+      if (!txt && !file) return toast('请输入文字或录制语音/添加照片');
+
+      const fd = new FormData();
+      if (txt) fd.append('text', txt);
+      if (file) fd.append('file', file, file.name || (file instanceof Blob ? 'voice-inbox.webm' : 'attachment'));
+      fd.append('route', 'inbox');
+
+      try {
+        toast('正在保存原始数据...');
+        const res = await fetch('/api/capture', { method: 'POST', headers: { 'X-Secretary-Route': 'inbox' }, body: fd });
+        const d = await res.json();
+        if (!d.ok) return toast('保存失败');
+        currentRecordId = d.record.id;
+        delete selectedFilesMap['inbox'];
+        document.getElementById('inboxFileName').innerText = '';
+        document.getElementById('inboxRecordHint').innerText = '按住说话 · 松开完成录音';
+
+        toast('原始文件已保存，AI 分析中...');
+        const aRes = await fetch(`/api/records/${currentRecordId}/analyze`, { method: 'POST' });
+        const aData = await aRes.json();
+        const r = aData.record;
+
+        document.getElementById('analysisModelTag').innerText = r.analysis.model || 'AI 分析';
+        let html = `<b>原始输入:</b> ${r.original_text || '(多媒体原件)'}<br><br><b>候选分类:</b><br>`;
+        (r.analysis.candidate_labels || []).forEach(l => {
+          html += `• <b>${l.destination}</b> (${l.confidence}): ${l.reason}<br>`;
+        });
+        if (r.analysis.evidence && r.analysis.evidence.length) {
+          html += `<br><b>判断依据:</b> ${r.analysis.evidence.join('；')}<br>`;
+        }
+        document.getElementById('analysisDetails').innerHTML = html;
+
+        const btns = document.getElementById('confirmButtons');
+        btns.innerHTML = '';
+        (r.analysis.candidate_labels || []).forEach(l => {
+          const b = document.createElement('button');
+          b.className = 'btn btn-primary';
+          b.innerText = `归档到 ${l.destination}`;
+          b.onclick = () => confirmArchive(l.destination);
+          btns.appendChild(b);
+        });
+        const keepBtn = document.createElement('button');
+        keepBtn.className = 'btn btn-secondary';
+        keepBtn.innerText = '留存收件箱';
+        keepBtn.onclick = () => { toast('已保留在收件箱'); switchNav('dash'); };
+        btns.appendChild(keepBtn);
+
+        document.getElementById('analysisResultCard').classList.remove('hidden');
+      } catch (e) {
+        toast('处理异常: ' + e.message);
+      }
+    }
+    async function confirmArchive(target) {
+      if (!currentRecordId) return;
+      try {
+        const res = await fetch(`/api/records/${currentRecordId}/confirm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ destination: target })
+        });
+        const d = await res.json();
+        if (d.ok) {
+          toast(`已归档至 [${target}]！`);
+          document.getElementById('inboxInput').value = '';
+          document.getElementById('analysisResultCard').classList.add('hidden');
+          switchNav('dash');
+        }
+      } catch (e) {}
+    }
+
+    async function submitMoneyFast() {
+      const txt = document.getElementById('moneyInput').value.trim();
+      const file = selectedFilesMap['money'];
+      const cat = document.getElementById('accountCategorySelector').value;
+      if (!txt && !file) return toast('请输入凭证说明或拍照/上传凭证');
+
+      const fd = new FormData();
+      if (txt) fd.append('text', txt);
+      if (file) fd.append('file', file, file.name || (file instanceof Blob ? 'voice-money.webm' : 'receipt.jpg'));
+      fd.append('route', '记账:' + cat);
+
+      try {
+        const res = await fetch('/api/capture', { method: 'POST', headers: { 'X-Secretary-Route': 'accounting' }, body: fd });
+        const d = await res.json();
+        if (!d.ok) return toast('保存失败');
+        currentRecordId = d.record.id;
+        delete selectedFilesMap['money'];
+        document.getElementById('moneyFileName').innerText = '';
+        document.getElementById('moneyRecordHint').innerText = '按住语音记账 · 松开完成';
+
+        const aRes = await fetch(`/api/records/${currentRecordId}/analyze`, { method: 'POST' });
+        const aData = await aRes.json();
+        const fields = (aData.record && aData.record.analysis && aData.record.analysis.candidate_fields) || {};
+
+        document.getElementById('mAmount').value = fields.amount || '';
+        document.getElementById('mDirection').value = fields.direction || 'expense';
+        document.getElementById('mMerchant').value = fields.merchant || cat || '';
+        document.getElementById('mPayment').value = fields.payment_method || '微信';
+
+        document.getElementById('moneyConfirmCard').classList.remove('hidden');
+        toast('要素已识别，核实后点击保存');
+      } catch (e) {}
+    }
+    async function confirmMoneySave() {
+      if (!currentRecordId) return;
+      const cat = document.getElementById('accountCategorySelector').value;
+      const payload = {
+        destination: '记账',
+        confirmed_fields: {
+          category: cat,
+          amount: document.getElementById('mAmount').value,
+          direction: document.getElementById('mDirection').value,
+          merchant: document.getElementById('mMerchant').value,
+          payment_method: document.getElementById('mPayment').value,
+        }
+      };
+      try {
+        const res = await fetch(`/api/records/${currentRecordId}/confirm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const d = await res.json();
+        if (d.ok) {
+          toast('记账凭证已确认存档！');
+          document.getElementById('moneyInput').value = '';
+          document.getElementById('moneyConfirmCard').classList.add('hidden');
+          switchNav('dash');
+        }
+      } catch (e) {}
+    }
+
+    async function submitProjectDirect() {
+      if (!currentSelectedProject) return toast('请先新建或选择项目');
+      const txt = document.getElementById('projInput').value.trim();
+      const file = selectedFilesMap['proj'];
+      if (!txt && !file) return toast('请输入施工说明或上传现场照片/图纸/录音');
+
+      const fd = new FormData();
+      if (txt) fd.append('text', txt);
+      if (file) fd.append('file', file, file.name || (file instanceof Blob ? 'field-voice.webm' : 'site-photo.jpg'));
+      fd.append('route', currentSelectedProject);
+
+      try {
+        const res = await fetch('/api/capture', { method: 'POST', headers: { 'X-Secretary-Route': currentSelectedProject }, body: fd });
+        const d = await res.json();
+        if (d.ok) {
+          toast(`已直接保存至 [${currentSelectedProject}] 原始档案！`);
+          document.getElementById('projInput').value = '';
+          document.getElementById('projFileName').innerText = '';
+          document.getElementById('projRecordHint').innerText = '按住现场口播 · 松开完成';
+          delete selectedFilesMap['proj'];
+          switchNav('dash');
+        }
+      } catch (e) {}
+    }
+
+    /* 归档流检索 */
+    function toggleArchivesPanel() {
+      const p = document.getElementById('settingsArchivePanel');
+      p.classList.toggle('hidden');
+      if (!p.classList.contains('hidden')) loadRecent();
+    }
+    function debounceSearch() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        const kw = document.getElementById('globalSearchInput').value.trim();
+        loadRecent(kw);
+      }, 350);
+    }
+    async function loadRecent(kw = '') {
+      const c = document.getElementById('recentList');
+      if (!c) return;
+      c.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-muted);font-size:12px;">检索云端归档中...</div>';
+      try {
+        const url = '/api/recent?limit=30' + (kw ? '&q=' + encodeURIComponent(kw) : '');
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.ok || !data.records.length) {
+          c.innerHTML = '<div style="text-align:center;padding:18px;color:var(--text-muted);font-size:12px;">暂无历史归档记录</div>';
+          return;
+        }
+        c.innerHTML = data.records.map(r => renderNoteCardItem(r)).join('');
+      } catch (e) {
+        c.innerHTML = '<div style="color:var(--danger-color);font-size:12px;">检索失败</div>';
+      }
+    }
+
+    /* 运行日志 */
+    async function toggleLogsPanel() {
+      const p = document.getElementById('settingsLogsPanel');
+      p.classList.toggle('hidden');
+      if (!p.classList.contains('hidden')) loadServerLogs();
+    }
+    async function loadServerLogs() {
+      const el = document.getElementById('logTerminalContent');
+      el.innerText = '正在读取服务器实时日志...';
+      try {
+        const res = await fetch('/api/logs');
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.logs) && data.logs.length) {
+          el.innerText = data.logs.join('\n');
+          el.scrollTop = el.scrollHeight;
+        } else {
+          el.innerText = '[SYSTEM INFO] 飞牛私有化容器部署正常，当前无错误日志。\n[READY] 本地多模态解析器与 SenseNova 服务待命。';
+        }
+      } catch (e) {
+        el.innerText = '日志读取失败: ' + e.message;
+      }
+    }
+
+    /* 按分类加载卡片流 */
+    async function loadByRoute(route, containerId) {
+      const c = document.getElementById(containerId);
+      if (!c) return;
+      c.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">加载中...</div>';
+      try {
+        const res = await fetch('/api/recent?route=' + encodeURIComponent(route) + '&limit=24');
+        const data = await res.json();
+        if (!data.ok || !data.records.length) {
+          c.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">暂无记录</div>';
+          return;
+        }
+        c.innerHTML = data.records.map(r => renderNoteCardItem(r)).join('');
+      } catch (e) {
+        c.innerHTML = '<div style="color:var(--danger-color);font-size:12px;">加载失败</div>';
+      }
+    }
+
+    /* AI 服务选型 */
+    function onAiProviderChanged() {
+      const p = document.getElementById('aiServiceProvider').value;
+      const data = AI_PROVIDERS[p];
+      if (data) {
+        document.getElementById('cfgAiUrl').value = data.endpoint;
+        document.getElementById('aiEndpointSubtitle').innerText = data.endpoint 
+          ? `默认: ${data.endpoint}` 
+          : '请输入兼容 OpenAI 格式的服务地址';
+        
+        const mSel = document.getElementById('aiModelSelector');
+        mSel.innerHTML = data.models.map(m => `<option value="${m}">${m}</option>`).join('');
+        if (data.models.length > 0) mSel.value = data.models[0];
+      }
+      markSettingDirty();
+    }
+    function onAiModelSelected() { markSettingDirty(); }
+    function addCustomModelAction() {
+      const input = document.getElementById('customModelInput');
+      const val = (input.value || '').trim();
+      if (!val) return toast('请输入模型名称');
+      const mSel = document.getElementById('aiModelSelector');
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.innerText = val + ' (自定义)';
+      opt.selected = true;
+      mSel.appendChild(opt);
+      input.value = '';
+      markSettingDirty();
+      toast('✅ 已加入模型列表: ' + val);
+    }
+
+    /* 设置持久化 */
+    function resetSettings() {
+      loadSavedAppearance();
+      loadSystemConfig();
+      isSettingDirty = false;
+      toast('已取消更改');
+    }
+    function loadSavedAppearance() {
+      const theme = localStorage.getItem('xiaoya_theme') || 'warm';
+      const font = localStorage.getItem('xiaoya_font') || 'heiti';
+      const size = localStorage.getItem('xiaoya_size') || 'normal';
+      const lang = localStorage.getItem('xiaoya_lang') || 'zh';
+
+      document.getElementById('settingTheme').value = theme;
+      document.getElementById('settingFont').value = font;
+      document.getElementById('settingFontSize').value = size;
+      document.getElementById('settingLang').value = lang;
+
+      applyDomAppearance(theme, font, size);
+    }
+    async function loadSystemConfig() {
+      try {
+        const res = await fetch('/api/config');
+        const data = await res.json();
+        if (data.ok && data.config) {
+          const ai = data.config.ai || {};
+          document.getElementById('cfgAiUrl').value = ai.url || 'https://token.sensenova.cn/v1';
+          const modelName = ai.model || 'SenseChat-5';
+          const mSel = document.getElementById('aiModelSelector');
+          let matched = false;
+          for (let i = 0; i < mSel.options.length; i++) {
+            if (mSel.options[i].value === modelName) {
+              mSel.selectedIndex = i;
+              matched = true;
+              break;
+            }
+          }
+          if (!matched) {
+            const opt = document.createElement('option');
+            opt.value = modelName;
+            opt.innerText = modelName;
+            opt.selected = true;
+            mSel.appendChild(opt);
+          }
+          if (ai.key_masked) {
+            document.getElementById('cfgAiKey').placeholder = '当前已配置: ' + ai.key_masked;
+          }
+        }
+      } catch(e) {}
+    }
+    async function saveAllSettings() {
+      const theme = document.getElementById('settingTheme').value;
+      const font = document.getElementById('settingFont').value;
+      const size = document.getElementById('settingFontSize').value;
+      const lang = document.getElementById('settingLang').value;
+
+      localStorage.setItem('xiaoya_theme', theme);
+      localStorage.setItem('xiaoya_font', font);
+      localStorage.setItem('xiaoya_size', size);
+      localStorage.setItem('xiaoya_lang', lang);
+
+      applyDomAppearance(theme, font, size);
+
+      const chosenModel = document.getElementById('aiModelSelector').value;
+      const endpoint = document.getElementById('cfgAiUrl').value.trim();
+      const payload = {
+        ai: {
+          url: endpoint,
+          model: chosenModel
+        }
+      };
+      const newKey = document.getElementById('cfgAiKey').value.trim();
+      if (newKey) payload.ai.key = newKey;
+
+      try {
+        const res = await fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.ok) {
+          isSettingDirty = false;
+          toast('✅ 设置已保存并立即生效！');
+          document.getElementById('cfgAiKey').value = '';
+          loadSystemConfig();
+        } else {
+          toast('保存失败: ' + data.error);
+        }
+      } catch (e) {
+        toast('网络异常');
+      }
+    }
+
+    // 初始化运行
+    loadSavedAppearance();
+    loadProjects();
+    loadAccountCategories();
+    loadSystemConfig();
+  </script>
+</body>
+</html>

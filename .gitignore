@@ -1,0 +1,10 @@
+# 隐私与本地数据隔离
+data/
+backups/
+*.log
+*.pid
+cloudflared
+__pycache__/
+*.pyc
+.env
+.DS_Store
