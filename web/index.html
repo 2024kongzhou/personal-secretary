@@ -1339,7 +1339,7 @@
     <!-- 1. 电脑端侧边栏 -->
     <aside class="app-sidebar" aria-label="侧边主导航">
       <div class="brand" onclick="switchNav('dash')">
-        <span class="brand-mark">小</span>
+        <img src="./icon-192.png" style="width:38px;height:38px;border-radius:9px;box-shadow:0 2px 8px rgba(0,0,0,0.15);object-fit:cover;margin-right:2px;" alt="小雅全能助手">
         <span class="brand-copy">
           <strong>小雅全能助手</strong>
           <small>AI 灵感与工作台</small>
@@ -1384,7 +1384,7 @@
     <!-- 2. 手机端顶部 Header -->
     <header class="mobile-header">
       <div style="display:flex;align-items:center;gap:10px;" onclick="switchNav('dash')">
-        <span class="brand-mark" style="width:34px;height:34px;font-size:17px;border-radius:9px;">小</span>
+        <img src="./icon-192.png" style="width:34px;height:34px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.15);object-fit:cover;" alt="小雅全能助手">
         <strong style="font-size:15.5px;">小雅全能助手</strong>
       </div>
       <button class="btn-pill" onclick="switchNav('sett')">⚙ 设置</button>
@@ -1541,7 +1541,7 @@
                 </button>
                 <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
                   <span>📁</span><span>选择文件</span>
-                  <input type="file" id="inboxFileGeneral" style="display:none;" onchange="onFileSelected(this, 'inboxFileName')">
+                  <input type="file" id="inboxFileGeneral" multiple style="display:none;" onchange="onFileSelected(this, 'inboxFileName')">
                 </label>
               </div>
               <div id="inboxFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
@@ -1615,7 +1615,7 @@
                 </button>
                 <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
                   <span>📁</span><span>上传文件</span>
-                  <input type="file" id="moneyFileGeneral" style="display:none;" onchange="onFileSelected(this, 'moneyFileName')">
+                  <input type="file" id="moneyFileGeneral" multiple style="display:none;" onchange="onFileSelected(this, 'moneyFileName')">
                 </label>
               </div>
               <div id="moneyFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
@@ -1714,7 +1714,7 @@
                 </button>
                 <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
                   <span>📁</span><span>图纸/资料</span>
-                  <input type="file" id="projFileGeneral" style="display:none;" onchange="onFileSelected(this, 'projFileName')">
+                  <input type="file" id="projFileGeneral" multiple style="display:none;" onchange="onFileSelected(this, 'projFileName')">
                 </label>
               </div>
               <div id="projFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
@@ -1778,7 +1778,7 @@
                 </button>
                 <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
                   <span>📁</span><span>添加文件</span>
-                  <input type="file" id="ideasFileGeneral" style="display:none;" onchange="onFileSelected(this, 'ideasFileName')">
+                  <input type="file" id="ideasFileGeneral" multiple style="display:none;" onchange="onFileSelected(this, 'ideasFileName')">
                 </label>
               </div>
               <div id="ideasFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:4px;"></div>
@@ -2134,7 +2134,7 @@
 
   <!-- 隐藏文件/相机输入 -->
   <input type="file" id="hiddenCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="onPhotoSelected(this)">
-  <input type="file" id="hiddenAlbumInput" accept="image/*" style="display:none;" onchange="onPhotoSelected(this)">
+  <input type="file" id="hiddenAlbumInput" accept="image/*" multiple style="display:none;" onchange="onPhotoSelected(this)">
 
   <!-- 拍照/相册 Action Sheet -->
   <div class="sheet-overlay hidden" id="photoActionSheet" onclick="closePhotoPicker(event)">
@@ -2331,21 +2331,34 @@
       document.getElementById('hiddenAlbumInput').click();
     }
     function onPhotoSelected(input) {
-      if (input.files && input.files[0] && activeTarget) {
-        const file = input.files[0];
-        selectedFilesMap[activeTarget] = file;
+      if (input.files && input.files.length > 0 && activeTarget) {
+        const files = Array.from(input.files);
+        if (!selectedFilesMap[activeTarget] || !Array.isArray(selectedFilesMap[activeTarget])) {
+          selectedFilesMap[activeTarget] = [];
+        }
+        selectedFilesMap[activeTarget].push(...files);
+        const count = selectedFilesMap[activeTarget].length;
         const el = document.getElementById(activeTarget + 'FileName');
-        if (el) el.innerText = '📷 已添加照片: ' + file.name;
-        toast('照片已添加: ' + file.name);
+        if (el) {
+          el.innerText = count === 1 ? ('📷 已选照片: ' + files[0].name) : (`📷 已选 ${count} 张相册照片 (支持批量上传)`);
+        }
+        toast(`已添加 ${files.length} 张照片 (共 ${count} 张)`);
       }
     }
     function onFileSelected(input, labelId) {
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
+      if (input.files && input.files.length > 0) {
+        const files = Array.from(input.files);
         const target = labelId.replace('FileName', '');
-        selectedFilesMap[target] = file;
-        document.getElementById(labelId).innerText = '📁 已选文件: ' + file.name;
-        toast('文件已添加: ' + file.name);
+        if (!selectedFilesMap[target] || !Array.isArray(selectedFilesMap[target])) {
+          selectedFilesMap[target] = [];
+        }
+        selectedFilesMap[target].push(...files);
+        const count = selectedFilesMap[target].length;
+        const el = document.getElementById(labelId);
+        if (el) {
+          el.innerText = count === 1 ? ('📁 已选文件: ' + files[0].name) : (`📁 已选 ${count} 个附件`);
+        }
+        toast(`已添加 ${files.length} 个附件 (共 ${count} 个)`);
       }
     }
 
@@ -2470,12 +2483,17 @@
     }
     async function submitMemoAction() {
       const txt = document.getElementById('ideaInput').value.trim();
-      const file = selectedFilesMap['ideas'];
-      if (!txt && !file) return toast('请输入随想内容或录音/上传照片');
+      const files = selectedFilesMap['ideas'];
+      const hasFiles = Array.isArray(files) ? files.length > 0 : !!files;
+      if (!txt && !hasFiles) return toast('请输入随想内容或录音/上传照片');
 
       const fd = new FormData();
       if (txt) fd.append('text', txt);
-      if (file) fd.append('file', file, file.name || (file instanceof Blob ? 'voice-memo.webm' : 'memo-attachment.jpg'));
+      if (Array.isArray(files)) {
+        files.forEach(f => fd.append('file', f, f.name || (f instanceof Blob ? 'voice-memo.webm' : 'memo-attachment.jpg')));
+      } else if (files) {
+        fd.append('file', files, files.name || (files instanceof Blob ? 'voice-memo.webm' : 'memo-attachment.jpg'));
+      }
       fd.append('route', '随想');
 
       try {
@@ -2610,36 +2628,69 @@
 
 
         let attachHtml = '';
-        if (r.raw_file) {
-          const isAudio = r.raw_file.endsWith('.webm') || r.raw_file.endsWith('.mp3') || r.raw_file.endsWith('.wav');
-          if (isAudio) {
+        const allFiles = Array.isArray(r.files) && r.files.length > 0 ? r.files : (r.raw_file ? [{ path: r.raw_file, name: r.original_filename || r.raw_file }] : []);
+        if (allFiles.length > 0) {
+          const fileItems = allFiles.map(f => typeof f === 'string' ? { path: f, name: f } : f);
+          const audioFiles = fileItems.filter(f => /\.(webm|mp3|wav|ogg|m4a)$/i.test(f.path));
+          const imgFiles = fileItems.filter(f => /\.(jpg|jpeg|png|gif|webp)$/i.test(f.path));
+          const otherFiles = fileItems.filter(f => !/\.(webm|mp3|wav|ogg|m4a|jpg|jpeg|png|gif|webp)$/i.test(f.path));
+
+          let parts = [];
+          if (audioFiles.length > 0) {
             const transcriptText = (r.original_text || r.transcription || r.content || '').trim();
             const transcriptHtml = transcriptText ? `
               <div style="margin-top:10px;padding:10px 12px;background:var(--bg-primary);border-radius:6px;border:1px solid var(--border-color);font-size:12.5px;line-height:1.6;color:var(--text-primary);">
                 <div style="font-size:11px;color:var(--text-muted);font-weight:700;margin-bottom:4px;">📝 录音转写文本:</div>
                 <div>${transcriptText}</div>
               </div>
-            ` : '<div style="margin-top:8px;font-size:11.5px;color:var(--text-muted);"><i>(暂无自动转写文本)</i></div>';
-
-            attachHtml = `
-              <div style="background:var(--bg-tertiary);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
-                <div style="font-weight:700;font-size:12px;margin-bottom:8px;">🎙 原始语音录音:</div>
-                <audio controls src="/api/files/${r.raw_file}" style="width:100%;height:36px;"></audio>
-                <div style="margin-top:6px;font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;">
-                  <span>文件: ${r.original_filename || 'voice.webm'}</span>
-                  <a href="/api/files/${r.raw_file}" target="_blank" style="color:var(--primary-color);font-weight:600;text-decoration:none;">下载音频原件</a>
-                </div>
+            ` : '';
+            parts.push(`
+              <div style="background:var(--bg-tertiary);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-top:12px;">
+                <div style="font-weight:700;font-size:12px;margin-bottom:8px;">🎙 原始语音录音 (${audioFiles.length} 条):</div>
+                ${audioFiles.map(af => `
+                  <audio controls src="/api/files/${af.path}" style="width:100%;height:36px;margin-bottom:6px;"></audio>
+                  <div style="margin-bottom:8px;font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;">
+                    <span>文件: ${af.name || af.path}</span>
+                    <a href="/api/files/${af.path}" target="_blank" style="color:var(--primary-color);font-weight:600;text-decoration:none;">下载音频</a>
+                  </div>
+                `).join('')}
                 ${transcriptHtml}
               </div>
-            `;
-          } else {
-            attachHtml = `
-              <div style="background:var(--bg-tertiary);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
-                <div style="font-weight:700;font-size:12px;margin-bottom:6px;">📎 原始多模态附件:</div>
-                <div><a href="/api/files/${r.raw_file}" target="_blank" style="color:var(--primary-color);font-weight:600;text-decoration:none;">查看/下载原始文件 (${r.original_filename || 'attachment'})</a></div>
-              </div>
-            `;
+            `);
           }
+
+          if (imgFiles.length > 0) {
+            parts.push(`
+              <div style="background:var(--bg-tertiary);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-top:12px;">
+                <div style="font-weight:700;font-size:12px;margin-bottom:8px;">📷 原始照片/单据凭证 (${imgFiles.length} 张):</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(110px, 1fr));gap:8px;">
+                  ${imgFiles.map(im => `
+                    <div style="border-radius:6px;overflow:hidden;border:1px solid var(--border-color);position:relative;background:#000;">
+                      <a href="/api/files/${im.path}" target="_blank" style="display:block;padding-top:100%;position:relative;">
+                        <img src="/api/files/${im.path}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" alt="原图" loading="lazy">
+                      </a>
+                      <div style="padding:4px 6px;background:var(--bg-primary);font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;">
+                        <a href="/api/files/${im.path}" target="_blank" style="color:var(--text-primary);text-decoration:none;">${im.name || '原图'}</a>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `);
+          }
+
+          if (otherFiles.length > 0) {
+            parts.push(`
+              <div style="background:var(--bg-tertiary);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-top:12px;">
+                <div style="font-weight:700;font-size:12px;margin-bottom:8px;">📎 其它附件 (${otherFiles.length} 个):</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  ${otherFiles.map(of => `<a href="/api/files/${of.path}" target="_blank" class="btn-pill">下载: ${of.name || of.path}</a>`).join('')}
+                </div>
+              </div>
+            `);
+          }
+
+          attachHtml = parts.join('');
         }
         document.getElementById('modalAttachmentBox').innerHTML = attachHtml;
 
@@ -2725,9 +2776,20 @@
       }
 
       let fileBadge = '';
-      if (r.raw_file) {
-        const isAudio = r.raw_file.endsWith('.webm') || r.raw_file.endsWith('.mp3');
-        fileBadge = `<span style="font-size:11px;color:var(--primary-color);margin-left:6px;">${isAudio?'🎙 语音':'📎 附件'}</span>`;
+      const cardFiles = Array.isArray(r.files) && r.files.length > 0 ? r.files : (r.raw_file ? [r.raw_file] : []);
+      if (cardFiles.length > 0) {
+        const fileNames = cardFiles.map(f => typeof f === 'string' ? f : (f.path || ''));
+        const hasAudio = fileNames.some(f => /\.(webm|mp3|wav)$/i.test(f));
+        const imgCount = fileNames.filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f)).length;
+        if (hasAudio) {
+          fileBadge = `<span style="font-size:11px;color:var(--primary-color);margin-left:6px;">🎙 语音</span>`;
+        } else if (imgCount > 1) {
+          fileBadge = `<span style="font-size:11px;color:var(--primary-color);margin-left:6px;">📷 ${imgCount}图</span>`;
+        } else if (imgCount === 1) {
+          fileBadge = `<span style="font-size:11px;color:var(--primary-color);margin-left:6px;">📷 照片</span>`;
+        } else {
+          fileBadge = `<span style="font-size:11px;color:var(--primary-color);margin-left:6px;">📎 附件</span>`;
+        }
       }
 
       let content = r.original_text || '(多媒体原件存档)';
@@ -3020,12 +3082,17 @@
     /* 数据捕获 */
     async function submitInboxCapture() {
       const txt = document.getElementById('inboxInput').value.trim();
-      const file = selectedFilesMap['inbox'];
-      if (!txt && !file) return toast('请输入文字或录制语音/添加照片');
+      const files = selectedFilesMap['inbox'];
+      const hasFiles = Array.isArray(files) ? files.length > 0 : !!files;
+      if (!txt && !hasFiles) return toast('请输入文字或录制语音/添加照片');
 
       const fd = new FormData();
       if (txt) fd.append('text', txt);
-      if (file) fd.append('file', file, file.name || (file instanceof Blob ? 'voice-inbox.webm' : 'attachment'));
+      if (Array.isArray(files)) {
+        files.forEach(f => fd.append('file', f, f.name || (f instanceof Blob ? 'voice-inbox.webm' : 'attachment')));
+      } else if (files) {
+        fd.append('file', files, files.name || (files instanceof Blob ? 'voice-inbox.webm' : 'attachment'));
+      }
       fd.append('route', 'inbox');
 
       try {
@@ -3093,13 +3160,18 @@
 
     async function submitMoneyFast() {
       const txt = document.getElementById('moneyInput').value.trim();
-      const file = selectedFilesMap['money'];
+      const files = selectedFilesMap['money'];
       const cat = document.getElementById('accountCategorySelector').value;
-      if (!txt && !file) return toast('请输入凭证说明或拍照/上传凭证');
+      const hasFiles = Array.isArray(files) ? files.length > 0 : !!files;
+      if (!txt && !hasFiles) return toast('请输入凭证说明或拍照/上传凭证');
 
       const fd = new FormData();
       if (txt) fd.append('text', txt);
-      if (file) fd.append('file', file, file.name || (file instanceof Blob ? 'voice-money.webm' : 'receipt.jpg'));
+      if (Array.isArray(files)) {
+        files.forEach(f => fd.append('file', f, f.name || (f instanceof Blob ? 'voice-money.webm' : 'receipt.jpg')));
+      } else if (files) {
+        fd.append('file', files, files.name || (files instanceof Blob ? 'voice-money.webm' : 'receipt.jpg'));
+      }
       fd.append('route', '记账:' + cat);
 
       try {
@@ -3174,12 +3246,17 @@
     async function submitProjectDirect() {
       if (!currentSelectedProject) return toast('请先新建或选择项目');
       const txt = document.getElementById('projInput').value.trim();
-      const file = selectedFilesMap['proj'];
-      if (!txt && !file) return toast('请输入施工说明或上传现场照片/图纸/录音');
+      const files = selectedFilesMap['proj'];
+      const hasFiles = Array.isArray(files) ? files.length > 0 : !!files;
+      if (!txt && !hasFiles) return toast('请输入施工说明或上传现场照片/图纸/录音');
 
       const fd = new FormData();
       if (txt) fd.append('text', txt);
-      if (file) fd.append('file', file, file.name || (file instanceof Blob ? 'field-voice.webm' : 'site-photo.jpg'));
+      if (Array.isArray(files)) {
+        files.forEach(f => fd.append('file', f, f.name || (f instanceof Blob ? 'field-voice.webm' : 'site-photo.jpg')));
+      } else if (files) {
+        fd.append('file', files, files.name || (files instanceof Blob ? 'field-voice.webm' : 'site-photo.jpg'));
+      }
       fd.append('route', currentSelectedProject);
 
       try {
@@ -3441,22 +3518,24 @@
       let badgeLabel = '文字';
       let displayTitle = '';
 
-      if (r.raw_file) {
-        const isAudio = r.raw_file.endsWith('.webm') || r.raw_file.endsWith('.mp3') || r.raw_file.endsWith('.wav');
-        const isImg = r.raw_file.endsWith('.jpg') || r.raw_file.endsWith('.jpeg') || r.raw_file.endsWith('.png') || r.raw_file.endsWith('.webp');
+      const allFiles = Array.isArray(r.files) && r.files.length > 0 ? r.files : (r.raw_file ? [r.raw_file] : []);
+      if (allFiles.length > 0) {
+        const fileNames = allFiles.map(f => typeof f === 'string' ? f : (f.path || f.name || ''));
+        const hasAudio = fileNames.some(f => /\.(webm|mp3|wav|ogg|m4a)$/i.test(f));
+        const imgFiles = fileNames.filter(f => /\.(jpg|jpeg|png|gif|webp)$/i.test(f));
 
-        if (isAudio) {
+        if (hasAudio) {
           kind = 'audio';
           badgeLabel = '录音';
           displayTitle = '录音';
-        } else if (isImg) {
+        } else if (imgFiles.length > 0) {
           kind = 'image';
-          badgeLabel = '图片';
-          displayTitle = '图片';
+          badgeLabel = imgFiles.length > 1 ? `相册 ${imgFiles.length}张` : '图片';
+          displayTitle = imgFiles.length > 1 ? `相册照片 (${imgFiles.length}张)` : '图片';
         } else {
           kind = 'file';
-          badgeLabel = '附件';
-          displayTitle = '文件';
+          badgeLabel = allFiles.length > 1 ? `附件 ${allFiles.length}个` : '附件';
+          displayTitle = allFiles.length > 1 ? `文件 (${allFiles.length}个)` : '文件';
         }
       } else {
         kind = 'text';

@@ -89,18 +89,40 @@ def safe_name(value):
 def now_stamp():
     return datetime.now(timezone.utc).astimezone().strftime("%Y%m%d-%H%M%S")
 
-def write_record(route, text, filename=None, content_type=None, raw_path=None):
+def write_record(route, text, filename=None, content_type=None, raw_path=None, files_list=None):
     folder = get_destination(route)
     stamp = now_stamp()
     record_id = f"{stamp}-{uuid.uuid4().hex[:8]}"
+    
+    # 构建多附件统一列表
+    attached_files = []
+    if files_list:
+        for item in files_list:
+            attached_files.append({
+                "path": str(item["raw_path"].relative_to(DATA_DIR)) if item.get("raw_path") else None,
+                "filename": item.get("filename"),
+                "content_type": item.get("content_type")
+            })
+    elif raw_path:
+        attached_files.append({
+            "path": str(raw_path.relative_to(DATA_DIR)),
+            "filename": filename,
+            "content_type": content_type
+        })
+
+    primary_file = attached_files[0]["path"] if attached_files else None
+    primary_name = attached_files[0]["filename"] if attached_files else None
+    primary_type = attached_files[0]["content_type"] if attached_files else None
+
     record = {
         "id": record_id,
         "received_at": datetime.now(timezone.utc).isoformat(),
         "route": route,
         "original_text": text or "",
-        "original_filename": filename,
-        "content_type": content_type,
-        "raw_file": str(raw_path.relative_to(DATA_DIR)) if raw_path else None,
+        "original_filename": primary_name,
+        "content_type": primary_type,
+        "raw_file": primary_file,
+        "files": attached_files,
         "processing": {"state": "captured", "level": "L0", "derived": False},
     }
     (folder / f"{record_id}.json").write_text(
@@ -362,8 +384,7 @@ class Handler(BaseHTTPRequestHandler):
                 # 1. 尝试识别重点或行动项
                 summary = clean_text[:40] + ("..." if len(clean_text) > 40 else "")
                 action_items = []
-                for sentence in re.split(r"[，。！？；
-]", clean_text):
+                for sentence in re.split(r"[，。！？；\n]", clean_text):
                     s = sentence.strip()
                     if s and any(k in s for k in ["记得", "安排", "通知", "确认", "购买", "报销", "联系", "提交", "验收"]):
                         action_items.append(s)
@@ -601,7 +622,7 @@ class Handler(BaseHTTPRequestHandler):
         route = ROUTE_ALIASES.get(route, route)
 
         text = ""
-        filename = content_type = raw_path = None
+        files_list = []
 
         if "multipart/form-data" in ctype.lower():
             body = self.rfile.read(length)
@@ -623,11 +644,16 @@ class Handler(BaseHTTPRequestHandler):
                     route = ROUTE_ALIASES.get(c, c) or route
                     continue
                 if file_m and file_m.group(1):
-                    filename = safe_name(file_m.group(1))
-                    content_type = part.get_content_type()
+                    fname = safe_name(file_m.group(1))
+                    ftype = part.get_content_type()
                     folder = get_destination(route)
-                    raw_path = folder / f"{now_stamp()}-{uuid.uuid4().hex[:8]}-{filename}"
-                    raw_path.write_bytes(value)
+                    r_path = folder / f"{now_stamp()}-{uuid.uuid4().hex[:8]}-{fname}"
+                    r_path.write_bytes(value)
+                    files_list.append({
+                        "raw_path": r_path,
+                        "filename": fname,
+                        "content_type": ftype
+                    })
                 elif field == "text":
                     text = value.decode(part.get_content_charset() or "utf-8", "replace")
         else:
@@ -639,7 +665,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 text = body.decode("utf-8", "replace")
 
-        record = write_record(route, text, filename, content_type, raw_path)
+        record = write_record(route, text, files_list=files_list)
         self.send_json(201, {"ok": True, "record": record})
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
