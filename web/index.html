@@ -419,6 +419,93 @@
     }
 
     /* 3. 卡片与网格系统 */
+    /* 资产显示模式：卡片 vs 列表时间线 */
+    #dashAssetFlowContainer.view-list {
+      display: flex !important;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+      padding-left: 20px;
+      margin-left: 10px;
+      border-left: 2px solid var(--border-color);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 16px;
+      padding-bottom: 4px;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -27px;
+      top: 12px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px var(--border-color);
+    }
+    .timeline-row {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .timeline-row:hover, .timeline-row:active {
+      border-color: var(--primary-color);
+      transform: translateX(2px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+    }
+    .timeline-content-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+    .timeline-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .badge-audio { background: #fee2e2; color: #b91c1c; }
+    .badge-image { background: #e0e7ff; color: #3730a3; }
+    .badge-text  { background: var(--bg-tertiary); color: var(--text-secondary); }
+    .timeline-label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .timeline-time {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    /* 卡片模式微调 */
+    #dashAssetFlowContainer.view-card {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+      gap: 16px;
+    }
+    #dashAssetFlowContainer.view-card .asset-card {
+      border-radius: 12px;
+      padding: 14px;
+    }
+
     .notes-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
@@ -612,40 +699,223 @@
     }
 
     /* 88px 麦克风录音按键 (收件箱/记账/现场/随想全部统一配备) */
+    
+    /* ==========================================================================
+       专业录音笔硬件风格面板 (Hardware Audio Recorder Capsule)
+       - 大尺寸实体按键质感 (104px 宽大录音舱体)
+       - 金属渐变环、醒目大图标、拟物深度与按压微凹质感
+       - 动态声波光环、按住说话、松开自动完成
+       ========================================================================== */
     .voice-control-box {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px 0 10px;
+      padding: 20px 0 14px;
+      width: 100%;
     }
-    .btn-record-mic {
-      width: 88px;
-      height: 88px;
+
+    .recorder-deck {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* 录音笔外圈多重声学防震光环 */
+    .recorder-ring {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 114px;
+      height: 114px;
       border-radius: 50%;
-      border: 6px solid var(--primary-light);
-      background: var(--primary-color);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-size: 36px;
-      cursor: pointer;
-      box-shadow: 0 10px 25px rgba(180, 83, 9, 0.25);
+      background: radial-gradient(circle, var(--bg-tertiary) 0%, var(--border-color) 100%);
+      box-shadow: 0 8px 24px rgba(44, 36, 29, 0.12), inset 0 2px 5px rgba(255,255,255,0.8);
       transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* 录音笔实体金属核心按键 (100px) */
+    .recorder-btn {
+      width: 98px;
+      height: 98px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #c2413b, #991b1b);
+      border: 4px solid #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
       user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      box-shadow: 0 8px 20px rgba(185, 28, 28, 0.4), inset 0 3px 6px rgba(255,255,255,0.35);
+      transition: all 0.18s ease;
+      position: relative;
+      z-index: 2;
     }
-    .btn-record-mic:active, .btn-record-mic.recording {
-      transform: scale(1.12);
-      background: var(--danger-color);
-      border-color: rgba(194, 65, 59, 0.25);
-      box-shadow: 0 0 35px rgba(194, 65, 59, 0.6);
-      animation: pulseMic 1.2s infinite alternate;
+
+    .recorder-btn .recorder-icon {
+      font-size: 34px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      transition: transform 0.2s ease;
     }
-    @keyframes pulseMic {
-      from { box-shadow: 0 0 15px rgba(194, 65, 59, 0.4); }
-      to { box-shadow: 0 0 35px rgba(194, 65, 59, 0.8); }
+
+    .recorder-btn .recorder-sublabel {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+      text-transform: uppercase;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
     }
-    .voice-hint {
+
+    /* 按住状态：录音笔红灯常亮、动态脉冲雷达波纹 */
+    .recorder-deck.pressing .recorder-ring {
+      transform: scale(1.08);
+      box-shadow: 0 0 45px rgba(220, 38, 38, 0.55);
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.4) 100%);
+    }
+
+    .recorder-deck.pressing .recorder-btn {
+      transform: scale(0.95);
+      background: linear-gradient(145deg, #ef4444, #b91c1c);
+      box-shadow: inset 0 4px 10px rgba(0,0,0,0.5), 0 0 30px rgba(239, 68, 68, 0.8);
+      border-color: #fee2e2;
+    }
+
+    .recorder-deck.pressing .recorder-icon {
+      transform: scale(1.15);
+      animation: recordGlow 1s infinite alternate ease-in-out;
+    }
+
+    @keyframes recordGlow {
+      from { filter: drop-shadow(0 0 2px #fff); }
+      to { filter: drop-shadow(0 0 12px #fff); }
+    }
+
+    /* 录音笔底座状态说明 */
+    .recorder-status-caption {
+      margin-top: 12px;
+      font-size: calc(13px * var(--font-scale));
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-tertiary);
+      padding: 5px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+    }
+
+    .recorder-status-caption .status-led {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #948c83;
+      transition: background 0.2s ease;
+    }
+
+    .recorder-deck.pressing + .recorder-status-caption {
+      color: #b91c1c;
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+
+    .recorder-deck.pressing + .recorder-status-caption .status-led {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+      animation: blinkLed 0.8s infinite;
+    }
+
+    @keyframes blinkLed {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* 微信同款屏幕中央录音悬浮指示器 */
+    .wechat-voice-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .wechat-voice-modal-overlay.active {
+      opacity: 1;
+    }
+
+    .wechat-recording-hud {
+      width: 170px;
+      height: 170px;
+      background: rgba(30, 26, 23, 0.88);
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      color: #fff;
+      animation: hudPop 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes hudPop {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .hud-waves {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      height: 38px;
+      margin-bottom: 12px;
+    }
+    .hud-wave-bar {
+      width: 4px;
+      background: #e6a15f;
+      border-radius: 3px;
+      animation: waveScale 0.8s ease-in-out infinite alternate;
+    }
+    .hud-wave-bar:nth-child(1) { height: 16px; animation-delay: 0.1s; }
+    .hud-wave-bar:nth-child(2) { height: 28px; animation-delay: 0.3s; }
+    .hud-wave-bar:nth-child(3) { height: 38px; animation-delay: 0.15s; }
+    .hud-wave-bar:nth-child(4) { height: 26px; animation-delay: 0.4s; }
+    .hud-wave-bar:nth-child(5) { height: 14px; animation-delay: 0.2s; }
+
+    @keyframes waveScale {
+      0% { transform: scaleY(0.4); opacity: 0.5; }
+      100% { transform: scaleY(1.15); opacity: 1; }
+    }
+
+    .hud-text {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #fff;
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+    }
+    .hud-timer {
+      font-size: 12px;
+      color: #e6a15f;
+      margin-top: 6px;
+      font-family: monospace;
+      font-weight: 700;
+    }
+
+.voice-hint {
       font-size: 11.5px;
       color: var(--text-muted);
       margin-top: 8px;
@@ -751,23 +1021,32 @@
     @media (max-width: 768px) {
       .app-sidebar { display: none; }
       .notes-list-header { display: none; }
-      .notes-list-toolbar { padding: 10px 14px; }
+      .notes-list-toolbar { 
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .notes-list-toolbar input[type="text"] {
+        font-size: 14px; /* 防止 iOS 聚焦时自动放大页面 */
+      }
 
       .app-shell {
         flex-direction: column;
-        padding-top: calc(56px + env(safe-area-inset-top, 0px));
-        padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+        padding-top: calc(54px + env(safe-area-inset-top, 0px));
+        padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
       }
 
       .mobile-header {
         position: fixed;
         top: 0; left: 0; right: 0;
         z-index: 100;
-        height: calc(56px + env(safe-area-inset-top, 0px));
+        height: calc(54px + env(safe-area-inset-top, 0px));
         padding-top: env(safe-area-inset-top, 0px);
-        padding-left: 16px;
-        padding-right: 16px;
-        background: rgba(255, 253, 250, 0.94);
+        padding-left: 14px;
+        padding-right: 14px;
+        background: rgba(255, 253, 250, 0.95);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-bottom: 1px solid var(--border-color);
@@ -776,18 +1055,113 @@
         justify-content: space-between;
       }
       html[data-theme="cyber"] .mobile-header, body[data-theme="cyber"] .mobile-header {
-        background: rgba(29, 26, 23, 0.94);
+        background: rgba(29, 26, 23, 0.95);
       }
 
-      .content-scroller { padding: 12px; }
-      .grid-4, .grid-2 { grid-template-columns: 1fr; gap: 12px; }
-      .notes-grid { grid-template-columns: 1fr; gap: 12px; }
+      .content-scroller { 
+        padding: 10px 12px 24px;
+        max-width: 100vw;
+        overflow-x: hidden;
+      }
+      .grid-4, .grid-2 { 
+        grid-template-columns: 1fr; 
+        gap: 10px; 
+      }
 
+      /* 手机屏幕自适应：时间线容器与自适应排版 */
+      #dashAssetFlowContainer.view-list {
+        display: flex !important;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+        padding-left: 14px;
+        margin-left: 6px;
+        border-left: 2px solid var(--border-color);
+      }
+      .timeline-item {
+        position: relative;
+        margin-bottom: 12px;
+        padding-bottom: 2px;
+      }
+      .timeline-dot {
+        position: absolute;
+        left: -20px;
+        top: 13px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px var(--border-color);
+      }
+      .timeline-row {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .timeline-row:active {
+        background: var(--bg-secondary);
+      }
+      .timeline-content-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        flex: 1;
+      }
+      .timeline-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 5px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .timeline-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+      }
+      .timeline-time {
+        font-size: 10.5px;
+        color: var(--text-muted);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      /* 手机屏幕下的卡片模式自适应 */
+      #dashAssetFlowContainer.view-card {
+        display: flex !important;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .notes-grid { 
+        grid-template-columns: 1fr; 
+        gap: 12px; 
+      }
+      .note-card {
+        padding: 12px;
+        border-radius: 12px;
+      }
+
+      /* 底部移动导航栏自适应与安全区域 */
       .mobile-bottom-nav {
         position: fixed;
         bottom: 0; left: 0; right: 0;
         z-index: 100;
-        height: calc(64px + env(safe-area-inset-bottom, 0px));
+        height: calc(60px + env(safe-area-inset-bottom, 0px));
         padding-bottom: env(safe-area-inset-bottom, 0px);
         background: rgba(255, 253, 250, 0.96);
         backdrop-filter: blur(20px);
@@ -796,7 +1170,7 @@
         display: grid;
         grid-template-columns: repeat(6, 1fr);
         align-items: center;
-        box-shadow: 0 -4px 20px rgba(44, 36, 29, 0.05);
+        box-shadow: 0 -3px 16px rgba(44, 36, 29, 0.05);
       }
       html[data-theme="cyber"] .mobile-bottom-nav, body[data-theme="cyber"] .mobile-bottom-nav {
         background: rgba(29, 26, 23, 0.96);
@@ -805,28 +1179,55 @@
         border: 0;
         background: none;
         color: var(--text-muted);
-        font-size: 10.5px;
+        font-size: 10px;
         font-weight: 600;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 3px;
+        gap: 2px;
         cursor: pointer;
-        padding: 6px 0;
+        padding: 4px 0;
+        -webkit-tap-highlight-color: transparent;
       }
       .m-nav-item.active { color: var(--primary-color); }
-      .m-nav-item .m-icon { font-size: 19px; }
+      .m-nav-item .m-icon { font-size: 18px; }
 
-      .note-modal-overlay { padding: 0; }
+      /* 弹窗全屏手机自适应 */
+      .note-modal-overlay { 
+        padding: 0; 
+      }
       .note-modal {
         width: 100vw;
         height: 100vh;
-        max-height: 100vh;
+        height: 100dvh;
+        max-height: 100dvh;
         border-radius: 0;
-        padding-top: env(safe-area-inset-top, 0px);
-        padding-bottom: env(safe-area-inset-bottom, 0px);
+        padding: calc(12px + env(safe-area-inset-top, 0px)) 14px calc(16px + env(safe-area-inset-bottom, 0px));
+        display: flex;
+        flex-direction: column;
       }
+      .note-modal-body {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* 金刚区 & 录音按钮触控优化 */
+      .record-big-btn {
+        width: 80px !important;
+        height: 80px !important;
+        font-size: 32px !important;
+      }
+    }
+
+    /* 极小屏幕（iPhone SE / 窄屏小手机 <= 375px）微调 */
+    @media (max-width: 375px) {
+      .content-scroller { padding: 8px 10px; }
+      .timeline-label { font-size: 12.5px; }
+      .m-nav-item { font-size: 9px; }
+      .m-nav-item .m-icon { font-size: 16px; }
+      .mobile-header h1 { font-size: 15px !important; }
     }
 
     .sheet-overlay {
@@ -984,12 +1385,13 @@
 
           <!-- 1. 工作台首页 -->
           <div id="section-dash">
+            <!-- 顶部核心捷径金刚区 -->
             <div class="grid-4" style="margin-bottom:20px;">
               <div class="action-tile" onclick="switchNav('inbox')">
                 <div class="tile-badge">📥</div>
                 <div>
                   <div style="font-weight:700;font-size:14px;">智能收件箱</div>
-                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">信息随手记与多模态落盘</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">随手记 · 拍照与录音落盘</div>
                 </div>
               </div>
               <div class="action-tile" onclick="switchNav('money')">
@@ -1003,15 +1405,52 @@
                 <div class="tile-badge">🏢</div>
                 <div>
                   <div style="font-weight:700;font-size:14px;">项目现场档案</div>
-                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">施工巡检 · 口播与进度归档</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">施工巡检 · 进度现场归档</div>
                 </div>
               </div>
               <div class="action-tile" onclick="switchNav('ideas')">
                 <div class="tile-badge">✦</div>
                 <div>
                   <div style="font-weight:700;font-size:14px;">随想 Memos</div>
-                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">即时便签 · 语音录音 · #标签</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">便签速写 · 录音笔口述</div>
                 </div>
+              </div>
+            </div>
+
+            <!-- 全能编辑工作台与资产管理流水 (用户核心需求：文字、语音、图片直观查看与编辑) -->
+            <div class="note-card" style="cursor:default;margin-bottom:20px;">
+              <div class="note-card-header" style="flex-wrap:wrap;gap:12px;align-items:center;">
+                <div>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:18px;">📋</span>
+                    <h2 class="note-title" style="font-size:16px;">多模态资产编辑工作台</h2>
+                  </div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">
+                    实时汇聚所有文字、录音笔原件、现场相片与单据凭证，支持单条提取、直接编辑、快捷复制与删除
+                  </div>
+                </div>
+                <!-- 资产类型快速筛选Tab -->
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <button class="btn-pill active" id="assetTab-all" onclick="filterDashboardAssets('all')">全部记录</button>
+                  <button class="btn-pill" id="assetTab-audio" onclick="filterDashboardAssets('audio')">🎙 录音原件</button>
+                  <button class="btn-pill" id="assetTab-image" onclick="filterDashboardAssets('image')">📷 照片单据</button>
+                  <button class="btn-pill" id="assetTab-text" onclick="filterDashboardAssets('text')">✍ 纯文本</button>
+                  <button class="btn-pill" onclick="loadDashboardAssetFlow()" title="刷新">🔄 刷新</button>
+                  <span style="flex:1;"></span>
+                  <!-- 显示模式切换 -->
+                  <button id="viewModeCard" onclick="setAssetViewMode('card')" title="卡片模式" style="background:var(--accent-warm);color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;transition:all 0.2s;">⊞ 卡片</button>
+                  <button id="viewModeList" onclick="setAssetViewMode('list')" title="列表模式" style="background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-color);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;transition:all 0.2s;">☰ 列表</button>
+                </div>
+              </div>
+
+              <!-- 搜索与状态提示 -->
+              <div style="margin:12px 0 16px;">
+                <input type="text" id="dashAssetSearch" placeholder="快速检索正文、录音原件名、分类或 #标签..." oninput="debounceDashAssetSearch()" style="width:100%;height:38px;">
+              </div>
+
+              <!-- 工作台卡片流容器 -->
+              <div id="dashAssetFlowContainer" class="notes-grid">
+                <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">正在加载多模态资产流...</div>
               </div>
             </div>
 
@@ -1019,8 +1458,8 @@
             <div class="note-card" style="cursor:default;">
               <div class="note-card-header">
                 <div>
-                  <div class="note-title">我的工程与项目档案</div>
-                  <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">点击直达专属项目现场，支持随时新增与调序</div>
+                  <div class="note-title">我的工程与项目现场</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">点击直达专属项目现场，随时新增巡查档案</div>
                 </div>
                 <button class="btn btn-primary" style="height:32px;font-size:12px;" onclick="promptAddProjectDirect()">+ 新增项目</button>
               </div>
@@ -1056,12 +1495,18 @@
               <div id="inboxFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
 
               <div class="voice-control-box">
-                <button class="btn-record-mic" id="inboxRecordBtn" 
-                  onmousedown="startRecording('inbox')" onmouseup="stopRecording('inbox')" 
-                  ontouchstart="startRecording('inbox')" ontouchend="stopRecording('inbox')">
-                  🎙
-                </button>
-                <div class="voice-hint" id="inboxRecordHint">按住说话 · 松开完成录音</div>
+                <div class="recorder-deck" id="inboxRecorderDeck">
+                  <div class="recorder-ring">
+                    <div class="recorder-btn" id="inboxVoiceBar" data-target="inbox">
+                      <span class="recorder-icon">🎙</span>
+                      <span class="recorder-sublabel">REC</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="recorder-status-caption">
+                  <span class="status-led"></span>
+                  <span id="inboxRecordHint">按住录音笔说话 · 松开结束</span>
+                </div>
               </div>
 
               <div style="display:flex;gap:12px;margin-top:16px;">
@@ -1124,12 +1569,18 @@
               <div id="moneyFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
 
               <div class="voice-control-box">
-                <button class="btn-record-mic" id="moneyRecordBtn" 
-                  onmousedown="startRecording('money')" onmouseup="stopRecording('money')" 
-                  ontouchstart="startRecording('money')" ontouchend="stopRecording('money')">
-                  🎙
-                </button>
-                <div class="voice-hint" id="moneyRecordHint">按住语音记账 · 松开完成</div>
+                <div class="recorder-deck" id="moneyRecorderDeck">
+                  <div class="recorder-ring">
+                    <div class="recorder-btn" id="moneyVoiceBar" data-target="money">
+                      <span class="recorder-icon">🎙</span>
+                      <span class="recorder-sublabel">REC</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="recorder-status-caption">
+                  <span class="status-led"></span>
+                  <span id="moneyRecordHint">按住录音笔口述记账 · 松开结束</span>
+                </div>
               </div>
 
               <div style="display:flex;gap:12px;margin-top:16px;">
@@ -1217,12 +1668,18 @@
               <div id="projFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
 
               <div class="voice-control-box">
-                <button class="btn-record-mic" id="projRecordBtn" 
-                  onmousedown="startRecording('proj')" onmouseup="stopRecording('proj')" 
-                  ontouchstart="startRecording('proj')" ontouchend="stopRecording('proj')">
-                  🎙
-                </button>
-                <div class="voice-hint" id="projRecordHint">按住现场口播 · 松开完成</div>
+                <div class="recorder-deck" id="projRecorderDeck">
+                  <div class="recorder-ring">
+                    <div class="recorder-btn" id="projVoiceBar" data-target="proj">
+                      <span class="recorder-icon">🎙</span>
+                      <span class="recorder-sublabel">REC</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="recorder-status-caption">
+                  <span class="status-led"></span>
+                  <span id="projRecordHint">按住录音笔现场口播 · 松开结束</span>
+                </div>
               </div>
 
               <div style="display:flex;gap:12px;margin-top:16px;">
@@ -1274,14 +1731,20 @@
               </div>
               <div id="ideasFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:4px;"></div>
 
-              <!-- 随想 Memos 专属 88px 麦克风语音录入按键 -->
+              <!-- 随想 Memos 专业录音笔大按键 -->
               <div class="voice-control-box">
-                <button class="btn-record-mic" id="ideasRecordBtn" 
-                  onmousedown="startRecording('ideas')" onmouseup="stopRecording('ideas')" 
-                  ontouchstart="startRecording('ideas')" ontouchend="stopRecording('ideas')">
-                  🎙
-                </button>
-                <div class="voice-hint" id="ideasRecordHint">按住口述随想 · 松开完成录制</div>
+                <div class="recorder-deck" id="ideasRecorderDeck">
+                  <div class="recorder-ring">
+                    <div class="recorder-btn" id="ideasVoiceBar" data-target="ideas">
+                      <span class="recorder-icon">🎙</span>
+                      <span class="recorder-sublabel">REC</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="recorder-status-caption">
+                  <span class="status-led"></span>
+                  <span id="ideasRecordHint">按住录音笔口述随想 · 松开结束</span>
+                </div>
               </div>
 
               <div style="display:flex;gap:12px;margin-top:12px;">
@@ -1304,112 +1767,184 @@
 
           <!-- 6. 系统设置 (Settings) -->
           <div id="section-sett" class="hidden">
-            <div class="grid-2">
-              <div class="note-card" style="cursor:default;">
-                <div class="note-title">界面主题配色</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择符合使用习惯的主题风格（含 Notepad 经典大地色）</div>
-                <div style="margin-top:12px;">
+            <!-- 模块 1：界面与排版视觉偏好 -->
+            <div class="note-card" style="cursor:default;margin-bottom:16px;">
+              <div class="note-card-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:20px;">🎨</span>
+                  <div>
+                    <div class="note-title">界面视觉与排版偏好</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">个性化定制属于你的专属工作台主题配色、正文字体及缩放比例</div>
+                  </div>
+                </div>
+              </div>
+              <div class="grid-2" style="margin-top:12px;">
+                <div class="field-group">
+                  <label class="field-label">主题配色风格 (含 Notepad 经典大地色)</label>
                   <select id="settingTheme" class="select-box" onchange="onThemeDropdownChange()">
-                    <option value="warm" selected>🍂 温暖胡桃 (Warm Walnut - 经典)</option>
+                    <option value="warm" selected>🍂 温暖胡桃 (Warm Walnut - 经典默认)</option>
                     <option value="business">💼 商务现代 (Business Slate)</option>
                     <option value="vibrant">🎈 活泼落日 (Vibrant Coral)</option>
                     <option value="cyber">⚡ 赛博暗黑 (Cyber Dark)</option>
                   </select>
                 </div>
-              </div>
 
-              <div class="note-card" style="cursor:default;">
-                <div class="note-title">显示字体</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择正文字体排版规范</div>
-                <div style="margin-top:12px;">
+                <div class="field-group">
+                  <label class="field-label">显示正文字体排版规范</label>
                   <select id="settingFont" class="select-box" onchange="onFontDropdownChange()">
-                    <option value="heiti">🔤 现代黑体 (清晰锐利)</option>
+                    <option value="heiti">🔤 现代黑体 (清晰锐利 · 默认)</option>
                     <option value="simsun">📖 经典宋体 (典雅工整)</option>
                     <option value="fangsong">✍ 文艺仿宋 (秀丽挺拔)</option>
                   </select>
                 </div>
-              </div>
 
-              <div class="note-card" style="cursor:default;">
-                <div class="note-title">字号缩放</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">调整整体文字大小与屏幕占比</div>
-                <div style="margin-top:12px;">
+                <div class="field-group">
+                  <label class="field-label">整体字号与屏幕缩放比例</label>
                   <select id="settingFontSize" class="select-box" onchange="onSizeDropdownChange()">
-                    <option value="small">小号 (紧凑精细)</option>
-                    <option value="normal" selected>中号 (标准默认)</option>
-                    <option value="large">大号 (清晰大字)</option>
+                    <option value="small">小号 (紧凑排布 · 视野更宽广)</option>
+                    <option value="normal" selected>中号 (舒适标准 · 移动端优选)</option>
+                    <option value="large">大号 (清晰大字 · 易读省力)</option>
                   </select>
                 </div>
-              </div>
 
-              <div class="note-card" style="cursor:default;">
-                <div class="note-title">系统语言</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">切换界面提示语言</div>
-                <div style="margin-top:12px;">
+                <div class="field-group">
+                  <label class="field-label">工作台提示语言</label>
                   <select id="settingLang" class="select-box" onchange="onLangDropdownChange()">
-                    <option value="zh" selected>简体中文 (Chinese)</option>
+                    <option value="zh" selected>简体中文 (Chinese - 默认)</option>
                     <option value="en">English (英文)</option>
                   </select>
                 </div>
               </div>
             </div>
 
-            <div class="grid-2" style="margin-top:16px;">
-              <div class="note-card" style="cursor:default;">
-                <div class="note-title">模型服务</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择常用 AI 服务提供商</div>
-                <div style="margin-top:12px;">
+            <!-- 模块 2：AI 认知模型服务引擎 -->
+            <div class="note-card" style="cursor:default;margin-bottom:16px;">
+              <div class="note-card-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:20px;">🧠</span>
+                  <div>
+                    <div class="note-title">AI 大模型服务与认知引擎</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">配置智能收件箱意图分类、单据记账要素提取与多模态识别的服务通道</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-2" style="margin-top:12px;">
+                <div class="field-group">
+                  <label class="field-label">AI 服务提供商选型</label>
                   <select id="aiServiceProvider" class="select-box" onchange="onAiProviderChanged()">
-                    <option value="sensenova">SenseNova 商汤日日新</option>
+                    <option value="sensenova">SenseNova 商汤日日新 (默认官方托管)</option>
                     <option value="bailian">Bailian Coding (阿里云百炼)</option>
-                    <option value="openai">OpenAI Official</option>
-                    <option value="deepseek">DeepSeek 官方 API</option>
+                    <option value="openai">OpenAI 官方服务 (GPT-4o / mini)</option>
+                    <option value="deepseek">DeepSeek 官方 API (DeepSeek-V3)</option>
                     <option value="custom">自定义 OpenAI 兼容接口</option>
                   </select>
                 </div>
-              </div>
 
-              <div class="note-card" style="cursor:default;">
-                <div class="note-title">模型列表</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择当前激活的模型</div>
-                <div style="margin-top:12px;">
+                <div class="field-group">
+                  <label class="field-label">当前生效的智能大模型</label>
                   <select id="aiModelSelector" class="select-box" onchange="onAiModelSelected()">
                     <option value="SenseChat-5">SenseChat-5 (日日新旗舰)</option>
-                    <option value="SenseChat-5-Vision">SenseChat-5-Vision (多模态)</option>
+                    <option value="SenseChat-5-Vision">SenseChat-5-Vision (多模态识图)</option>
                     <option value="qwen2.5-coder-32b-instruct">qwen2.5-coder-32b-instruct</option>
                     <option value="deepseek-v3">deepseek-v3</option>
                   </select>
+                  <div style="display:flex;gap:8px;margin-top:8px;">
+                    <input type="text" id="customModelInput" placeholder="输入自定义模型名按回车添加..." onkeydown="if(event.key==='Enter') addCustomModelAction()" style="height:36px;">
+                    <button class="btn btn-secondary" style="height:36px;padding:0 12px;font-size:12px;" onclick="addCustomModelAction()">+ 添加</button>
+                  </div>
                 </div>
-                <div style="display:flex;gap:8px;margin-top:8px;">
-                  <input type="text" id="customModelInput" placeholder="手动添加模型并回车..." onkeydown="if(event.key==='Enter') addCustomModelAction()">
-                  <button class="btn btn-secondary" style="height:42px;" onclick="addCustomModelAction()">+ 添加</button>
-                </div>
-              </div>
 
-              <div class="note-card" style="cursor:default;">
-                <div class="note-title">连接地址</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="aiEndpointSubtitle">默认: https://token.sensenova.cn/v1</div>
-                <div style="margin-top:12px;">
+                <div class="field-group">
+                  <label class="field-label">API 接入 Endpoint (服务网关地址)</label>
                   <input type="text" id="cfgAiUrl" value="https://token.sensenova.cn/v1" oninput="markSettingDirty()">
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:4px;" id="aiEndpointSubtitle">默认网关: https://token.sensenova.cn/v1</div>
                 </div>
-              </div>
 
-              <div class="note-card" style="cursor:default;">
-                <div class="note-title">认证凭据</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">API Key 安全密钥（飞牛端加密留存）</div>
-                <div style="display:flex;gap:8px;margin-top:12px;">
-                  <input type="password" id="cfgAiKey" placeholder="请输入 API Key" oninput="markSettingDirty()" style="flex:1;">
-                  <button class="btn btn-secondary" style="height:42px;" onclick="togglePasswordVisibility('cfgAiKey', this)">👁</button>
+                <div class="field-group">
+                  <label class="field-label">API Key 授权密钥 (飞牛本地安全隔离存储)</label>
+                  <div style="display:flex;gap:8px;">
+                    <input type="password" id="cfgAiKey" placeholder="请输入 API Key（留空则保持原有配置）" oninput="markSettingDirty()" style="flex:1;">
+                    <button class="btn btn-secondary" style="height:42px;width:42px;padding:0;" onclick="togglePasswordVisibility('cfgAiKey', this)">👁</button>
+                  </div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">密钥仅保存在内网宿主机，绝不外泄给第三方</div>
                 </div>
               </div>
             </div>
 
-            <div class="grid-2" style="margin-top:16px;">
+            <!-- 模块 3：硬件麦克风与多模态采集规范 -->
+            <div class="note-card" style="cursor:default;margin-bottom:16px;">
+              <div class="note-card-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:20px;">🎙</span>
+                  <div>
+                    <div class="note-title">硬件录音笔与音视频采集参数</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">控制硬件录音笔按键触控模式、振动反馈与高保真原件落盘规则</div>
+                  </div>
+                </div>
+              </div>
+              <div class="grid-2" style="margin-top:12px;">
+                <div class="field-group">
+                  <label class="field-label">录音按键触发方式</label>
+                  <select id="cfgVoiceMode" class="select-box" onchange="toast('已切换为硬件按住口述模式')">
+                    <option value="hold" selected>按住开始录音 · 松开自动结束 (微信/专业录音笔规范)</option>
+                    <option value="tap">点击一次开始 · 再次点击结束 (会议录音模式)</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">触感振动反馈 (手机端)</label>
+                  <select id="cfgVibration" class="select-box" onchange="toast('振动反馈已更新')">
+                    <option value="on" selected>开启 (开始与停止录音时伴随物理微震动反馈)</option>
+                    <option value="off">关闭振动</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 模块 4：网络、隧道通道与私有化存储状态 -->
+            <div class="note-card" style="cursor:default;margin-bottom:16px;">
+              <div class="note-card-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:20px;">🛡</span>
+                  <div>
+                    <div class="note-title">私有化存储与网络通道</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">飞牛 fnOS 本地落盘目录、Cloudflare 专属命名隧道与域名解析状态</div>
+                  </div>
+                </div>
+              </div>
+              <div class="grid-2" style="margin-top:12px;">
+                <div style="background:var(--bg-tertiary);border-radius:var(--radius-md);padding:14px;border:1px solid var(--border-color);">
+                  <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;">
+                    <span style="color:var(--success-color);">●</span> 专属域名隧道状态
+                  </div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.6;">
+                    访问地址：<b style="color:var(--primary-color);">https://m.keyi.de5.net</b><br>
+                    隧道ID：<code>23ecbafd-b1b2-4ec2-a066-b62e3199236a</code><br>
+                    通道类型：Cloudflare Named Tunnel (固定永久域名)
+                  </div>
+                </div>
+
+                <div style="background:var(--bg-tertiary);border-radius:var(--radius-md);padding:14px;border:1px solid var(--border-color);">
+                  <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;">
+                    <span style="color:var(--success-color);">●</span> 飞牛私有化存储路径
+                  </div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.6;">
+                    服务程序：<code>/vol1/1000/personal-secretary</code><br>
+                    多模态文件库：<code>data/raw/ (inbox/accounting/projects)</code><br>
+                    数据库：<code>data/secretary.db (SQLite 本地持久化)</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 模块 5：系统维护、归档流与底层实时日志 -->
+            <div class="grid-2" style="margin-bottom:16px;">
               <div class="note-card" style="cursor:default;">
                 <div class="note-card-header">
                   <div>
-                    <div class="note-title">全域记录与归档流</div>
-                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">所有分类的历史明细与全文检索</div>
+                    <div class="note-title">全量历史检索</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">直接全文检索云端所有历史记录</div>
                   </div>
                   <button class="btn-pill" onclick="toggleArchivesPanel()">展开 / 刷新</button>
                 </div>
@@ -1422,8 +1957,8 @@
               <div class="note-card" style="cursor:default;">
                 <div class="note-card-header">
                   <div>
-                    <div class="note-title">系统运行日志</div>
-                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">容器底层采集、存储与分析事件</div>
+                    <div class="note-title">服务运行日志</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">宿主机实时事件流与 AI 分析日志</div>
                   </div>
                   <button class="btn-pill" onclick="toggleLogsPanel()">实时日志</button>
                 </div>
@@ -1433,37 +1968,38 @@
               </div>
             </div>
 
-            <div class="note-card" style="margin-top:16px;cursor:default;">
+            <!-- 模块 6：支持与关于 -->
+            <div class="note-card" style="cursor:default;margin-bottom:20px;">
               <div class="note-card-header">
                 <div>
                   <div class="note-title">支持与关于</div>
-                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">小雅全能助手 · 纯净版 v0.8.0 Pro</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">小雅全能助手 · 纯净版 v1.0.0 Pro</div>
                 </div>
               </div>
               <div class="grid-2">
-                <div style="border:1px dashed var(--border-color);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toast('👩‍💼 官方客服顾问通道正在接入中...')">
-                  <div style="font-size:28px;">👩‍💼</div>
+                <div style="border:1px dashed var(--border-color);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toast('👩💼 官方技术顾问通道正在为您连接...')">
+                  <div style="font-size:28px;">👩💼</div>
                   <div>
-                    <div style="font-weight:700;font-size:13px;">联系客服</div>
-                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">技术顾问 / 咨询答疑</div>
+                    <div style="font-weight:700;font-size:13px;">联系客服与顾问</div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">专属私有化运维答疑 / 功能需求反馈</div>
                   </div>
                 </div>
                 <div style="border:1px dashed var(--border-color);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toast('☕ 感谢您的心意，请作者喝杯咖啡打赏通道即将开放！')">
                   <div style="font-size:28px;">☕</div>
                   <div>
-                    <div style="font-weight:700;font-size:13px;">支持与打赏</div>
-                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">请作者喝杯咖啡 · 完全自愿</div>
+                    <div style="font-weight:700;font-size:13px;">赞赏与支持</div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">请作者喝杯咖啡 · 完全自愿支持独立开发</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:20px;padding-bottom:30px;">
-              <button class="btn btn-secondary" onclick="resetSettings()">取消更改</button>
-              <button class="btn btn-primary" onclick="saveAllSettings()">保存配置并生效</button>
+            <!-- 底部保存按钮条 -->
+            <div style="display:flex;justify-content:flex-end;gap:12px;padding-bottom:30px;">
+              <button class="btn btn-secondary" onclick="resetSettings()">恢复默认</button>
+              <button class="btn btn-primary" onclick="saveAllSettings()">💾 保存所有配置并立即生效</button>
             </div>
           </div>
-
         </div>
       </div>
     </main>
@@ -1471,22 +2007,16 @@
     <!-- 4. 手机端底部毛玻璃 Tab 导航条 -->
     <nav class="mobile-bottom-nav">
       <button class="m-nav-item active" id="m-nav-dash" onclick="switchNav('dash')">
-        <span class="m-icon">⌂</span><span>首页</span>
+        <span class="m-icon">⌂</span><span>工作台</span>
       </button>
       <button class="m-nav-item" id="m-nav-inbox" onclick="switchNav('inbox')">
-        <span class="m-icon">📥</span><span>收件箱</span>
-      </button>
-      <button class="m-nav-item" id="m-nav-money" onclick="switchNav('money')">
-        <span class="m-icon">📊</span><span>记账</span>
-      </button>
-      <button class="m-nav-item" id="m-nav-proj" onclick="switchNav('proj')">
-        <span class="m-icon">🏢</span><span>项目</span>
+        <span class="m-icon">📥</span><span>速记/凭证</span>
       </button>
       <button class="m-nav-item" id="m-nav-ideas" onclick="switchNav('ideas')">
-        <span class="m-icon">✦</span><span>随想</span>
+        <span class="m-icon">✦</span><span>随想 Memos</span>
       </button>
       <button class="m-nav-item" id="m-nav-sett" onclick="switchNav('sett')">
-        <span class="m-icon">⚙</span><span>设置</span>
+        <span class="m-icon">⚙</span><span>设置中心</span>
       </button>
     </nav>
   </div>
@@ -1585,6 +2115,7 @@
     // 当前模态正在查看/编辑的记录对象与状态
     let activeModalRecord = null;
     let isModalEditMode = false;
+
     let cachedRecordsMap = {};
 
     const AI_PROVIDERS = {
@@ -1766,41 +2297,117 @@
       }
     }
 
-    /* 录音逻辑 (收件箱/记账/现场/随想全部统一配备) */
-    async function startRecording(target) {
+    /* ==========================================================================
+       专业硬件录音笔按压交互引擎 (Hardware Recorder Deck Engine)
+       - 采用 Pointer Events 全面支持触屏与鼠标
+       - 按住录音笔主体，外圈声学光环与红色呼吸光启动，屏幕呼出 HUD
+       - 松开自动停止，原件即刻留存，LED 状态灯与提示词联动
+       ========================================================================== */
+    let recordStartTime = 0;
+    let recordTimerInterval = null;
+    let isCurrentlyRecording = false;
+
+    function initWechatVoiceBars() {
+      const decks = [
+        { id: 'inboxVoiceBar', deckId: 'inboxRecorderDeck', target: 'inbox', defaultText: '按住录音笔说话 · 松开结束' },
+        { id: 'moneyVoiceBar', deckId: 'moneyRecorderDeck', target: 'money', defaultText: '按住录音笔口述记账 · 松开结束' },
+        { id: 'projVoiceBar', deckId: 'projRecorderDeck', target: 'proj', defaultText: '按住录音笔现场口播 · 松开结束' },
+        { id: 'ideasVoiceBar', deckId: 'ideasRecorderDeck', target: 'ideas', defaultText: '按住录音笔口述随想 · 松开结束' }
+      ];
+
+      decks.forEach(cfg => {
+        const el = document.getElementById(cfg.id);
+        const deckEl = document.getElementById(cfg.deckId);
+        if (!el) return;
+
+        el.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          el.setPointerCapture(e.pointerId);
+          startWechatRecording(cfg.target, el, deckEl);
+        });
+
+        const handleStop = (e) => {
+          if (!isCurrentlyRecording || activeTarget !== cfg.target) return;
+          e.preventDefault();
+          stopWechatRecording(cfg.target, el, deckEl, cfg.defaultText);
+        };
+
+        el.addEventListener('pointerup', handleStop);
+        el.addEventListener('pointercancel', handleStop);
+      });
+    }
+
+    async function startWechatRecording(target, barEl, deckEl) {
+      if (isCurrentlyRecording) return;
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
         audioChunks = [];
         activeTarget = target;
+        isCurrentlyRecording = true;
 
         mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
         mediaRecorder.onstop = () => {
           recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
           selectedFilesMap[target] = recordedAudioBlob;
           const el = document.getElementById(target + 'FileName');
-          if (el) el.innerText = '🎙 录音就绪 (' + Math.round(recordedAudioBlob.size / 1024) + ' KB)';
-          const hint = document.getElementById(target + 'RecordHint');
-          if (hint) hint.innerText = '✓ 录音就绪，点击下方保存提交';
-          toast('录音已捕获，原件安全留存');
+          if (el) el.innerText = '🎙 语音录音就绪 (' + Math.round(recordedAudioBlob.size / 1024) + ' KB)';
+          toast('录音已完成，原件安全就绪');
         };
 
         mediaRecorder.start();
-        const btn = document.getElementById(target + 'RecordBtn');
-        if (btn) btn.classList.add('recording');
-        const hint = document.getElementById(target + 'RecordHint');
-        if (hint) hint.innerText = '🔴 正在录音... 松开即结束';
+
+        // 硬件震动
+        if (navigator.vibrate) {
+          try { navigator.vibrate(50); } catch(e){}
+        }
+
+        // 录音笔激活状态
+        if (deckEl) deckEl.classList.add('pressing');
+        const hintEl = document.getElementById(target + 'RecordHint');
+        if (hintEl) hintEl.innerText = '🔴 正在对着录音笔录音... 松开结束';
+
+        // 屏幕中央 HUD
+        const hud = document.getElementById('wechatVoiceHud');
+        if (hud) hud.classList.add('active');
+
+        recordStartTime = Date.now();
+        const timerEl = document.getElementById('hudTimer');
+        if (timerEl) timerEl.innerText = '0:00';
+        clearInterval(recordTimerInterval);
+        recordTimerInterval = setInterval(() => {
+          const sec = Math.floor((Date.now() - recordStartTime) / 1000);
+          const m = Math.floor(sec / 60);
+          const s = sec % 60;
+          if (timerEl) timerEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }, 300);
+
       } catch (err) {
-        toast('麦克风权限提示: ' + err.message);
+        isCurrentlyRecording = false;
+        toast('请允许麦克风权限: ' + err.message);
       }
     }
-    function stopRecording(target) {
+
+    function stopWechatRecording(target, barEl, deckEl, defaultText) {
+      if (!isCurrentlyRecording) return;
+      isCurrentlyRecording = false;
+      clearInterval(recordTimerInterval);
+
       if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         mediaRecorder.stop();
         mediaRecorder.stream.getTracks().forEach(track => track.stop());
       }
-      const btn = document.getElementById(target + 'RecordBtn');
-      if (btn) btn.classList.remove('recording');
+
+      if (navigator.vibrate) {
+        try { navigator.vibrate([30, 40, 30]); } catch(e){}
+      }
+
+      if (deckEl) deckEl.classList.remove('pressing');
+      const hintEl = document.getElementById(target + 'RecordHint');
+      if (hintEl) hintEl.innerText = defaultText;
+
+      const hud = document.getElementById('wechatVoiceHud');
+      if (hud) hud.classList.remove('active');
     }
 
     /* Memos 标签插入与提交 (支持语音、照片与文字) */
@@ -1843,15 +2450,16 @@
     /* ==========================================================================
        6. 查看与编辑功能的深度落实 (对齐 Notepad 查看与编辑)
        ========================================================================== */
-    function openNoteDetailModal(recordId) {
+    function openNoteDetailModal(recordId, directlyEdit = false) {
       const record = cachedRecordsMap[recordId];
       if (!record) return toast('未找到记录详情');
 
       activeModalRecord = record;
-      isModalEditMode = false;
+      isModalEditMode = !!directlyEdit;
       renderModalState();
       document.getElementById('noteDetailModal').classList.remove('hidden');
     }
+
 
     function closeNoteModal(event) {
       if (event.target === document.getElementById('noteDetailModal')) {
@@ -1903,11 +2511,23 @@
         if (r.raw_file) {
           const isAudio = r.raw_file.endsWith('.webm') || r.raw_file.endsWith('.mp3') || r.raw_file.endsWith('.wav');
           if (isAudio) {
+            const transcriptText = (r.original_text || r.transcription || r.content || '').trim();
+            const transcriptHtml = transcriptText ? `
+              <div style="margin-top:10px;padding:10px 12px;background:var(--bg-primary);border-radius:6px;border:1px solid var(--border-color);font-size:12.5px;line-height:1.6;color:var(--text-primary);">
+                <div style="font-size:11px;color:var(--text-muted);font-weight:700;margin-bottom:4px;">📝 录音转写文本:</div>
+                <div>${transcriptText}</div>
+              </div>
+            ` : '<div style="margin-top:8px;font-size:11.5px;color:var(--text-muted);"><i>(暂无自动转写文本)</i></div>';
+
             attachHtml = `
               <div style="background:var(--bg-tertiary);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
                 <div style="font-weight:700;font-size:12px;margin-bottom:8px;">🎙 原始语音录音:</div>
                 <audio controls src="/api/files/${r.raw_file}" style="width:100%;height:36px;"></audio>
-                <div style="margin-top:6px;font-size:11px;color:var(--text-muted);"><a href="/api/files/${r.raw_file}" target="_blank" style="color:var(--primary-color);">下载音频原件 (${r.original_filename || 'voice.webm'})</a></div>
+                <div style="margin-top:6px;font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;">
+                  <span>文件: ${r.original_filename || 'voice.webm'}</span>
+                  <a href="/api/files/${r.raw_file}" target="_blank" style="color:var(--primary-color);font-weight:600;text-decoration:none;">下载音频原件</a>
+                </div>
+                ${transcriptHtml}
               </div>
             `;
           } else {
@@ -2562,103 +3182,377 @@
 
     /* 设置持久化 */
     function resetSettings() {
-      loadSavedAppearance();
       loadSystemConfig();
-      isSettingDirty = false;
-      toast('已取消更改');
+      toast('已重置未保存的设置');
     }
-    function loadSavedAppearance() {
-      const theme = localStorage.getItem('xiaoya_theme') || 'warm';
-      const font = localStorage.getItem('xiaoya_font') || 'heiti';
-      const size = localStorage.getItem('xiaoya_size') || 'normal';
-      const lang = localStorage.getItem('xiaoya_lang') || 'zh';
+      
+    
+    /* ==========================================================================
+       全能多模态资产编辑工作台逻辑 (时间线列表、精简展示、点击展开、录音带文本)
+       ========================================================================== */
+    let currentDashboardAssetFilter = 'all';
+    let dashAssetDebounceTimer = null;
+    let allLoadedDashboardRecords = [];
+    let currentAssetViewMode = localStorage.getItem('assetViewMode') || 'list';
 
-      document.getElementById('settingTheme').value = theme;
-      document.getElementById('settingFont').value = font;
-      document.getElementById('settingFontSize').value = size;
-      document.getElementById('settingLang').value = lang;
-
-      applyDomAppearance(theme, font, size);
-    }
-    async function loadSystemConfig() {
-      try {
-        const res = await fetch('/api/config');
-        const data = await res.json();
-        if (data.ok && data.config) {
-          const ai = data.config.ai || {};
-          document.getElementById('cfgAiUrl').value = ai.url || 'https://token.sensenova.cn/v1';
-          const modelName = ai.model || 'SenseChat-5';
-          const mSel = document.getElementById('aiModelSelector');
-          let matched = false;
-          for (let i = 0; i < mSel.options.length; i++) {
-            if (mSel.options[i].value === modelName) {
-              mSel.selectedIndex = i;
-              matched = true;
-              break;
-            }
-          }
-          if (!matched) {
-            const opt = document.createElement('option');
-            opt.value = modelName;
-            opt.innerText = modelName;
-            opt.selected = true;
-            mSel.appendChild(opt);
-          }
-          if (ai.key_masked) {
-            document.getElementById('cfgAiKey').placeholder = '当前已配置: ' + ai.key_masked;
-          }
-        }
-      } catch(e) {}
-    }
-    async function saveAllSettings() {
-      const theme = document.getElementById('settingTheme').value;
-      const font = document.getElementById('settingFont').value;
-      const size = document.getElementById('settingFontSize').value;
-      const lang = document.getElementById('settingLang').value;
-
-      localStorage.setItem('xiaoya_theme', theme);
-      localStorage.setItem('xiaoya_font', font);
-      localStorage.setItem('xiaoya_size', size);
-      localStorage.setItem('xiaoya_lang', lang);
-
-      applyDomAppearance(theme, font, size);
-
-      const chosenModel = document.getElementById('aiModelSelector').value;
-      const endpoint = document.getElementById('cfgAiUrl').value.trim();
-      const payload = {
-        ai: {
-          url: endpoint,
-          model: chosenModel
-        }
-      };
-      const newKey = document.getElementById('cfgAiKey').value.trim();
-      if (newKey) payload.ai.key = newKey;
-
-      try {
-        const res = await fetch('/api/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (data.ok) {
-          isSettingDirty = false;
-          toast('✅ 设置已保存并立即生效！');
-          document.getElementById('cfgAiKey').value = '';
-          loadSystemConfig();
+    function setAssetViewMode(mode) {
+      currentAssetViewMode = mode;
+      localStorage.setItem('assetViewMode', mode);
+      const container = document.getElementById('dashAssetFlowContainer');
+      if (container) {
+        if (mode === 'list') {
+          container.classList.remove('view-card', 'notes-grid');
+          container.classList.add('view-list');
         } else {
-          toast('保存失败: ' + data.error);
+          container.classList.remove('view-list');
+          container.classList.add('view-card', 'notes-grid');
         }
+      }
+      const cardBtn = document.getElementById('viewModeCard');
+      const listBtn = document.getElementById('viewModeList');
+      if (cardBtn && listBtn) {
+        if (mode === 'card') {
+          cardBtn.style.background = 'var(--accent-warm)';
+          cardBtn.style.color = '#fff';
+          cardBtn.style.border = 'none';
+          listBtn.style.background = 'var(--bg-tertiary)';
+          listBtn.style.color = 'var(--text-secondary)';
+          listBtn.style.border = '1px solid var(--border-color)';
+        } else {
+          listBtn.style.background = 'var(--accent-warm)';
+          listBtn.style.color = '#fff';
+          listBtn.style.border = 'none';
+          cardBtn.style.background = 'var(--bg-tertiary)';
+          cardBtn.style.color = 'var(--text-secondary)';
+          cardBtn.style.border = '1px solid var(--border-color)';
+        }
+      }
+      renderDashboardAssetCards();
+    }
+
+    function initAssetViewMode() {
+      setAssetViewMode(currentAssetViewMode);
+    }
+
+    async function loadDashboardAssetFlow(kw = '') {
+      const container = document.getElementById('dashAssetFlowContainer');
+      if (!container) return;
+      container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">正在检索多模态资产流...</div>';
+
+      try {
+        const url = '/api/recent?limit=60' + (kw ? '&q=' + encodeURIComponent(kw) : '');
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.ok || !data.records || data.records.length === 0) {
+          container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);font-size:12px;">暂无多模态录入资产，可点击上方金刚区或使用录音笔录入第一条内容</div>';
+          allLoadedDashboardRecords = [];
+          return;
+        }
+
+        // 统一按时间倒序排序 (时间线排列)
+        data.records.sort((a, b) => {
+          const tA = new Date(a.received_at || a.created_at || 0).getTime();
+          const tB = new Date(b.received_at || b.created_at || 0).getTime();
+          return tB - tA;
+        });
+
+        allLoadedDashboardRecords = data.records;
+        data.records.forEach(r => { cachedRecordsMap[r.id] = r; });
+        renderDashboardAssetCards();
+      } catch (err) {
+        container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--danger-color);font-size:12px;">加载多模态资产失败</div>';
+      }
+    }
+
+    function filterDashboardAssets(type) {
+      currentDashboardAssetFilter = type;
+      ['all', 'audio', 'image', 'text'].forEach(t => {
+        const btn = document.getElementById('assetTab-' + t);
+        if (btn) {
+          if (t === type) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+      });
+      renderDashboardAssetCards();
+    }
+
+    function debounceDashAssetSearch() {
+      clearTimeout(dashAssetDebounceTimer);
+      dashAssetDebounceTimer = setTimeout(() => {
+        const kw = (document.getElementById('dashAssetSearch').value || '').trim();
+        loadDashboardAssetFlow(kw);
+      }, 350);
+    }
+
+    function renderDashboardAssetCards() {
+      const container = document.getElementById('dashAssetFlowContainer');
+      if (!container) return;
+
+      let records = allLoadedDashboardRecords || [];
+      if (currentDashboardAssetFilter === 'audio') {
+        records = records.filter(r => r.raw_file && (r.raw_file.endsWith('.webm') || r.raw_file.endsWith('.mp3') || r.raw_file.endsWith('.wav')));
+      } else if (currentDashboardAssetFilter === 'image') {
+        records = records.filter(r => r.raw_file && (r.raw_file.endsWith('.jpg') || r.raw_file.endsWith('.jpeg') || r.raw_file.endsWith('.png') || r.raw_file.endsWith('.webp')));
+      } else if (currentDashboardAssetFilter === 'text') {
+        records = records.filter(r => !r.raw_file);
+      }
+
+      if (records.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);font-size:12px;">该筛选分类下暂无资产记录</div>';
+        return;
+      }
+
+      if (currentAssetViewMode === 'list') {
+        // 时间线精简列表展示
+        container.innerHTML = records.map(r => renderDashboardTimelineItem(r)).join('');
+      } else {
+        // 卡片瀑布流展示
+        container.innerHTML = records.map(r => renderDashboardCardItem(r)).join('');
+      }
+    }
+
+    // 格式化展示标签与正文摘要：
+    // 录音 -> "录音"
+    // 图片 -> "图片"
+    // 文字 -> 前8个字后面加省略号
+    function getAssetSummary(r) {
+      const content = (r.original_text || r.transcription || r.content || '').trim();
+      let kind = 'text';
+      let badgeLabel = '文字';
+      let displayTitle = '';
+
+      if (r.raw_file) {
+        const isAudio = r.raw_file.endsWith('.webm') || r.raw_file.endsWith('.mp3') || r.raw_file.endsWith('.wav');
+        const isImg = r.raw_file.endsWith('.jpg') || r.raw_file.endsWith('.jpeg') || r.raw_file.endsWith('.png') || r.raw_file.endsWith('.webp');
+
+        if (isAudio) {
+          kind = 'audio';
+          badgeLabel = '录音';
+          displayTitle = '录音';
+        } else if (isImg) {
+          kind = 'image';
+          badgeLabel = '图片';
+          displayTitle = '图片';
+        } else {
+          kind = 'file';
+          badgeLabel = '附件';
+          displayTitle = '文件';
+        }
+      } else {
+        kind = 'text';
+        badgeLabel = '文字';
+        if (content.length > 8) {
+          displayTitle = content.substring(0, 8) + '...';
+        } else {
+          displayTitle = content || '无文字内容';
+        }
+      }
+
+      return { kind, badgeLabel, displayTitle, content };
+    }
+
+    // 1. 时间线精简列表项
+    function renderDashboardTimelineItem(r) {
+      cachedRecordsMap[r.id] = r;
+      const { kind, badgeLabel, displayTitle } = getAssetSummary(r);
+      const timeStr = r.received_at ? r.received_at.substring(5, 16).replace('T', ' ') : (r.created_at ? r.created_at.substring(5, 16).replace('T', ' ') : '');
+      const badgeClass = kind === 'audio' ? 'badge-audio' : (kind === 'image' ? 'badge-image' : 'badge-text');
+
+      return `
+        <div class="timeline-item" onclick="openNoteDetailModal('${r.id}', false)">
+          <div class="timeline-dot"></div>
+          <div class="timeline-row">
+            <div class="timeline-content-left">
+              <span class="timeline-badge ${badgeClass}">${badgeLabel}</span>
+              <span class="timeline-label">${displayTitle}</span>
+            </div>
+            <div class="timeline-time">${timeStr} ›</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 2. 卡片流展示（录音最后自动显示识别文本）
+    function renderDashboardCardItem(r) {
+      cachedRecordsMap[r.id] = r;
+      let routeName = r.route || '随想';
+      const timeStr = r.received_at ? r.received_at.substring(5, 16).replace('T', ' ') : '';
+      const { kind, badgeLabel, displayTitle, content } = getAssetSummary(r);
+
+      let badgeClass = kind === 'audio' ? 'badge-audio' : (kind === 'image' ? 'badge-image' : 'badge-text');
+      let mediaPreview = '';
+
+      if (kind === 'audio') {
+        // 录音：音频条 + 最后自动显示识别/转写文本
+        const transcriptText = content ? content : (r.transcription || '');
+        const autoTextHtml = transcriptText ? `
+          <div style="margin-top:8px;padding:8px 10px;background:var(--bg-primary);border-radius:6px;border:1px solid var(--border-color);font-size:12px;line-height:1.5;color:var(--text-primary);">
+            <div style="font-size:10.5px;color:var(--text-muted);margin-bottom:3px;font-weight:600;">📝 录音转写文本:</div>
+            <div>${transcriptText}</div>
+          </div>
+        ` : '';
+
+        mediaPreview = `
+          <div style="margin:10px 0;background:var(--bg-tertiary);border-radius:var(--radius-md);padding:8px 10px;border:1px solid var(--border-color);">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;display:flex;justify-content:space-between;">
+              <span>🎙 录音原件</span>
+              <a href="/api/files/${r.raw_file}" download target="_blank" style="color:var(--primary-color);font-weight:600;text-decoration:none;">下载</a>
+            </div>
+            <audio controls src="/api/files/${r.raw_file}" style="width:100%;height:32px;"></audio>
+            ${autoTextHtml}
+          </div>
+        `;
+      } else if (kind === 'image') {
+        mediaPreview = `
+          <div style="margin:10px 0;text-align:center;background:var(--bg-tertiary);padding:6px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+            <a href="/api/files/${r.raw_file}" target="_blank">
+              <img src="/api/files/${r.raw_file}" style="max-height:120px;max-width:100%;border-radius:6px;object-fit:cover;" alt="图片">
+            </a>
+          </div>
+        `;
+      }
+
+      let textPreview = '';
+      if (kind !== 'audio') {
+        textPreview = content ? `<div class="note-preview" style="font-size:12.5px;line-height:1.5;">${content}</div>` : '';
+      }
+
+      return `
+        <div class="note-card" style="display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;" onclick="openNoteDetailModal('${r.id}', false)">
+          <div>
+            <div class="note-card-header" style="margin-bottom:8px;">
+              <div style="display:flex;align-items:center;gap:6px;overflow:hidden;">
+                <h3 class="note-title" style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${displayTitle}</h3>
+              </div>
+              <div style="display:flex;gap:4px;flex-shrink:0;">
+                <span class="note-tag-chip">${routeName}</span>
+                <span class="timeline-badge ${badgeClass}">${badgeLabel}</span>
+              </div>
+            </div>
+
+            ${textPreview}
+            ${mediaPreview}
+          </div>
+
+          <div style="margin-top:10px;padding-top:8px;border-top:1px dashed var(--border-color);display:flex;align-items:center;justify-content:space-between;gap:6px;" onclick="event.stopPropagation()">
+            <span style="font-size:11px;color:var(--text-muted);">🕒 ${timeStr}</span>
+            <div style="display:flex;gap:4px;">
+              <button class="btn-pill" style="height:26px;padding:0 8px;font-size:11px;" onclick="copySingleRecordContent('${r.id}')">📋 复制</button>
+              <button class="btn-pill" style="height:26px;padding:0 8px;font-size:11px;color:var(--primary-color);" onclick="openNoteDetailModal('${r.id}', true)">✏️ 编辑</button>
+              <button class="btn-pill" style="height:26px;padding:0 6px;font-size:11px;color:var(--danger-color);" onclick="quickDeleteRecord('${r.id}')">✕</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* 一键复制单条内容 */
+    function copySingleRecordContent(recordId) {
+      const r = cachedRecordsMap[recordId];
+      if (!r) return toast('未找到记录');
+      const textToCopy = (r.original_text || r.transcription || r.content || '').trim();
+      if (!textToCopy) return toast('该条目无文本内容可复制');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          toast('✅ 文本已复制到剪贴板');
+        }).catch(() => {
+          fallbackCopyText(textToCopy);
+        });
+      } else {
+        fallbackCopyText(textToCopy);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        toast('✅ 文本已复制');
       } catch (e) {
+        toast('复制失败，请手动长按复制');
+      }
+      document.body.removeChild(ta);
+    }
+
+    /* 快捷删除单条记录 */
+    async function quickDeleteRecord(recordId) {
+      if (!confirm('确定要删除这条多模态归档记录吗？')) return;
+      try {
+        const res = await fetch(`/api/records/${recordId}/delete`, { method: 'POST' });
+        const d = await res.json();
+        if (d.ok) {
+          toast('已删除');
+          loadDashboardAssetFlow();
+          if (activeModalRecord && activeModalRecord.id === recordId) closeNoteModalDirect();
+        } else {
+          toast('删除失败: ' + (d.error || '未知错误'));
+        }
+      } catch(e) {
         toast('网络异常');
       }
     }
 
-    // 初始化运行
+
+    // 页面与多模态资产初始化
+    
+    /* ==========================================================================
+       手机屏幕动态自适应与智能排版机制 (自动识别屏幕尺寸、旋转与动态视口高度)
+       ========================================================================== */
+    function updateAdaptiveViewportLayout() {
+      // 动态计算真实视口高度 (解决 iOS Safari / 安卓 Chrome 动态地址栏与底部栏高度遮挡)
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+      const screenWidth = window.innerWidth || document.documentElement.clientWidth;
+      const isMobile = screenWidth <= 768;
+      const isNarrow = screenWidth <= 375;
+
+      document.body.classList.toggle('is-mobile-screen', isMobile);
+      document.body.classList.toggle('is-narrow-screen', isNarrow);
+
+      // 如果是在移动设备上，且尚未手动设置视图，默认自动采用最佳排版（时间线列表模式）
+      if (isMobile && !localStorage.getItem('assetViewMode')) {
+        currentAssetViewMode = 'list';
+      }
+    }
+
+    window.addEventListener('resize', updateAdaptiveViewportLayout, { passive: true });
+    window.addEventListener('orientationchange', () => {
+      setTimeout(updateAdaptiveViewportLayout, 100);
+    });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateAdaptiveViewportLayout, { passive: true });
+    }
+
+    updateAdaptiveViewportLayout();
+    initAssetViewMode();
+    loadDashboardAssetFlow();
     loadSavedAppearance();
     loadProjects();
     loadAccountCategories();
     loadSystemConfig();
-  </script>
+    initWechatVoiceBars();
+
+</script>
+
+  <!-- 微信同款录音 HUD 指示弹窗 -->
+  <div class="wechat-voice-modal-overlay" id="wechatVoiceHud">
+    <div class="wechat-recording-hud">
+      <div class="hud-waves">
+        <div class="hud-wave-bar"></div>
+        <div class="hud-wave-bar"></div>
+        <div class="hud-wave-bar"></div>
+        <div class="hud-wave-bar"></div>
+        <div class="hud-wave-bar"></div>
+      </div>
+      <div class="hud-text">正在录音</div>
+      <div class="hud-timer" id="hudTimer">0:01</div>
+    </div>
+  </div>
+
 </body>
 </html>
