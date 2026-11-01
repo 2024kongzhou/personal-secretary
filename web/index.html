@@ -1279,7 +1279,59 @@
     }
 
     .hidden { display: none !important; }
-  </style>
+  
+/* AI 润色与双视图切换样式 */
+.view-switch-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 3px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.view-switch-btn {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #94a3b8);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+.view-switch-btn.active {
+  background: #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+.polished-box {
+  background: rgba(59, 130, 246, 0.06);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  white-space: pre-wrap;
+}
+.receipt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+</style>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0d1527">
+  <link rel="apple-touch-icon" href="./icon-192.png">
 </head>
 <body data-theme="warm" data-font="heiti" data-size="normal">
 
@@ -2477,6 +2529,30 @@
       renderModalState();
     }
 
+    
+    let currentDetailViewTab = 'polished'; // 'polished' or 'raw'
+
+    function switchDetailViewTab(tab) {
+      currentDetailViewTab = tab;
+      const btnP = document.getElementById('btnViewPolished');
+      const btnR = document.getElementById('btnViewRaw');
+      const boxP = document.getElementById('modalPolishedBox');
+      const boxR = document.getElementById('modalRawBox');
+      if (btnP && btnR && boxP && boxR) {
+        if (tab === 'polished') {
+          btnP.classList.add('active');
+          btnR.classList.remove('active');
+          boxP.classList.remove('hidden');
+          boxR.classList.add('hidden');
+        } else {
+          btnR.classList.add('active');
+          btnP.classList.remove('active');
+          boxR.classList.remove('hidden');
+          boxP.classList.add('hidden');
+        }
+      }
+    }
+
     function renderModalState() {
       const r = activeModalRecord;
       if (!r) return;
@@ -2505,7 +2581,33 @@
 
         let content = r.original_text || '(多媒体原件存档)';
         let highlighted = content.replace(/(#[^\s#]+)/g, '<span class="note-tag-chip">$1</span>');
-        document.getElementById('modalViewContent').innerHTML = highlighted;
+        
+        // 智能润色提取逻辑
+        let rawClean = content.replace(/[啊呃嗯呀那个然后就是说]+/g, '').trim();
+        let polishedText = '【智能提炼要点】\n' + (rawClean || '(空)');
+        
+        let actions = [];
+        let sentences = rawClean.split(/[，。！？；\n]/);
+        for (let s of sentences) {
+          s = s.trim();
+          if (s && (s.includes('记得') || s.includes('安排') || s.includes('通知') || s.includes('确认') || s.includes('购买') || s.includes('报销') || s.includes('联系') || s.includes('提交') || s.includes('验收'))) {
+            actions.push(s);
+          }
+        }
+        if (actions.length > 0) {
+          polishedText += '\n\n【提取行动项】\n' + actions.map(a => '• ' + a).join('\n');
+        }
+
+        const dualViewHtml = `
+          <div class="view-switch-tabs">
+            <button id="btnViewPolished" class="view-switch-btn ${currentDetailViewTab === 'polished' ? 'active' : ''}" onclick="switchDetailViewTab('polished')">✨ AI 结构化精简</button>
+            <button id="btnViewRaw" class="view-switch-btn ${currentDetailViewTab === 'raw' ? 'active' : ''}" onclick="switchDetailViewTab('raw')">📄 原始完整记录</button>
+          </div>
+          <div id="modalPolishedBox" class="polished-box ${currentDetailViewTab === 'polished' ? '' : 'hidden'}">${polishedText}</div>
+          <div id="modalRawBox" class="${currentDetailViewTab === 'raw' ? '' : 'hidden'}">${highlighted}</div>
+        `;
+        document.getElementById('modalViewContent').innerHTML = dualViewHtml;
+
 
         let attachHtml = '';
         if (r.raw_file) {
@@ -3009,9 +3111,27 @@
         document.getElementById('moneyFileName').innerText = '';
         document.getElementById('moneyRecordHint').innerText = '按住语音记账 · 松开完成';
 
+        // 1. 调用通用分析
         const aRes = await fetch(`/api/records/${currentRecordId}/analyze`, { method: 'POST' });
         const aData = await aRes.json();
-        const fields = (aData.record && aData.record.analysis && aData.record.analysis.candidate_fields) || {};
+        let fields = (aData.record && aData.record.analysis && aData.record.analysis.candidate_fields) || {};
+
+        // 2. 增强调用专门的票据智能解析
+        try {
+          const pRes = await fetch('/api/parse_receipt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: txt })
+          });
+          const pData = await pRes.json();
+          if (pData.ok && pData.data) {
+            if (!fields.amount && pData.data.amount) fields.amount = pData.data.amount;
+            if ((!fields.merchant || fields.merchant === 'None') && pData.data.merchant) fields.merchant = pData.data.merchant;
+            if (pData.data.category && accountCategoryList.includes(pData.data.category)) {
+              document.getElementById('accountCategorySelector').value = pData.data.category;
+            }
+          }
+        } catch(pe) {}
 
         document.getElementById('mAmount').value = fields.amount || '';
         document.getElementById('mDirection').value = fields.direction || 'expense';
@@ -3554,5 +3674,12 @@
     </div>
   </div>
 
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>

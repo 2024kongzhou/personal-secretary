@@ -346,6 +346,81 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         parsed = urlparse(self.path)
         path = parsed.path
+        if path == "/api/polish":
+            length = int(self.headers.get("Content-Length", "0"))
+            try:
+                body = json.loads(self.rfile.read(length).decode("utf-8"))
+                text = (body.get("text") or "").strip()
+                if not text:
+                    return self.send_json(400, {"ok": False, "error": "文本不能为空"})
+                
+                # 规则预处理：剔除口吃、语气停顿词
+                clean_text = re.sub(r"[啊呃嗯呀那个然后就是说]+", "", text)
+                clean_text = re.sub(r"\s+", " ", clean_text).strip()
+                
+                # 智能结构化梳理
+                # 1. 尝试识别重点或行动项
+                summary = clean_text[:40] + ("..." if len(clean_text) > 40 else "")
+                action_items = []
+                for sentence in re.split(r"[，。！？；
+]", clean_text):
+                    s = sentence.strip()
+                    if s and any(k in s for k in ["记得", "安排", "通知", "确认", "购买", "报销", "联系", "提交", "验收"]):
+                        action_items.append(s)
+                
+                polished = f"【要点摘要】\n{clean_text}\n"
+                if action_items:
+                    polished += "\n【提取事项】\n" + "\n".join(f"- {item}" for item in action_items)
+                
+                return self.send_json(200, {
+                    "ok": True,
+                    "original": text,
+                    "polished": polished,
+                    "action_items": action_items
+                })
+            except Exception as e:
+                return self.send_json(500, {"ok": False, "error": str(e)})
+
+        if path == "/api/parse_receipt":
+            length = int(self.headers.get("Content-Length", "0"))
+            try:
+                body = json.loads(self.rfile.read(length).decode("utf-8"))
+                text = (body.get("text") or "").strip()
+                
+                # 智能正则匹配票据与记账信息
+                amount_match = re.search(r"(?:金额|合计|总计|实付|消费|￥|¥|支付)?[:：\s]*([0-9]+(?:\.[0-9]{1,2})?)\s*(?:元|块)?", text)
+                amount = amount_match.group(1) if amount_match else ""
+                
+                # 日期匹配
+                date_match = re.search(r"(\d{4}[-/年]\d{1,2}[-/月]\d{1,2}日?)", text)
+                date_str = date_match.group(1) if date_match else datetime.now().strftime("%Y-%m-%d")
+                
+                # 商家/商户匹配
+                merchant_match = re.search(r"(?:收款方|商户|商家|店铺|公司|在)(?:名称)?[:：\s]*([\u4e00-\u9fa5A-Za-z0-9（）()]+?)(?:[，,\s\n]|$)", text)
+                merchant = merchant_match.group(1) if merchant_match else "未指定商户"
+                
+                # 消费类型推断
+                cat = "日常餐饮"
+                if any(k in text for k in ["加油", "打车", "高铁", "机票", "停车", "路桥", "交通"]):
+                    cat = "差旅交通"
+                elif any(k in text for k in ["水泥", "钢筋", "五金", "砂石", "租赁", "材料", "工程"]):
+                    cat = "工程采购"
+                elif any(k in text for k in ["打印", "办公", "电脑", "纸张", "耗材", "快递"]):
+                    cat = "办公开销"
+                
+                return self.send_json(200, {
+                    "ok": True,
+                    "data": {
+                        "amount": amount,
+                        "date": date_str,
+                        "merchant": merchant,
+                        "category": cat,
+                        "confidence": "high" if amount else "medium"
+                    }
+                })
+            except Exception as e:
+                return self.send_json(500, {"ok": False, "error": str(e)})
+
         if path == "/api/logs":
             log_entries = []
             log_dir = DATA_DIR / "logs"
