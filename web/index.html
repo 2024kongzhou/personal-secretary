@@ -2317,7 +2317,42 @@
     </div>
   </div>
 
+  <!-- 全局悬浮速记按钮 FAB -->
+  <button id="globalFab" onclick="fabQuickCapture()" title="随手记一笔"
+    style="position:fixed;right:20px;bottom:84px;width:56px;height:56px;border-radius:50%;
+    background:linear-gradient(135deg,#0071e3,#38bdf8);color:#fff;border:none;cursor:pointer;
+    font-size:28px;line-height:56px;text-align:center;box-shadow:0 6px 20px rgba(0,113,227,0.4);
+    z-index:9000;transition:transform 0.2s ease,box-shadow 0.2s ease;display:none;"
+    onmouseover="this.style.transform='scale(1.08)';this.style.boxShadow='0 8px 26px rgba(0,113,227,0.5)'"
+    onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 6px 20px rgba(0,113,227,0.4)'">＋</button>
+
   <script>
+    // 动态问候语 + 日期（修复原代码 updateLiveGreeting 未定义的 bug）
+    function updateLiveGreeting(){
+      try{
+        const now = new Date();
+        const h = now.getHours();
+        let greet = '晚上好';
+        if(h < 6) greet = '夜深了';
+        else if(h < 11) greet = '早上好';
+        else if(h < 13) greet = '中午好';
+        else if(h < 18) greet = '下午好';
+        const week = ['日','一','二','三','四','五','六'][now.getDay()];
+        const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 · 周${week}`;
+        const titleEl = document.getElementById('liveGreetingTitle');
+        const dateEl = document.getElementById('todayDateStr');
+        if(titleEl) titleEl.textContent = `${greet}，今天一切就绪`;
+        if(dateEl) dateEl.textContent = dateStr;
+      }catch(e){}
+    }
+    // FAB 点击：跳到速记页并聚焦输入框
+    function fabQuickCapture(){
+      switchNav('inbox');
+      setTimeout(()=>{
+        const ta = document.getElementById('inboxInput');
+        if(ta){ ta.focus(); ta.scrollIntoView({behavior:'smooth',block:'center'}); }
+      },120);
+    }
     let currentRecordId = null;
     let mediaRecorder = null;
     let audioChunks = [];
@@ -2454,6 +2489,10 @@
         if (currentSelectedProject) loadByRoute(currentSelectedProject, 'projectList');
       }
       if (key === 'money') loadAccountCategories();
+
+      // FAB 显示控制：速记页/设置页隐藏，其他页显示
+      const fab = document.getElementById('globalFab');
+      if (fab) fab.style.display = (key === 'inbox' || key === 'sett') ? 'none' : 'block';
     }
 
     function quickCreateAction() {
@@ -2747,10 +2786,13 @@
 
     function checkAuth() {
       const token = localStorage.getItem('xiaoya_token');
+      const overlay = document.getElementById('loginOverlay');
       if (!token) {
-        document.getElementById('loginOverlay').style.display = 'flex';
+        overlay.style.display = 'flex';
         return false;
       }
+      // 已有 token：隐藏登录遮罩，直接进入工作台
+      overlay.style.display = 'none';
       return true;
     }
 
@@ -4241,6 +4283,8 @@
       loadSystemConfig();
       initWechatVoiceBars();
     }
+    // 兜底：无论 initApp 内部是否有函数缺失，都强制切到今日聚焦页（保证 FAB/问候语显示）
+    try { switchNav('dash'); } catch (e) { console.warn('switchNav兜底:', e); }
 
     // 页面加载时检查认证
     if (checkAuth()) {
