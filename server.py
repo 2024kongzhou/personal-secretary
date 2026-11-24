@@ -18,6 +18,7 @@ import urllib.request
 import urllib.error
 import hmac
 import logging
+import subprocess
 from logging.handlers import RotatingFileHandler
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -33,7 +34,7 @@ CONFIG_FILE = DATA_DIR / "config.json"
 MAX_BYTES = 100 * 1024 * 1024
 
 # 认证令牌：优先从环境变量读取，否则使用默认（应尽快更换）
-AUTH_TOKEN = os.environ.get("SECRETARY_TOKEN", "XiaoyaSecret2026!")
+AUTH_TOKEN = os.environ.get("SECRETARY_TOKEN", "Binzhou123")
 # CORS 白名单：仅允许本机/局域网访问
 CORS_ORIGINS = {
     "http://192.168.1.100:18765",
@@ -59,6 +60,147 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger("personal-secretary")
+
+# ========== 今日简报 (实时行情/天气/新闻) ==========
+# 铁律: 所有数据必须来自真实接口,任何失败如实标注,绝不编造/模拟/猜测
+BRIEFING_UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+EM_DOMAINS = ["push2delay.eastmoney.com", "push2his.eastmoney.com", "push2.eastmoney.com"]
+_news_cache = {"data": None, "ts": 0, "ttl": 1800}  # 新闻缓存30分钟
+
+def _http_get_json(url, timeout=10):
+    """抓取URL返回JSON,失败抛异常(不吞错误)"""
+    req = urllib.request.Request(url, headers=BRIEFING_UA)
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read().decode("utf-8", "ignore"))
+
+def _em_quote(secid):
+    """东方财富实时行情 — 用 curl 抓(绕过东财对Python urllib的TLS指纹封锁),失败抛异常"""
+    last_err = None
+    for dom in EM_DOMAINS:
+        url = f"https://{dom}/api/qt/stock/get?fltt=2&invt=2&fields=f43,f57,f58,f60,f170,f171&secid={secid}"
+        for _ in range(2):
+            try:
+                raw = subprocess.run(
+                    ["curl", "-s", "-m", "8", "-A",
+                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36", url],
+                    capture_output=True, text=True, timeout=12
+                ).stdout
+                d = json.loads(raw).get("data")
+                if d and d.get("f43") not in (None, "-"):
+                    return {
+                        "name": d.get("f58"), "code": d.get("f57"),
+                        "price": d.get("f43"), "change_pct": d.get("f170"),
+                        "ok": True
+                    }
+                break
+            except Exception as e:
+                last_err = e
+                time.sleep(0.4)
+    raise RuntimeError(f"行情获取失败 {secid}: {last_err}")
+
+def _get_quotes():
+    """实时行情: 上证/COMEX黄金/COMEX白银/布伦特原油/NYMEX原油 — 并行抓,全部真实数据"""
+    specs = [
+        ("上证指数", "1.000001"),
+        ("COMEX黄金", "101.GC00Y"),
+        ("COMEX白银", "101.SI00Y"),
+        ("布伦特原油", "112.B00Y"),
+        ("NYMEX原油", "102.CL00Y"),
+    ]
+    quotes = [None] * len(specs)
+    def fetch_one(i, name, secid):
+        try:
+            quotes[i] = _em_quote(secid)
+        except Exception:
+            quotes[i] = {"name": name, "ok": False, "error": "获取失败"}
+    threads = [threading.Thread(target=fetch_one, args=(i, n, s))
+               for i, (n, s) in enumerate(specs)]
+    for t in threads: t.start()
+    for t in threads: t.join(timeout=20)
+    # 兜底: 超时未返回的标记失败
+    for i, (n, _) in enumerate(specs):
+        if quotes[i] is None:
+            quotes[i] = {"name": n, "ok": False, "error": "获取超时"}
+    return quotes
+
+def _get_weather():
+    """滨州天气 - wttr.in 免费接口,真实数据"""
+    try:
+        d = _http_get_json("https://wttr.in/Binzhou?format=j1&lang=zh")
+        cur = d["current_condition"][0]
+        today = d["weather"][0]
+        return {
+            "city": "滨州",
+            "temp": cur["temp_C"],
+            "feels": cur.get("FeelsLikeC"),
+            "desc": cur.get("lang_zh", [{}])[0].get("value") or cur["weatherDesc"][0]["value"],
+            "humidity": cur["humidity"],
+            "wind": cur.get("windspeedKmph"),
+            "max": today.get("maxtempC"), "min": today.get("mintempC"),
+            "ok": True
+        }
+    except Exception:
+        return {"city": "滨州", "ok": False, "error": "获取失败"}
+
+def _get_news():
+    """过去24小时财经要闻,缓存30分钟。返回真实标题,失败如实标注"""
+    now = time.time()
+    if _news_cache["data"] and (now - _news_cache["ts"]) < _news_cache["ttl"]:
+        return _news_cache["data"]
+    items = _fetch_news_real()
+    _news_cache["data"] = items
+    _news_cache["ts"] = now
+    return items
+
+def _fetch_news_real():
+    """从真实源抓财经新闻(排除体育/娱乐/宗教),双源聚合:新浪7x24+华尔街见闻"""
+    collected = []
+    # 源1: 新浪财经7x24直播(稳定,真实)
+    try:
+        url = ("https://zhibo.sina.com.cn/api/zhibo/feed?page=1&page_size=20"
+               "&zhibo_id=152&tag_id=0&dire=f&dpc=1")
+        d = _http_get_json(url)
+        for it in ((d.get("result") or {}).get("data", {})
+                   .get("feed", {}).get("list", []) or [])[:25]:
+            t = (it.get("rich_text") or it.get("text") or "").strip()
+            if t:
+                collected.append({"title": t[:90], "source": "新浪财经",
+                                  "time": (it.get("create_time") or "")[11:16]})
+    except Exception:
+        pass
+    # 源2: 华尔街见闻快讯(稳定,真实,全球化财经)
+    try:
+        url = "https://api-one-wscn.awtmt.com/apiv1/content/lives?channel=global-channel&limit=20"
+        d = _http_get_json(url)
+        for it in (d.get("data") or {}).get("items", [])[:25]:
+            t = (it.get("content_text") or it.get("title") or "").strip()
+            if t:
+                # display_time 可能是时间戳(数字)或字符串,统一处理
+                dt = it.get("display_time") or ""
+                tm = ""
+                if isinstance(dt, (int, float)):
+                    tm = time.strftime("%H:%M", time.localtime(dt))
+                elif isinstance(dt, str) and len(dt) >= 16:
+                    tm = dt[11:16]
+                collected.append({"title": t[:90], "source": "华尔街见闻",
+                                  "time": tm})
+    except Exception:
+        pass
+    # 过滤: 排除体育/娱乐/宗教(用户明确不要),保留财经/时政/科技/产业
+    ban = ["体育", "足球", "篮球", "赛事", "联赛", "夺冠", "球员", "中超", "NBA",
+           "世界杯", "奥运", "欧冠", "电竞", "游戏", "胜", "负", "战平", "进球",
+           "娱乐", "明星", "影视", "电影", "综艺", "演唱会", "偶像", "出道",
+           "宗教", "教会", "信仰", "寺庙", "祈祷"]
+    filtered = [n for n in collected if not any(b in n["title"] for b in ban)]
+    # 去重(按标题)
+    seen, uniq = set(), []
+    for n in filtered:
+        key = n["title"][:30]  # 前30字去重
+        if key not in seen:
+            seen.add(key)
+            uniq.append(n)
+    return {"items": uniq[:20], "ok": len(uniq) > 0, "total": len(uniq)}
+
 
 # ========== 默认配置 ==========
 DEFAULT_CONFIG = {
@@ -477,6 +619,31 @@ class Handler(BaseHTTPRequestHandler):
                     "ok": True, "service": "personal-secretary",
                     "version": "0.5", "capture": "L0",
                     "ai_enabled": cfg.get("ai", {}).get("enabled", False)
+                })
+
+            if path == "/api/briefing":
+                """今日简报: 实时行情+天气+新闻,并行抓取,失败项如实标注"""
+                results = {}
+                def run(key, fn):
+                    try:
+                        results[key] = fn()
+                    except Exception as e:
+                        results[key] = {"ok": False, "error": "获取失败"}
+                        logger.warning(f"简报-{key}失败: {e}")
+                threads = [
+                    threading.Thread(target=run, args=("quotes", _get_quotes)),
+                    threading.Thread(target=run, args=("weather", _get_weather)),
+                    threading.Thread(target=run, args=("news", _get_news)),
+                ]
+                for t in threads: t.start()
+                for t in threads: t.join(timeout=15)
+                quotes = results.get("quotes", [])
+                return self.send_json(200, {
+                    "ok": True,
+                    "quotes": quotes if isinstance(quotes, list) else [],
+                    "weather": results.get("weather", {"ok": False, "error": "获取失败"}),
+                    "news": results.get("news", {"ok": False, "items": [], "error": "获取失败"}),
+                    "updated_at": datetime.now().strftime("%H:%M"),
                 })
 
             if path == "/api/config":
