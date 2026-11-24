@@ -51,6 +51,9 @@
     }
 
     /* ===== 全局精致滚动条（去网页感，更原生） ===== */
+    body {
+      background: var(--bg-secondary);
+    }
     * { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.18) transparent; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -176,8 +179,58 @@
       height: 100vh;
       height: 100dvh;
       overflow: hidden;
-      background: var(--bg-secondary);
+      /* 背景透明，让 fixed 光斑层透出来（毛玻璃的灵魂） */
+      background: transparent;
+      position: relative;
     }
+    /* ===== 毛玻璃质感：背景柔和光斑层 ===== */
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .bg-glow::before,
+    .bg-glow::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.75;
+    }
+    .bg-glow::before {
+      width: 520px; height: 520px;
+      top: -140px; right: -100px;
+      background: radial-gradient(circle, rgba(0,113,227,0.55), transparent 68%);
+      animation: float1 18s ease-in-out infinite;
+    }
+    .bg-glow::after {
+      width: 460px; height: 460px;
+      bottom: -120px; left: -80px;
+      background: radial-gradient(circle, rgba(168,85,247,0.45), transparent 68%);
+      animation: float2 22s ease-in-out infinite;
+    }
+    /* 中部再加一个青色光斑，丰富层次 */
+    .bg-glow > .glow-mid {
+      position: absolute;
+      width: 300px; height: 300px;
+      top: 40%; left: 50%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56,189,248,0.4), transparent 70%);
+      filter: blur(70px);
+      animation: float1 26s ease-in-out infinite reverse;
+    }
+    @keyframes float1 {
+      0%,100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(-30px,40px) scale(1.1); }
+    }
+    @keyframes float2 {
+      0%,100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(40px,-30px) scale(1.08); }
+    }
+    /* 让主内容浮在光斑之上 */
+    .app-shell > *:not(.bg-glow) { position: relative; z-index: 1; }
 
     /* 1. 电脑端侧边栏 (232px) */
     .app-sidebar {
@@ -562,13 +615,15 @@
       gap: 14px;
     }
 
-    /* 核心 Note 卡片 (对齐 Notepad .note-card) */
+    /* 核心 Note 卡片 (对齐 Notepad .note-card) — 毛玻璃质感 */
     .note-card {
-      background: var(--surface-elevated);
+      background: color-mix(in srgb, var(--surface-elevated) 72%, transparent);
+      backdrop-filter: blur(16px) saturate(1.6);
+      -webkit-backdrop-filter: blur(16px) saturate(1.6);
       border-radius: var(--radius-lg);
       padding: 20px;
       box-shadow: var(--card-shadow);
-      border: 1px solid var(--border-color);
+      border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
       cursor: pointer;
       transition: all 0.25s ease;
       display: flex;
@@ -1399,8 +1454,10 @@
     .note-card {
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
       border-radius: var(--radius-lg) !important;
-      border: 1px solid var(--border-color) !important;
-      background: var(--surface-elevated) !important;
+      border: 1px solid color-mix(in srgb, var(--border-color) 75%, transparent) !important;
+      background: color-mix(in srgb, var(--surface-elevated) 70%, transparent) !important;
+      backdrop-filter: blur(18px) saturate(1.7) !important;
+      -webkit-backdrop-filter: blur(18px) saturate(1.7) !important;
       box-shadow: var(--card-shadow) !important;
     }
 
@@ -1438,6 +1495,8 @@
 
 
   <div class="app-shell">
+    <!-- 毛玻璃背景光斑层 -->
+    <div class="bg-glow"><div class="glow-mid"></div></div>
     <!-- 1. 电脑端侧边栏 -->
     <aside class="app-sidebar" aria-label="侧边主导航">
       <div class="brand" onclick="switchNav('dash')">
