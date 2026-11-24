@@ -1,0 +1,26 @@
+# ===== 敏感/私有数据（绝不上传）=====
+data/
+backups/
+*.log
+*.pid
+
+# ===== 二进制/大文件 =====
+cloudflared
+
+# ===== 代码备份文件 =====
+server.py.bak*
+server.py.v*-backup
+web/*.bak
+web/*-backup
+web/index.html.v*-backup
+
+# ===== Python =====
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# ===== 临时/缓存 =====
+quick_tunnel.*
+tunnel_cron.log
+.DS_Store

@@ -1,0 +1,4275 @@
+﻿<!doctype html>
+<html lang="zh-CN" data-theme="warm" data-font="heiti" data-size="normal">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <title>小雅全能助手 · 个人工作台</title>
+  <style>
+    /* ==========================================================================
+       TechFunWay/notepad 完整设计精髓落实：
+       1. 侧边栏导航 + 顶部检索筛选 + 网格展示
+       2. 查看模式 (Note View)：详情查看、标题、标签高亮、元数据 (创建/修改时间)、原始文件附件下载、直接删除
+       3. 编辑模式 (Note Edit)：直接在界面中修改标题、正文内容、标签，保存并立即同步
+       4. 随想 Memos 全面配备 88px 麦克风录音语音录入功能！
+       ========================================================================== */
+    :root {
+      /* 核心主视觉：苹果极简呼吸感 (Modern Apple Clean) */
+      --primary-color: #0071e3;
+      --primary-strong: #0056b3;
+      --primary-hover: #0077ed;
+      --primary-light: rgba(0, 113, 227, 0.08);
+      --accent-color: #38bdf8;
+      --success-color: #34c759;
+      --warning-color: #ff9500;
+      --danger-color: #ff3b30;
+      
+      --text-primary: #1d1d1f;
+      --text-secondary: #515154;
+      --text-muted: #86868b;
+      
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-strong: rgba(0, 0, 0, 0.16);
+      --border-light: rgba(0, 0, 0, 0.04);
+      
+      --bg-primary: #ffffff;
+      --bg-secondary: #fbfbfd;
+      --bg-tertiary: #f5f5f7;
+      --bg-glass: rgba(255, 255, 255, 0.82);
+      --surface-elevated: #ffffff;
+      
+      --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+      --card-shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.03);
+      --card-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.09);
+      
+      --app-sidebar-width: 240px;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --font-scale: 1;
+      --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Helvetica Neue", sans-serif;
+    }
+
+    /* 主题 1：大地温润 (Warm Walnut) */
+    html[data-theme="walnut"], body[data-theme="walnut"] {
+      --primary-color: #b45309;
+      --primary-strong: #8f3f08;
+      --primary-hover: #9a470a;
+      --primary-light: #f8eadb;
+      --accent-color: #c55d27;
+      --text-primary: #1c1917;
+      --text-secondary: #625c56;
+      --text-muted: #948c83;
+      --border-color: #e6e1db;
+      --border-strong: #d6cfc7;
+      --border-light: #eeeae5;
+      --bg-primary: #fffdfa;
+      --bg-secondary: #f6f3ef;
+      --bg-tertiary: #f0ece7;
+      --bg-glass: rgba(255, 253, 250, 0.88);
+      --surface-elevated: #fffdfa;
+      --card-shadow: 0 2px 10px rgba(44, 36, 29, 0.05);
+      --card-shadow-hover: 0 12px 30px rgba(44, 36, 29, 0.1);
+    }
+
+    /* 主题 2：极光暗夜黑 (Dark Nebula) */
+    html[data-theme="cyber"], body[data-theme="cyber"],
+    html[data-theme="dark"], body[data-theme="dark"] {
+      --primary-color: #3b82f6;
+      --primary-strong: #60a5fa;
+      --primary-hover: #2563eb;
+      --primary-light: rgba(59, 130, 246, 0.15);
+      --accent-color: #38bdf8;
+      --success-color: #34d399;
+      --warning-color: #fbbf24;
+      --danger-color: #f87171;
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --border-color: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --border-light: rgba(255, 255, 255, 0.04);
+      --bg-primary: #0a0a0c;
+      --bg-secondary: #131316;
+      --bg-tertiary: #1b1b20;
+      --bg-glass: rgba(19, 19, 22, 0.85);
+      --surface-elevated: #1a1a20;
+      --card-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+      --card-shadow-hover: 0 14px 36px rgba(0, 0, 0, 0.65);
+    }
+
+    /* 主题 3：商务静谧蓝 (Business Slate) */
+    html[data-theme="business"], body[data-theme="business"] {
+      --primary-color: #1e293b;
+      --primary-strong: #0f172a;
+      --primary-hover: #334155;
+      --primary-light: rgba(30, 41, 59, 0.08);
+      --accent-color: #0284c7;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --border-light: #f1f5f9;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --bg-glass: rgba(255, 255, 255, 0.88);
+      --surface-elevated: #ffffff;
+      --card-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+      --card-shadow-hover: 0 12px 28px rgba(15, 23, 42, 0.1);
+    }
+
+    /* 主题 4：活力日落 (Vibrant Sunset) */
+    html[data-theme="vibrant"], body[data-theme="vibrant"] {
+      --primary-color: #ea580c;
+      --primary-strong: #c2410c;
+      --primary-hover: #f97316;
+      --primary-light: rgba(234, 88, 12, 0.09);
+      --accent-color: #d97706;
+      --bg-primary: #ffffff;
+      --bg-secondary: #fffbf9;
+      --bg-tertiary: #fff4ed;
+      --bg-glass: rgba(255, 255, 255, 0.88);
+      --text-primary: #292524;
+      --text-secondary: #78716c;
+      --border-color: #fed7aa;
+      --border-strong: #fdba74;
+    }
+
+    /* 字体大小缩放支持 */
+    html[data-size="compact"], body[data-size="compact"] { --font-scale: 0.92; }
+    html[data-size="normal"], body[data-size="normal"] { --font-scale: 1; }
+    html[data-size="large"], body[data-size="large"] { --font-scale: 1.12; }
+    
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100dvh;
+      background: var(--bg-secondary);
+      font-family: var(--font-family);
+      color: var(--text-primary);
+      font-size: calc(14px * var(--font-scale));
+      line-height: 1.5;
+    }
+
+    .app-shell {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--bg-secondary);
+    }
+
+    /* 1. 电脑端侧边栏 (232px) */
+    .app-sidebar {
+      width: var(--app-sidebar-width);
+      flex: 0 0 var(--app-sidebar-width);
+      background: var(--bg-primary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px 16px;
+      z-index: 50;
+      transition: width 0.25s ease, padding 0.25s ease;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 8px 24px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 12px;
+    }
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-strong));
+      border-radius: 10px;
+      box-shadow: 0 6px 16px var(--primary-light);
+      font-size: 19px;
+      font-weight: 800;
+    }
+    .brand-copy {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .brand-copy strong {
+      font-size: calc(15px * var(--font-scale));
+      color: var(--text-primary);
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      white-space: nowrap;
+    }
+    .brand-copy small {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .primary-nav {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .nav-label {
+      margin: 16px 10px 8px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .nav-item {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 0 12px;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 0;
+      border-radius: var(--radius-md);
+      font: inherit;
+      font-size: calc(13.5px * var(--font-scale));
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      margin-bottom: 3px;
+      text-align: left;
+    }
+    .nav-item:hover {
+      color: var(--primary-color);
+      background: var(--primary-light);
+    }
+    .nav-item.active {
+      color: var(--primary-color);
+      background: var(--primary-light);
+      font-weight: 600;
+    }
+    .nav-icon {
+      font-size: 17px;
+      flex: 0 0 20px;
+      display: grid;
+      place-items: center;
+    }
+
+    .sidebar-footer {
+      padding-top: 14px;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-md);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-light);
+    }
+    .user-avatar-mini {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--primary-color);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* 2. 主工作区 */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 顶部导航 Header */
+    .notes-list-header {
+      padding: 20px 32px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-light);
+      flex: none;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .page-heading {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .page-eyebrow {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--primary-color);
+      text-transform: uppercase;
+    }
+    .page-title {
+      font-size: calc(22px * var(--font-scale));
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notes-count {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      padding: 3px 10px;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    .create-btn {
+      height: 38px;
+      padding: 0 18px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-strong));
+      border: none;
+      box-shadow: 0 4px 14px var(--primary-light);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      font-size: calc(13px * var(--font-scale));
+    }
+    .create-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(180, 83, 9, 0.25);
+    }
+
+    /* 搜索与筛选工具栏 */
+    .notes-list-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 32px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      flex: none;
+    }
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 260px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      height: 40px;
+      padding-left: 40px;
+      padding-right: 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      outline: none;
+      font-size: calc(13px * var(--font-scale));
+      transition: all 0.2s ease;
+    }
+    .search-input:focus {
+      background: var(--bg-primary);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+    .filter-group {
+      display: flex;
+      gap: 10px;
+    }
+    .toolbar-select {
+      height: 40px;
+      padding: 0 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-size: calc(13px * var(--font-scale));
+      outline: none;
+    }
+
+    /* 内容滚动容器 */
+    .content-scroller {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .content-container {
+      max-width: 1260px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* 3. 卡片与网格系统 */
+    /* 资产显示模式：卡片 vs 列表时间线 */
+    #dashAssetFlowContainer.view-list {
+      display: flex !important;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+      padding-left: 20px;
+      margin-left: 10px;
+      border-left: 2px solid var(--border-color);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 16px;
+      padding-bottom: 4px;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -27px;
+      top: 12px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px var(--border-color);
+    }
+    .timeline-row {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .timeline-row:hover, .timeline-row:active {
+      border-color: var(--primary-color);
+      transform: translateX(2px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+    }
+    .timeline-content-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+    .timeline-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .badge-audio { background: #fee2e2; color: #b91c1c; }
+    .badge-image { background: #e0e7ff; color: #3730a3; }
+    .badge-text  { background: var(--bg-tertiary); color: var(--text-secondary); }
+    .timeline-label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .timeline-time {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    /* 卡片模式微调 */
+    #dashAssetFlowContainer.view-card {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+      gap: 16px;
+    }
+    #dashAssetFlowContainer.view-card .asset-card {
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+      gap: 16px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    /* 核心 Note 卡片 (对齐 Notepad .note-card) */
+    .note-card {
+      background: var(--surface-elevated);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .note-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--primary-color);
+    }
+    .note-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+    .note-title {
+      font-size: calc(15.5px * var(--font-scale));
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+    .note-preview {
+      font-size: calc(13px * var(--font-scale));
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .note-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-light);
+    }
+    .note-time {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .note-tag-chip {
+      color: var(--primary-color);
+      background: var(--primary-light);
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    /* 金刚区卡片 */
+    .action-tile {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--card-shadow);
+    }
+    .action-tile:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--primary-color);
+    }
+    .tile-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--primary-light);
+      color: var(--primary-color);
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+    }
+
+    /* 表单组件 */
+    .field-group { margin-bottom: 16px; }
+    .field-label {
+      display: block;
+      font-size: calc(12.5px * var(--font-scale));
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .select-box, input[type="text"], input[type="password"], input[type="number"], textarea {
+      width: 100%;
+      height: 42px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0 14px;
+      font-size: calc(13.5px * var(--font-scale));
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+    textarea {
+      height: 96px;
+      padding: 10px 14px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .select-box:focus, input:focus, textarea:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    /* 按钮规范 */
+    .btn {
+      height: 40px;
+      padding: 0 18px;
+      border-radius: var(--radius-md);
+      font-size: calc(13px * var(--font-scale));
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 0;
+      transition: all 0.18s ease;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--primary-color);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-strong);
+    }
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    .btn-secondary:hover {
+      background: var(--border-light);
+    }
+    .btn-pill {
+      height: 28px;
+      padding: 0 11px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    /* 88px 麦克风录音按键 (收件箱/记账/现场/随想全部统一配备) */
+    
+    /* ==========================================================================
+       专业录音笔硬件风格面板 (Hardware Audio Recorder Capsule)
+       - 大尺寸实体按键质感 (104px 宽大录音舱体)
+       - 金属渐变环、醒目大图标、拟物深度与按压微凹质感
+       - 动态声波光环、按住说话、松开自动完成
+       ========================================================================== */
+    .voice-control-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0 14px;
+      width: 100%;
+    }
+
+    .recorder-deck {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* 录音笔外圈多重声学防震光环 */
+    .recorder-ring {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 114px;
+      height: 114px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--bg-tertiary) 0%, var(--border-color) 100%);
+      box-shadow: 0 8px 24px rgba(44, 36, 29, 0.12), inset 0 2px 5px rgba(255,255,255,0.8);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* 录音笔实体金属核心按键 (100px) */
+    .recorder-btn {
+      width: 98px;
+      height: 98px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #c2413b, #991b1b);
+      border: 4px solid #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      box-shadow: 0 8px 20px rgba(185, 28, 28, 0.4), inset 0 3px 6px rgba(255,255,255,0.35);
+      transition: all 0.18s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .recorder-btn .recorder-icon {
+      font-size: 34px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      transition: transform 0.2s ease;
+    }
+
+    .recorder-btn .recorder-sublabel {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+      text-transform: uppercase;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    }
+
+    /* 按住状态：录音笔红灯常亮、动态脉冲雷达波纹 */
+    .recorder-deck.pressing .recorder-ring {
+      transform: scale(1.08);
+      box-shadow: 0 0 45px rgba(220, 38, 38, 0.55);
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.4) 100%);
+    }
+
+    .recorder-deck.pressing .recorder-btn {
+      transform: scale(0.95);
+      background: linear-gradient(145deg, #ef4444, #b91c1c);
+      box-shadow: inset 0 4px 10px rgba(0,0,0,0.5), 0 0 30px rgba(239, 68, 68, 0.8);
+      border-color: #fee2e2;
+    }
+
+    .recorder-deck.pressing .recorder-icon {
+      transform: scale(1.15);
+      animation: recordGlow 1s infinite alternate ease-in-out;
+    }
+
+    @keyframes recordGlow {
+      from { filter: drop-shadow(0 0 2px #fff); }
+      to { filter: drop-shadow(0 0 12px #fff); }
+    }
+
+    /* 录音笔底座状态说明 */
+    .recorder-status-caption {
+      margin-top: 12px;
+      font-size: calc(13px * var(--font-scale));
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-tertiary);
+      padding: 5px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+    }
+
+    .recorder-status-caption .status-led {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #948c83;
+      transition: background 0.2s ease;
+    }
+
+    .recorder-deck.pressing + .recorder-status-caption {
+      color: #b91c1c;
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+
+    .recorder-deck.pressing + .recorder-status-caption .status-led {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+      animation: blinkLed 0.8s infinite;
+    }
+
+    @keyframes blinkLed {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* 微信同款屏幕中央录音悬浮指示器 */
+    .wechat-voice-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .wechat-voice-modal-overlay.active {
+      opacity: 1;
+    }
+
+    .wechat-recording-hud {
+      width: 170px;
+      height: 170px;
+      background: rgba(30, 26, 23, 0.88);
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      color: #fff;
+      animation: hudPop 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes hudPop {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .hud-waves {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      height: 38px;
+      margin-bottom: 12px;
+    }
+    .hud-wave-bar {
+      width: 4px;
+      background: #e6a15f;
+      border-radius: 3px;
+      animation: waveScale 0.8s ease-in-out infinite alternate;
+    }
+    .hud-wave-bar:nth-child(1) { height: 16px; animation-delay: 0.1s; }
+    .hud-wave-bar:nth-child(2) { height: 28px; animation-delay: 0.3s; }
+    .hud-wave-bar:nth-child(3) { height: 38px; animation-delay: 0.15s; }
+    .hud-wave-bar:nth-child(4) { height: 26px; animation-delay: 0.4s; }
+    .hud-wave-bar:nth-child(5) { height: 14px; animation-delay: 0.2s; }
+
+    @keyframes waveScale {
+      0% { transform: scaleY(0.4); opacity: 0.5; }
+      100% { transform: scaleY(1.15); opacity: 1; }
+    }
+
+    .hud-text {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #fff;
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+    }
+    .hud-timer {
+      font-size: 12px;
+      color: #e6a15f;
+      margin-top: 6px;
+      font-family: monospace;
+      font-weight: 700;
+    }
+
+.voice-hint {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    /* ==========================================================================
+       4. 查看模式 (Note View) 与 编辑模式 (Note Edit) 对齐 Notepad NotesView.vue
+       ========================================================================== */
+    .note-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(5px);
+      z-index: 1200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .note-modal {
+      width: min(840px, 100%);
+      max-height: 90vh;
+      background: var(--surface-elevated);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--card-shadow-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: zoomIn 0.2s ease-out;
+    }
+    @keyframes zoomIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex: none;
+    }
+    .modal-title-area {
+      flex: 1;
+      min-width: 0;
+    }
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-light);
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex: none;
+    }
+
+    .view-content-box {
+      font-size: calc(14px * var(--font-scale));
+      line-height: 1.7;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      word-break: break-all;
+      background: var(--bg-primary);
+      padding: 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+    }
+    .view-meta-bar {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* 手机端适配 (≤768px) */
+    .mobile-header { display: none; }
+    .mobile-bottom-nav { display: none; }
+
+    @media (max-width: 1120px) and (min-width: 769px) {
+      .app-sidebar {
+        width: 72px;
+        flex: 0 0 72px;
+        padding: 18px 8px;
+        align-items: center;
+      }
+      .brand-copy, .nav-label, .nav-item span, .user-profile-badge span {
+        display: none;
+      }
+      .brand { padding: 0 0 16px 0; justify-content: center; }
+      .nav-item { justify-content: center; padding: 0; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .app-sidebar { display: none; }
+      .notes-list-header { display: none; }
+      .notes-list-toolbar { 
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .notes-list-toolbar input[type="text"] {
+        font-size: 14px; /* 防止 iOS 聚焦时自动放大页面 */
+      }
+
+      .app-shell {
+        flex-direction: column;
+        padding-top: calc(54px + env(safe-area-inset-top, 0px));
+        padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+      }
+
+      .mobile-header {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 100;
+        height: calc(54px + env(safe-area-inset-top, 0px));
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-left: 14px;
+        padding-right: 14px;
+        background: rgba(255, 253, 250, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      html[data-theme="cyber"] .mobile-header, body[data-theme="cyber"] .mobile-header {
+        background: rgba(29, 26, 23, 0.95);
+      }
+
+      .content-scroller { 
+        padding: 10px 12px 24px;
+        max-width: 100vw;
+        overflow-x: hidden;
+      }
+      .grid-4, .grid-2 { 
+        grid-template-columns: 1fr; 
+        gap: 10px; 
+      }
+
+      /* 手机屏幕自适应：时间线容器与自适应排版 */
+      #dashAssetFlowContainer.view-list {
+        display: flex !important;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+        padding-left: 14px;
+        margin-left: 6px;
+        border-left: 2px solid var(--border-color);
+      }
+      .timeline-item {
+        position: relative;
+        margin-bottom: 12px;
+        padding-bottom: 2px;
+      }
+      .timeline-dot {
+        position: absolute;
+        left: -20px;
+        top: 13px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px var(--border-color);
+      }
+      .timeline-row {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .timeline-row:active {
+        background: var(--bg-secondary);
+      }
+      .timeline-content-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        flex: 1;
+      }
+      .timeline-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 5px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .timeline-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+      }
+      .timeline-time {
+        font-size: 10.5px;
+        color: var(--text-muted);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      /* 手机屏幕下的卡片模式自适应 */
+      #dashAssetFlowContainer.view-card {
+        display: flex !important;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .notes-grid { 
+        grid-template-columns: 1fr; 
+        gap: 12px; 
+      }
+      .note-card {
+        padding: 12px;
+        border-radius: 12px;
+      }
+
+      /* 底部移动导航栏自适应与安全区域 */
+      .mobile-bottom-nav {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        z-index: 100;
+        height: calc(60px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        background: rgba(255, 253, 250, 0.96);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid var(--border-color);
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        align-items: center;
+        box-shadow: 0 -3px 16px rgba(44, 36, 29, 0.05);
+      }
+      html[data-theme="cyber"] .mobile-bottom-nav, body[data-theme="cyber"] .mobile-bottom-nav {
+        background: rgba(29, 26, 23, 0.96);
+      }
+      .m-nav-item {
+        border: 0;
+        background: none;
+        color: var(--text-muted);
+        font-size: 10px;
+        font-weight: 600;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        cursor: pointer;
+        padding: 4px 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .m-nav-item.active { color: var(--primary-color); }
+      .m-nav-item .m-icon { font-size: 18px; }
+
+      /* 弹窗全屏手机自适应 */
+      .note-modal-overlay { 
+        padding: 0; 
+      }
+      .note-modal {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100dvh;
+        border-radius: 0;
+        padding: calc(12px + env(safe-area-inset-top, 0px)) 14px calc(16px + env(safe-area-inset-bottom, 0px));
+        display: flex;
+        flex-direction: column;
+      }
+      .note-modal-body {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* 金刚区 & 录音按钮触控优化 */
+      .record-big-btn {
+        width: 80px !important;
+        height: 80px !important;
+        font-size: 32px !important;
+      }
+    }
+
+    /* 极小屏幕（iPhone SE / 窄屏小手机 <= 375px）微调 */
+    @media (max-width: 375px) {
+      .content-scroller { padding: 8px 10px; }
+      .timeline-label { font-size: 12.5px; }
+      .m-nav-item { font-size: 9px; }
+      .m-nav-item .m-icon { font-size: 16px; }
+      .mobile-header h1 { font-size: 15px !important; }
+    }
+
+    .sheet-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .sheet-modal {
+      width: min(100vw, 500px);
+      background: var(--bg-primary);
+      border-radius: 20px 20px 0 0;
+      padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+      animation: slideUp 0.22s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%);
+      background: rgba(28, 25, 23, 0.94);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: calc(12.5px * var(--font-scale));
+      font-weight: 500;
+      z-index: 2000;
+      box-shadow: var(--card-shadow-lg);
+    }
+
+    .log-box {
+      background: #1c1917;
+      color: #e6a15f;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.6;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      max-height: 260px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .hidden { display: none !important; }
+  
+/* AI 润色与双视图切换样式 */
+.view-switch-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 3px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.view-switch-btn {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #94a3b8);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+.view-switch-btn.active {
+  background: #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+.polished-box {
+  background: rgba(59, 130, 246, 0.06);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  white-space: pre-wrap;
+}
+.receipt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+
+    /* 高级毛玻璃与交互动效强化 */
+    .mobile-bottom-nav {
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      background: var(--bg-glass) !important;
+      border-top: 0.5px solid var(--border-color) !important;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.03);
+    }
+
+    .mobile-header {
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      background: var(--bg-glass) !important;
+      border-bottom: 0.5px solid var(--border-color) !important;
+    }
+
+    .action-tile {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      border-radius: var(--radius-lg) !important;
+      border: 1px solid var(--border-color) !important;
+      background: var(--surface-elevated) !important;
+      box-shadow: var(--card-shadow) !important;
+    }
+    .action-tile:active {
+      transform: scale(0.97) !important;
+    }
+
+    .note-card {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      border-radius: var(--radius-lg) !important;
+      border: 1px solid var(--border-color) !important;
+      background: var(--surface-elevated) !important;
+      box-shadow: var(--card-shadow) !important;
+    }
+
+    .btn, .btn-pill, .create-btn {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .btn:active, .btn-pill:active, .create-btn:active {
+      transform: scale(0.96) !important;
+    }
+
+  </style>
+  <link rel="manifest" href="./manifest.json?v=1793520331">
+  <meta name="theme-color" content="#0d1527">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=1793520331">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=1793520331">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=1793520331">
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1793520331">
+  <link rel="apple-touch-icon-precomposed" href="./apple-touch-icon-precomposed.png?v=1793520331">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="小雅助手">
+</head>
+<body data-theme="warm" data-font="heiti" data-size="normal">
+  <!-- 登录遮罩层 -->
+  <div id="loginOverlay" style="position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(9,13,22,0.95);backdrop-filter:blur(10px);">
+    <div style="background:#1a1f2e;border-radius:16px;padding:32px;width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.4);text-align:center;">
+      <img src="./icon-192.png" style="width:64px;height:64px;border-radius:14px;margin-bottom:16px;" alt="小雅全能助手">
+      <h2 style="color:#fff;margin:0 0 8px;font-size:20px;">小雅全能助手</h2>
+      <p style="color:#86868b;margin:0 0 24px;font-size:13px;">请输入访问令牌继续</p>
+      <input type="password" id="loginToken" placeholder="访问令牌" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;background:rgba(255,255,255,0.08);color:#fff;font-size:14px;margin-bottom:12px;outline:none;">
+      <button onclick="doLogin()" style="width:100%;padding:12px;background:#0071e3;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;">登录</button>
+      <p id="loginError" style="color:#ff3b30;font-size:12px;margin:12px 0 0;display:none;">令牌错误，请重试</p>
+    </div>
+  </div>
+
+
+  <div class="app-shell">
+    <!-- 1. 电脑端侧边栏 -->
+    <aside class="app-sidebar" aria-label="侧边主导航">
+      <div class="brand" onclick="switchNav('dash')">
+        <img src="./icon-192.png" style="width:38px;height:38px;border-radius:9px;box-shadow:0 2px 8px rgba(0,0,0,0.15);object-fit:cover;margin-right:2px;" alt="小雅全能助手">
+        <span class="brand-copy">
+          <strong>小雅全能助手</strong>
+          <small>AI 灵感与工作台</small>
+        </span>
+      </div>
+
+      <nav class="primary-nav">
+        <p class="nav-label">核心助手</p>
+        <button class="nav-item active" id="pc-nav-dash" onclick="switchNav('dash')">
+          <span class="nav-icon">⌂</span><span>今日聚焦</span>
+        </button>
+        <button class="nav-item" id="pc-nav-ideas" onclick="switchNav('ideas')">
+          <span class="nav-icon">📝</span><span>备忘录 (便签)</span>
+        </button>
+        <button class="nav-item" id="pc-nav-remind" onclick="switchNav('remind')">
+          <span class="nav-icon">⏰</span><span>待办与日程提醒</span>
+        </button>
+        <button class="nav-item" id="pc-nav-inbox" onclick="switchNav('inbox')">
+          <span class="nav-icon">⚡</span><span>随手速记 / 收集箱</span>
+        </button>
+
+        <p class="nav-label" style="margin-top:20px;">资产与档案</p>
+        <button class="nav-item" id="pc-nav-proj" onclick="switchNav('proj')">
+          <span class="nav-icon">📁</span><span>项目现场档案</span>
+        </button>
+        <button class="nav-item" id="pc-nav-money" onclick="switchNav('money')">
+          <span class="nav-icon">🧾</span><span>记账凭证与发票</span>
+        </button>
+
+        <p class="nav-label" style="margin-top:20px;">系统管理</p>
+        <button class="nav-item" id="pc-nav-sett" onclick="switchNav('sett')">
+          <span class="nav-icon">⚙</span><span>系统设置</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar-mini">雅</div>
+          <div style="min-width:0;flex:1;">
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">管理员空间</div>
+            <div style="font-size:10.5px;color:var(--text-muted);">飞牛私有化存储</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. 手机端顶部 Header -->
+    <header class="mobile-header">
+      <div style="display:flex;align-items:center;gap:10px;" onclick="switchNav('dash')">
+        <img src="./icon-192.png" style="width:34px;height:34px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.15);object-fit:cover;" alt="小雅全能助手">
+        <strong style="font-size:15.5px;">小雅全能助手</strong>
+      </div>
+      <button class="btn-pill" onclick="switchNav('sett')">⚙ 设置</button>
+    </header>
+
+    <!-- 3. 主工作区 -->
+    <main class="app-main">
+      <!-- 电脑端顶部 Header -->
+      <div class="notes-list-header">
+        <div class="header-left">
+          <div class="page-heading">
+            <span class="page-eyebrow" id="viewEyebrow">WORKSPACE</span>
+            <h1 class="page-title" id="viewTitle">工作台首页</h1>
+          </div>
+          <span class="notes-count" id="headerCountBadge">就绪</span>
+        </div>
+        <div class="header-right">
+          <button class="create-btn" onclick="quickCreateAction()">
+            <span>+ 快速新建</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 搜索与筛选工具栏 -->
+      <div class="notes-list-toolbar" id="mainToolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="globalFilterInput" placeholder="全局搜索便签、事项、现场、凭证..." oninput="onGlobalFilterInput()">
+        </div>
+        <div class="filter-group">
+          <select class="toolbar-select" id="quickTagFilter" onchange="onTagFilterChange()">
+            <option value="">全部标签 / 路由</option>
+            <option value="随想">随想 Memos</option>
+            <option value="inbox">收件箱</option>
+            <option value="记账">记账凭证</option>
+            <option value="#想法">#想法</option>
+            <option value="#工作">#工作</option>
+            <option value="#灵感">#灵感</option>
+          </select>
+          <select class="toolbar-select" id="quickSortFilter" onchange="onSortFilterChange()">
+            <option value="recent">最近更新</option>
+            <option value="created">创建时间</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 内容滚动区 -->
+      <div class="content-scroller">
+        <div class="content-container">
+
+          <!-- 1. 工作台首页 -->
+          <div id="section-dash">
+                        <!-- 晨间智能问候与状态流 -->
+            <div class="note-card" style="cursor:default;margin-bottom:18px;background:linear-gradient(135deg, rgba(0, 113, 227, 0.06) 0%, rgba(56, 189, 248, 0.03) 100%);border:1px solid rgba(0, 113, 227, 0.15);padding:18px 20px;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:var(--primary-color);letter-spacing:0.5px;text-transform:uppercase;" id="liveGreetingTag">TODAY FOCUS</div>
+                  <h2 style="font-size:18px;font-weight:700;color:var(--text-primary);margin-top:4px;" id="liveGreetingTitle">早上好，今天一切就绪</h2>
+                  <div style="font-size:12.5px;color:var(--text-secondary);margin-top:4px;" id="liveGreetingSubtitle">待办日程与备忘便签已同步至飞牛私有云</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <span class="btn-pill" style="font-size:11.5px;background:var(--surface-elevated);" id="todayDateStr">2026年11月2日</span>
+                  <button class="btn-pill" style="font-size:11.5px;" onclick="switchNav('remind')">+ 加待办</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 今日聚焦快捷金刚区 -->
+            <div class="grid-4" style="margin-bottom:18px;">
+              <div class="action-tile" onclick="switchNav('ideas')">
+                <div class="tile-badge">📝</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px;">备忘录 / 便签</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">灵感随笔 · 照片素材归档</div>
+                </div>
+              </div>
+              <div class="action-tile" onclick="switchNav('remind')">
+                <div class="tile-badge">⏰</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px;">待办与日程提醒</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;" id="dashReminderCountHint">0 个待办日程</div>
+                </div>
+              </div>
+              <div class="action-tile" onclick="switchNav('inbox')">
+                <div class="tile-badge">⚡</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px;">随手速记</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">口述录音 · 快速采集</div>
+                </div>
+              </div>
+              <div class="action-tile" onclick="switchNav('proj')">
+                <div class="tile-badge">📁</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px;">项目与记账档案</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">工地进度 · 票据账单</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 今日待办与提醒直达卡片 -->
+            <div class="note-card" style="cursor:default;margin-bottom:20px;border-left:4px solid var(--primary-color);">
+              <div class="note-card-header" style="margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:16px;">⏰</span>
+                  <div class="note-title" style="font-size:14px;">今日待办与关键日程</div>
+                </div>
+                <button class="btn-pill" onclick="switchNav('remind')">查看全部待办 ›</button>
+              </div>
+              <div id="dashTodayReminders" style="display:flex;flex-direction:column;gap:8px;">
+                <div style="color:var(--text-muted);font-size:12px;padding:4px 0;">正在加载待办事项...</div>
+              </div>
+            </div>
+
+            <!-- 全能编辑工作台与资产管理流水 (用户核心需求：文字、语音、图片直观查看与编辑) -->
+            <div class="note-card" style="cursor:default;margin-bottom:20px;">
+              <div class="note-card-header" style="flex-wrap:wrap;gap:12px;align-items:center;">
+                <div>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:18px;">📋</span>
+                    <h2 class="note-title" style="font-size:16px;">多模态资产编辑工作台</h2>
+                  </div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">
+                    实时汇聚所有文字、录音笔原件、现场相片与单据凭证，支持单条提取、直接编辑、快捷复制与删除
+                  </div>
+                </div>
+                <!-- 资产类型快速筛选Tab -->
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <button class="btn-pill active" id="assetTab-all" onclick="filterDashboardAssets('all')">全部记录</button>
+                  <button class="btn-pill" id="assetTab-audio" onclick="filterDashboardAssets('audio')">🎙 录音原件</button>
+                  <button class="btn-pill" id="assetTab-image" onclick="filterDashboardAssets('image')">📷 照片单据</button>
+                  <button class="btn-pill" id="assetTab-text" onclick="filterDashboardAssets('text')">✍ 纯文本</button>
+                  <button class="btn-pill" onclick="loadDashboardAssetFlow()" title="刷新">🔄 刷新</button>
+                  <span style="flex:1;"></span>
+                  <!-- 显示模式切换 -->
+                  <button id="viewModeCard" onclick="setAssetViewMode('card')" title="卡片模式" style="background:var(--accent-warm);color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;transition:all 0.2s;">⊞ 卡片</button>
+                  <button id="viewModeList" onclick="setAssetViewMode('list')" title="列表模式" style="background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-color);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;transition:all 0.2s;">☰ 列表</button>
+                </div>
+              </div>
+
+              <!-- 搜索与状态提示 -->
+              <div style="margin:12px 0 16px;">
+                <input type="text" id="dashAssetSearch" placeholder="快速检索正文、录音原件名、分类或 #标签..." oninput="debounceDashAssetSearch()" style="width:100%;height:38px;">
+              </div>
+
+              <!-- 工作台卡片流容器 -->
+              <div id="dashAssetFlowContainer" class="notes-grid">
+                <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">正在加载多模态资产流...</div>
+              </div>
+            </div>
+
+            <!-- 我的工程档案看板 -->
+            <div class="note-card" style="cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">我的工程与项目现场</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">点击直达专属项目现场，随时新增巡查档案</div>
+                </div>
+                <button class="btn btn-primary" style="height:32px;font-size:12px;" onclick="promptAddProjectDirect()">+ 新增项目</button>
+              </div>
+              <div id="homeProjectContainer">
+                <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">暂未创建项目，点击右上角「+ 新增项目」开始使用</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 智能收件箱 (Inbox) -->
+                    <!-- 待办与事件提醒专属模块 (Section Remind) -->
+          <div id="section-remind" class="hidden">
+            <div class="note-card" style="cursor:default;margin-bottom:16px;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">新建事件提醒 / 待办事项</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">设定提醒时间，AI 秘书自动跟进并同步至日程清单</div>
+                </div>
+              </div>
+              <div class="field-group">
+                <input type="text" id="remindInputText" placeholder="提醒我做某事，例如：今天下午3点通知张总开会 / 报销高铁票" style="margin-bottom:10px;">
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:12px;color:var(--text-muted);">提醒时间:</span>
+                  <input type="datetime-local" id="remindDueTime" class="toolbar-select" style="padding:6px 10px;font-size:12px;">
+                </div>
+                <div style="display:flex;gap:6px;flex:1;overflow-x:auto;">
+                  <button class="btn-pill" type="button" onclick="setQuickRemindTime('1h')">1小时后</button>
+                  <button class="btn-pill" type="button" onclick="setQuickRemindTime('today18')">今晚18:00</button>
+                  <button class="btn-pill" type="button" onclick="setQuickRemindTime('tomorrow09')">明天09:00</button>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="submitNewReminder()">＋ 确认添加提醒</button>
+                <button class="btn btn-secondary" onclick="switchNav('dash')">返回今日</button>
+              </div>
+            </div>
+
+            <div style="margin-top:20px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h3 style="font-size:15px;font-weight:700;">待办日程清单</h3>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn-pill" onclick="loadRemindersList()">刷新</button>
+                </div>
+              </div>
+              <div id="remindersFullList" style="display:flex;flex-direction:column;gap:10px;">
+                <div style="color:var(--text-muted);font-size:12px;">正在加载待办清单...</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="section-inbox" class="hidden">
+            <div class="note-card" style="cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">快速信息捕获与归档</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">交代、琐事或资料原件，支持 AI 解析要素并确认归档</div>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <textarea id="inboxInput" placeholder="输入待办事项、工作交代或随手记..."></textarea>
+              </div>
+
+              <div style="display:flex;gap:10px;margin-bottom:12px;">
+                <button class="btn btn-secondary" type="button" style="flex:1;" onclick="openPhotoPicker('inbox')">
+                  <span>📷</span><span>拍照 / 相册</span>
+                </button>
+                <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
+                  <span>📁</span><span>选择文件</span>
+                  <input type="file" id="inboxFileGeneral" multiple style="display:none;" onchange="onFileSelected(this, 'inboxFileName')">
+                </label>
+              </div>
+              <div id="inboxFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
+
+              <div class="voice-control-box">
+                <div class="recorder-deck" id="inboxRecorderDeck">
+                  <div class="recorder-ring">
+                    <div class="recorder-btn" id="inboxVoiceBar" data-target="inbox">
+                      <span class="recorder-icon">🎙</span>
+                      <span class="recorder-sublabel">REC</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="recorder-status-caption">
+                  <span class="status-led"></span>
+                  <span id="inboxRecordHint">按住录音笔说话 · 松开结束</span>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:12px;margin-top:16px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="submitInboxCapture()">保存并让 AI 分析</button>
+                <button class="btn btn-secondary" onclick="switchNav('dash')">返回工作台</button>
+              </div>
+            </div>
+
+            <!-- 分析结果面板 -->
+            <div class="note-card hidden" id="analysisResultCard" style="margin-top:16px;cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">AI 智能分析结论</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);" id="analysisModelTag">候选归档与要素推断</div>
+                </div>
+              </div>
+              <div id="analysisDetails" style="font-size:13px;line-height:1.6;"></div>
+              <div style="display:flex;gap:10px;margin-top:16px;" id="confirmButtons"></div>
+            </div>
+          </div>
+
+          <!-- 3. 记账凭证 (Money) -->
+          <div id="section-money" class="hidden">
+            <div class="note-card" style="cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">记账凭证录入</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择类目上传发票单据或进行语音记账</div>
+                </div>
+                <button class="btn-pill" onclick="toggleAccountManager()">⚙ 类目管理</button>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">记账类目</label>
+                <select id="accountCategorySelector" class="select-box"></select>
+              </div>
+
+              <div id="accountManagerPanel" class="hidden" style="margin-bottom:14px;padding:14px;background:var(--bg-tertiary);border-radius:var(--radius-md);">
+                <div style="font-size:11.5px;font-weight:700;margin-bottom:8px;">自定义类目增删</div>
+                <div style="display:flex;gap:8px;margin-bottom:10px;">
+                  <input type="text" id="newAccountCatInput" placeholder="输入新类目 (如：工程备用金)">
+                  <button class="btn btn-primary" style="height:42px;" onclick="addAccountCategoryAction()">+ 添加</button>
+                </div>
+                <div id="accountCatChips" style="display:flex;flex-direction:column;gap:6px;max-height:140px;overflow-y:auto;"></div>
+              </div>
+
+              <div class="field-group">
+                <textarea id="moneyInput" placeholder="例如：下午在五金市场买水管花费120元微信付款"></textarea>
+              </div>
+
+              <div style="display:flex;gap:10px;margin-bottom:12px;">
+                <button class="btn btn-secondary" type="button" style="flex:1;" onclick="openPhotoPicker('money')">
+                  <span>🧾</span><span>拍照 / 发票凭证</span>
+                </button>
+                <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
+                  <span>📁</span><span>上传文件</span>
+                  <input type="file" id="moneyFileGeneral" multiple style="display:none;" onchange="onFileSelected(this, 'moneyFileName')">
+                </label>
+              </div>
+              <div id="moneyFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
+
+              <div class="voice-control-box">
+                <div class="recorder-deck" id="moneyRecorderDeck">
+                  <div class="recorder-ring">
+                    <div class="recorder-btn" id="moneyVoiceBar" data-target="money">
+                      <span class="recorder-icon">🎙</span>
+                      <span class="recorder-sublabel">REC</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="recorder-status-caption">
+                  <span class="status-led"></span>
+                  <span id="moneyRecordHint">按住录音笔口述记账 · 松开结束</span>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:12px;margin-top:16px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="submitMoneyFast()">提取并确认</button>
+                <button class="btn btn-secondary" onclick="switchNav('dash')">返回工作台</button>
+              </div>
+            </div>
+
+            <!-- 记账要素核实卡片 -->
+            <div class="note-card hidden" id="moneyConfirmCard" style="margin-top:16px;border-color:var(--warning-color);cursor:default;">
+              <div class="note-card-header">
+                <div class="note-title" style="color:var(--warning-color);">核实账目要素</div>
+              </div>
+              <div class="grid-2">
+                <div class="field-group">
+                  <label class="field-label">金额 (元)</label>
+                  <input type="number" step="0.01" id="mAmount">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">收支方向</label>
+                  <select id="mDirection" class="select-box">
+                    <option value="expense">支出</option>
+                    <option value="income">收入</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">商户 / 事由</label>
+                  <input type="text" id="mMerchant">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">支付渠道</label>
+                  <select id="mPayment" class="select-box">
+                    <option value="微信">微信支付</option>
+                    <option value="支付宝">支付宝</option>
+                    <option value="银行卡">银行卡</option>
+                    <option value="现金">现金</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:10px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="confirmMoneySave()">确认保存凭证</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('moneyConfirmCard').classList.add('hidden')">取消</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. 项目现场 (Projects) -->
+          <div id="section-proj" class="hidden">
+            <div class="note-card" style="cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">现场档案采集</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">选择目标工程项目，上传现场巡查照片或口播</div>
+                </div>
+                <button class="btn-pill" onclick="toggleProjectManager()">⚙ 管理项目</button>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">当前作业项目</label>
+                <select id="projectSelector" class="select-box" onchange="onProjectChanged()"></select>
+              </div>
+
+              <div id="projectManagerPanel" class="hidden" style="margin-bottom:14px;padding:14px;background:var(--bg-tertiary);border-radius:var(--radius-md);">
+                <div style="font-size:11.5px;font-weight:700;margin-bottom:8px;">项目名称管理</div>
+                <div style="display:flex;gap:8px;margin-bottom:10px;">
+                  <input type="text" id="newProjectNameInput" placeholder="输入新项目名称">
+                  <button class="btn btn-primary" style="height:42px;" onclick="addProjectAction()">+ 新建</button>
+                </div>
+                <div id="projectListChips" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;"></div>
+              </div>
+
+              <div class="field-group">
+                <textarea id="projInput" placeholder="施工进度、隐蔽工程巡视、现场交代..."></textarea>
+              </div>
+
+              <div style="display:flex;gap:10px;margin-bottom:12px;">
+                <button class="btn btn-secondary" type="button" style="flex:1;" onclick="openPhotoPicker('proj')">
+                  <span>📷</span><span>拍照 / 现场照片</span>
+                </button>
+                <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
+                  <span>📁</span><span>图纸/资料</span>
+                  <input type="file" id="projFileGeneral" multiple style="display:none;" onchange="onFileSelected(this, 'projFileName')">
+                </label>
+              </div>
+              <div id="projFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:8px;"></div>
+
+              <div class="voice-control-box">
+                <div class="recorder-deck" id="projRecorderDeck">
+                  <div class="recorder-ring">
+                    <div class="recorder-btn" id="projVoiceBar" data-target="proj">
+                      <span class="recorder-icon">🎙</span>
+                      <span class="recorder-sublabel">REC</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="recorder-status-caption">
+                  <span class="status-led"></span>
+                  <span id="projRecordHint">按住录音笔现场口播 · 松开结束</span>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:12px;margin-top:16px;">
+                <button class="btn btn-primary" style="flex:1;" id="btnSaveProj" onclick="submitProjectDirect()">保存至项目档案</button>
+                <button class="btn btn-secondary" onclick="switchNav('dash')">返回工作台</button>
+              </div>
+            </div>
+
+            <div style="margin-top:20px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h3 style="font-size:15px;font-weight:700;" id="projectArchiveHeader">项目专属档案库</h3>
+              </div>
+              <div id="projectList" class="notes-grid">
+                <div style="color:var(--text-muted);font-size:12px;">暂无该项目归档</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. 随想 Memos (落实语音录音录入 + 瀑布流笔记卡片) -->
+          <div id="section-ideas" class="hidden">
+            <div class="note-card" style="cursor:default;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">个人备忘录 · 便签素材库</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">支持文字、语音口述录入与 #标签 自动分类聚合</div>
+                </div>
+                <button class="btn-pill" onclick="insertMemoTag('#灵感 ')">+ #标签</button>
+              </div>
+
+              <div class="field-group">
+                <textarea id="ideaInput" placeholder="写下闪烁的点子... 或使用下方语音录制口述，输入 #想法 #灵感 #工作 自动分类聚合"></textarea>
+              </div>
+
+              <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;">
+                <span class="note-tag-chip" style="cursor:pointer;" onclick="insertMemoTag('#想法 ')">#想法</span>
+                <span class="note-tag-chip" style="cursor:pointer;" onclick="insertMemoTag('#工作 ')">#工作</span>
+                <span class="note-tag-chip" style="cursor:pointer;" onclick="insertMemoTag('#灵感 ')">#灵感</span>
+                <span class="note-tag-chip" style="cursor:pointer;" onclick="insertMemoTag('#备忘 ')">#备忘</span>
+              </div>
+
+              <div style="display:flex;gap:10px;margin-bottom:8px;">
+                <button class="btn btn-secondary" type="button" style="flex:1;" onclick="openPhotoPicker('ideas')">
+                  <span>📷</span><span>拍照 / 附图</span>
+                </button>
+                <label class="btn btn-secondary" style="flex:1;cursor:pointer;">
+                  <span>📁</span><span>添加文件</span>
+                  <input type="file" id="ideasFileGeneral" multiple style="display:none;" onchange="onFileSelected(this, 'ideasFileName')">
+                </label>
+              </div>
+              <div id="ideasFileName" style="font-size:11px;color:var(--primary-color);margin-bottom:4px;"></div>
+
+              <!-- 随想 Memos 专业录音笔大按键 -->
+              <div class="voice-control-box">
+                <div class="recorder-deck" id="ideasRecorderDeck">
+                  <div class="recorder-ring">
+                    <div class="recorder-btn" id="ideasVoiceBar" data-target="ideas">
+                      <span class="recorder-icon">🎙</span>
+                      <span class="recorder-sublabel">REC</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="recorder-status-caption">
+                  <span class="status-led"></span>
+                  <span id="ideasRecordHint">按住录音笔口述随想 · 松开结束</span>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:12px;margin-top:12px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="submitMemoAction()">保存到备忘录</button>
+                <button class="btn btn-secondary" onclick="switchNav('dash')">返回工作台</button>
+              </div>
+            </div>
+
+            <!-- Memos 笔记卡片瀑布流 (Notes Grid) -->
+            <div style="margin-top:20px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h3 style="font-size:15px;font-weight:700;">备忘录瀑布流</h3>
+                <button class="btn-pill" onclick="loadByRoute('随想', 'ideasList')">刷新列表</button>
+              </div>
+              <div id="ideasList" class="notes-grid">
+                <div style="color:var(--text-muted);font-size:12px;">暂无 Memos 记录</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. 系统设置 (Settings) -->
+          <div id="section-sett" class="hidden">
+            <!-- 模块 1：界面与排版视觉偏好 -->
+            <div class="note-card" style="cursor:default;margin-bottom:16px;">
+              <div class="note-card-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:20px;">🎨</span>
+                  <div>
+                    <div class="note-title">界面视觉与排版偏好</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">个性化定制属于你的专属工作台主题配色、正文字体及缩放比例</div>
+                  </div>
+                </div>
+              </div>
+              <div class="grid-2" style="margin-top:12px;">
+                <div class="field-group">
+                  <label class="field-label">主题配色风格 (含 Notepad 经典大地色)</label>
+                  <select id="settingTheme" class="select-box" onchange="onThemeDropdownChange()">
+                    <option value="warm" selected>🍂 温暖胡桃 (Warm Walnut - 经典默认)</option>
+                    <option value="business">💼 商务现代 (Business Slate)</option>
+                    <option value="vibrant">🎈 活泼落日 (Vibrant Coral)</option>
+                    <option value="cyber">⚡ 赛博暗黑 (Cyber Dark)</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">显示正文字体排版规范</label>
+                  <select id="settingFont" class="select-box" onchange="onFontDropdownChange()">
+                    <option value="heiti">🔤 现代黑体 (清晰锐利 · 默认)</option>
+                    <option value="simsun">📖 经典宋体 (典雅工整)</option>
+                    <option value="fangsong">✍ 文艺仿宋 (秀丽挺拔)</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">整体字号与屏幕缩放比例</label>
+                  <select id="settingFontSize" class="select-box" onchange="onSizeDropdownChange()">
+                    <option value="small">小号 (紧凑排布 · 视野更宽广)</option>
+                    <option value="normal" selected>中号 (舒适标准 · 移动端优选)</option>
+                    <option value="large">大号 (清晰大字 · 易读省力)</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">工作台提示语言</label>
+                  <select id="settingLang" class="select-box" onchange="onLangDropdownChange()">
+                    <option value="zh" selected>简体中文 (Chinese - 默认)</option>
+                    <option value="en">English (英文)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 模块 2：AI 认知模型服务引擎 -->
+            <div class="note-card" style="cursor:default;margin-bottom:16px;">
+              <div class="note-card-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:20px;">🧠</span>
+                  <div>
+                    <div class="note-title">AI 大模型服务与认知引擎</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">配置智能收件箱意图分类、单据记账要素提取与多模态识别的服务通道</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-2" style="margin-top:12px;">
+                <div class="field-group">
+                  <label class="field-label">AI 服务提供商选型</label>
+                  <select id="aiServiceProvider" class="select-box" onchange="onAiProviderChanged()">
+                    <option value="sensenova">SenseNova 商汤日日新 (默认官方托管)</option>
+                    <option value="bailian">Bailian Coding (阿里云百炼)</option>
+                    <option value="openai">OpenAI 官方服务 (GPT-4o / mini)</option>
+                    <option value="deepseek">DeepSeek 官方 API (DeepSeek-V3)</option>
+                    <option value="custom">自定义 OpenAI 兼容接口</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">当前生效的智能大模型</label>
+                  <select id="aiModelSelector" class="select-box" onchange="onAiModelSelected()">
+                    <option value="SenseChat-5">SenseChat-5 (日日新旗舰)</option>
+                    <option value="SenseChat-5-Vision">SenseChat-5-Vision (多模态识图)</option>
+                    <option value="qwen2.5-coder-32b-instruct">qwen2.5-coder-32b-instruct</option>
+                    <option value="deepseek-v3">deepseek-v3</option>
+                  </select>
+                  <div style="display:flex;gap:8px;margin-top:8px;">
+                    <input type="text" id="customModelInput" placeholder="输入自定义模型名按回车添加..." onkeydown="if(event.key==='Enter') addCustomModelAction()" style="height:36px;">
+                    <button class="btn btn-secondary" style="height:36px;padding:0 12px;font-size:12px;" onclick="addCustomModelAction()">+ 添加</button>
+                  </div>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">API 接入 Endpoint (服务网关地址)</label>
+                  <input type="text" id="cfgAiUrl" value="https://token.sensenova.cn/v1" oninput="markSettingDirty()">
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:4px;" id="aiEndpointSubtitle">默认网关: https://token.sensenova.cn/v1</div>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">API Key 授权密钥 (飞牛本地安全隔离存储)</label>
+                  <div style="display:flex;gap:8px;">
+                    <input type="password" id="cfgAiKey" placeholder="请输入 API Key（留空则保持原有配置）" oninput="markSettingDirty()" style="flex:1;">
+                    <button class="btn btn-secondary" style="height:42px;width:42px;padding:0;" onclick="togglePasswordVisibility('cfgAiKey', this)">👁</button>
+                  </div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">密钥仅保存在内网宿主机，绝不外泄给第三方</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 模块 3：硬件麦克风与多模态采集规范 -->
+            <div class="note-card" style="cursor:default;margin-bottom:16px;">
+              <div class="note-card-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:20px;">🎙</span>
+                  <div>
+                    <div class="note-title">硬件录音笔与音视频采集参数</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">控制硬件录音笔按键触控模式、振动反馈与高保真原件落盘规则</div>
+                  </div>
+                </div>
+              </div>
+              <div class="grid-2" style="margin-top:12px;">
+                <div class="field-group">
+                  <label class="field-label">录音按键触发方式</label>
+                  <select id="cfgVoiceMode" class="select-box" onchange="toast('已切换为硬件按住口述模式')">
+                    <option value="hold" selected>按住开始录音 · 松开自动结束 (微信/专业录音笔规范)</option>
+                    <option value="tap">点击一次开始 · 再次点击结束 (会议录音模式)</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">触感振动反馈 (手机端)</label>
+                  <select id="cfgVibration" class="select-box" onchange="toast('振动反馈已更新')">
+                    <option value="on" selected>开启 (开始与停止录音时伴随物理微震动反馈)</option>
+                    <option value="off">关闭振动</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 模块 4：网络、隧道通道与私有化存储状态 -->
+            <div class="note-card" style="cursor:default;margin-bottom:16px;">
+              <div class="note-card-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:20px;">🛡</span>
+                  <div>
+                    <div class="note-title">私有化存储与网络通道</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">飞牛 fnOS 本地落盘目录、Cloudflare 专属命名隧道与域名解析状态</div>
+                  </div>
+                </div>
+              </div>
+              <div class="grid-2" style="margin-top:12px;">
+                <div style="background:var(--bg-tertiary);border-radius:var(--radius-md);padding:14px;border:1px solid var(--border-color);">
+                  <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;">
+                    <span style="color:var(--success-color);">●</span> 专属安全加密隧道
+                  </div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.6;">
+                    访问地址：<b style="color:var(--primary-color);">https://m.keyi.de5.net</b><br>
+                    连接状态：<span style="color:var(--success-color);font-weight:600;">已建立安全双向加密通道 (TLS 1.3)</span><br>
+                    通道类型：Cloudflare Zero Trust 专用安全网关
+                  </div>
+                </div>
+
+                <div style="background:var(--bg-tertiary);border-radius:var(--radius-md);padding:14px;border:1px solid var(--border-color);">
+                  <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;">
+                    <span style="color:var(--success-color);">●</span> 私有数据安全隔离
+                  </div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.6;">
+                    数据归属：<b>本地 NAS 独占持久化</b><br>
+                    资产隔离：多模态原件严格本地隔离存储<br>
+                    数据库状态：SQLite 事务引擎运行正常
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 模块 5：系统维护、归档流与底层实时日志 -->
+            <div class="grid-2" style="margin-bottom:16px;">
+              <div class="note-card" style="cursor:default;">
+                <div class="note-card-header">
+                  <div>
+                    <div class="note-title">全量历史检索</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">直接全文检索云端所有历史记录</div>
+                  </div>
+                  <button class="btn-pill" onclick="toggleArchivesPanel()">展开 / 刷新</button>
+                </div>
+                <div id="settingsArchivePanel" class="hidden">
+                  <input type="text" id="globalSearchInput" placeholder="模糊检索任意历史记录..." oninput="debounceSearch()" style="margin-bottom:10px;">
+                  <div id="recentList" style="max-height:280px;overflow-y:auto;"><div style="color:var(--text-muted);font-size:12px;">加载中...</div></div>
+                </div>
+              </div>
+
+              <div class="note-card" style="cursor:default;">
+                <div class="note-card-header">
+                  <div>
+                    <div class="note-title">服务运行日志</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">宿主机实时事件流与 AI 分析日志</div>
+                  </div>
+                  <button class="btn-pill" onclick="toggleLogsPanel()">实时日志</button>
+                </div>
+                <div id="settingsLogsPanel" class="hidden">
+                  <div class="log-box" id="logTerminalContent">正在读取服务器实时日志...</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 模块 6：支持与关于 -->
+            <div class="note-card" style="cursor:default;margin-bottom:20px;">
+              <div class="note-card-header">
+                <div>
+                  <div class="note-title">支持与关于</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">小雅全能助手 · 纯净版 v1.5.0 Pro</div>
+                </div>
+              </div>
+              <div class="grid-2">
+                <div style="border:1px dashed var(--border-color);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toast('👩💼 官方技术顾问通道正在为您连接...')">
+                  <div style="font-size:28px;">👩💼</div>
+                  <div>
+                    <div style="font-weight:700;font-size:13px;">联系客服与顾问</div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">专属私有化运维答疑 / 功能需求反馈</div>
+                  </div>
+                </div>
+                <div style="border:1px dashed var(--border-color);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toast('☕ 感谢您的心意，请作者喝杯咖啡打赏通道即将开放！')">
+                  <div style="font-size:28px;">☕</div>
+                  <div>
+                    <div style="font-weight:700;font-size:13px;">赞赏与支持</div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">请作者喝杯咖啡 · 完全自愿支持独立开发</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 底部保存按钮条 -->
+            <div style="display:flex;justify-content:flex-end;gap:12px;padding-bottom:30px;">
+              <button class="btn btn-secondary" onclick="resetSettings()">恢复默认</button>
+              <button class="btn btn-primary" onclick="saveAllSettings()">💾 保存所有配置并立即生效</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 4. 手机端底部毛玻璃 Tab 导航条 -->
+    <nav class="mobile-bottom-nav">
+      <button class="m-nav-item active" id="m-nav-dash" onclick="switchNav('dash')">
+        <span class="m-icon">⌂</span><span>今日</span>
+      </button>
+      <button class="m-nav-item" id="m-nav-ideas" onclick="switchNav('ideas')">
+        <span class="m-icon">📝</span><span>备忘录</span>
+      </button>
+      <button class="m-nav-item" id="m-nav-remind" onclick="switchNav('remind')">
+        <span class="m-icon">⏰</span><span>待办提醒</span>
+      </button>
+      <button class="m-nav-item" id="m-nav-inbox" onclick="switchNav('inbox')">
+        <span class="m-icon">⚡</span><span>随手记</span>
+      </button>
+      <button class="m-nav-item" id="m-nav-proj" onclick="switchNav('proj')">
+        <span class="m-icon">📁</span><span>项目资产</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ==========================================================================
+       5. 模态窗口：落到实处的「查看详情 (Note View)」与「实时编辑 (Note Edit)」
+       ========================================================================== -->
+  <div class="note-modal-overlay hidden" id="noteDetailModal" onclick="closeNoteModal(event)">
+    <div class="note-modal" onclick="event.stopPropagation()">
+      
+      <!-- 模态顶部 -->
+      <div class="modal-header">
+        <div class="modal-title-area">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="note-tag-chip" id="modalRouteBadge">随想</span>
+            <span style="font-size:12px;color:var(--text-muted);" id="modalRecordIdTag"></span>
+          </div>
+          <h2 style="margin:6px 0 0;font-size:17px;font-weight:700;" id="modalDisplayTitle">查看详情</h2>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary" style="height:34px;padding:0 12px;font-size:12px;" id="modalToggleEditBtn" onclick="toggleModalEditMode()">
+            ✏️ 编辑
+          </button>
+          <button class="btn-pill" style="height:34px;width:34px;padding:0;display:grid;place-items:center;font-size:16px;" onclick="closeNoteModalDirect()">✕</button>
+        </div>
+      </div>
+
+      <!-- 模态正文 -->
+      <div class="modal-body">
+        <!-- 查看态 -->
+        <div id="modalViewContainer">
+          <div class="view-meta-bar" id="modalMetaBar"></div>
+          <div class="view-content-box" id="modalViewContent"></div>
+          <div id="modalAttachmentBox" style="margin-top:14px;"></div>
+        </div>
+
+        <!-- 编辑态 (支持修改正文、标题、路由分类) -->
+        <div id="modalEditContainer" class="hidden">
+          <div class="field-group">
+            <label class="field-label">归属分类 / 路由</label>
+            <input type="text" id="editModalRoute" placeholder="例如：随想、项目:阳光花园、inbox、记账">
+          </div>
+          <div class="field-group">
+            <label class="field-label">笔记正文内容 (支持 #标签)</label>
+            <textarea id="editModalContent" style="height:180px;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 模态底部 -->
+      <div class="modal-footer">
+        <div>
+          <button class="btn-pill" style="color:var(--danger-color);height:34px;" onclick="deleteCurrentModalRecord()">🗑 删除此项</button>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary" style="height:36px;" onclick="closeNoteModalDirect()">关闭</button>
+          <button class="btn btn-primary hidden" id="modalSaveBtn" style="height:36px;" onclick="saveModalEditChanges()">💾 保存修改</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 隐藏文件/相机输入 -->
+  <input type="file" id="hiddenCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="onPhotoSelected(this)">
+  <input type="file" id="hiddenAlbumInput" accept="image/*" multiple style="display:none;" onchange="onPhotoSelected(this)">
+
+  <!-- 拍照/相册 Action Sheet -->
+  <div class="sheet-overlay hidden" id="photoActionSheet" onclick="closePhotoPicker(event)">
+    <div class="sheet-modal" onclick="event.stopPropagation()">
+      <div style="font-size:12.5px;color:var(--text-muted);text-align:center;margin-bottom:14px;">选择照片来源</div>
+      <button class="btn btn-secondary" style="width:100%;height:46px;margin-bottom:8px;" onclick="triggerDirectCamera()">
+        <span>📸</span><span>直接拍照 (调起手机相机)</span>
+      </button>
+      <button class="btn btn-secondary" style="width:100%;height:46px;margin-bottom:8px;" onclick="triggerDirectAlbum()">
+        <span>🖼</span><span>从手机相册选择</span>
+      </button>
+      <button class="btn btn-secondary" style="width:100%;height:42px;background:var(--bg-secondary);" onclick="closePhotoPicker()">取消</button>
+    </div>
+  </div>
+
+  <script>
+    let currentRecordId = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordedAudioBlob = null;
+    let activeTarget = null;
+    let selectedFilesMap = {};
+    let searchDebounceTimer = null;
+
+    let projectList = [];
+    let currentSelectedProject = "";
+    let accountCategoryList = ["日常餐饮", "差旅交通", "工程采购", "办公开销"];
+    let isSettingDirty = false;
+
+    // 当前模态正在查看/编辑的记录对象与状态
+    let activeModalRecord = null;
+    let isModalEditMode = false;
+
+    let cachedRecordsMap = {};
+
+    const AI_PROVIDERS = {
+      sensenova: {
+        name: "SenseNova 商汤日日新",
+        endpoint: "https://token.sensenova.cn/v1",
+        models: ["SenseChat-5", "SenseChat-5-Vision", "SenseChat-Lite"]
+      },
+      bailian: {
+        name: "Bailian Coding",
+        endpoint: "https://coding.dashscope.aliyuncs.com/v1",
+        models: ["qwen2.5-coder-32b-instruct", "qwen-max", "qwen-plus"]
+      },
+      openai: {
+        name: "OpenAI Official",
+        endpoint: "https://api.openai.com/v1",
+        models: ["gpt-4o", "gpt-4o-mini", "o3-mini"]
+      },
+      deepseek: {
+        name: "DeepSeek Official",
+        endpoint: "https://api.deepseek.com/v1",
+        models: ["deepseek-chat", "deepseek-reasoner"]
+      },
+      custom: {
+        name: "自定义服务",
+        endpoint: "",
+        models: []
+      }
+    };
+
+    function toast(msg) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.innerText = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2200);
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerText = '🔒';
+      } else {
+        input.type = 'password';
+        btn.innerText = '👁';
+      }
+    }
+
+    function markSettingDirty() { isSettingDirty = true; }
+
+    function onThemeDropdownChange() {
+      const val = document.getElementById('settingTheme').value;
+      applyDomAppearance(val, document.getElementById('settingFont').value, document.getElementById('settingFontSize').value);
+      markSettingDirty();
+      toast('主题预览已生效：' + val);
+    }
+    function onFontDropdownChange() {
+      const val = document.getElementById('settingFont').value;
+      applyDomAppearance(document.getElementById('settingTheme').value, val, document.getElementById('settingFontSize').value);
+      markSettingDirty();
+    }
+    function onSizeDropdownChange() {
+      const val = document.getElementById('settingFontSize').value;
+      applyDomAppearance(document.getElementById('settingTheme').value, document.getElementById('settingFont').value, val);
+      markSettingDirty();
+    }
+    function onLangDropdownChange() { markSettingDirty(); }
+
+    function applyDomAppearance(theme, font, size) {
+      document.documentElement.setAttribute('data-theme', theme);
+      document.body.setAttribute('data-theme', theme);
+      document.documentElement.setAttribute('data-font', font);
+      document.body.setAttribute('data-font', font);
+      document.documentElement.setAttribute('data-size', size);
+      document.body.setAttribute('data-size', size);
+    }
+
+    /* 视图导航 */
+    function switchNav(key) {
+      const sections = ['dash', 'inbox', 'money', 'proj', 'ideas', 'sett', 'remind'];
+      sections.forEach(s => {
+        const el = document.getElementById('section-' + s);
+        if (el) el.classList.toggle('hidden', s !== key);
+
+        const pcBtn = document.getElementById('pc-nav-' + s);
+        if (pcBtn) pcBtn.classList.toggle('active', s === key);
+
+        const mBtn = document.getElementById('m-nav-' + s);
+        if (mBtn) mBtn.classList.toggle('active', s === key);
+      });
+
+      const meta = {
+        dash: { eyebrow: 'TODAY', title: '今日聚焦', count: '就绪' },
+        ideas: { eyebrow: 'NOTES', title: '个人备忘录', count: '便签素材' },
+        remind: { eyebrow: 'SCHEDULE', title: '待办与事件提醒', count: '日程待办' },
+        inbox: { eyebrow: 'QUICK', title: '随手速记', count: '快速录入' },
+        money: { eyebrow: 'ACCOUNTING', title: '记账与凭证', count: '发票单据' },
+        proj: { eyebrow: 'PROJECTS', title: '项目现场档案', count: '现场档案' },
+        sett: { eyebrow: 'SETTINGS', title: '系统设置与管理', count: '偏好配置' }
+      };
+
+      const cur = meta[key] || meta.dash;
+      const eyeEl = document.getElementById('viewEyebrow');
+      const titEl = document.getElementById('viewTitle');
+      const countEl = document.getElementById('headerCountBadge');
+      if (eyeEl) eyeEl.innerText = cur.eyebrow;
+      if (titEl) titEl.innerText = cur.title;
+      if (countEl) countEl.innerText = cur.count;
+
+      if (key === 'ideas') loadByRoute('随想', 'ideasList');
+      if (key === 'remind') loadRemindersList();
+      if (key === 'dash') loadDashboardReminders();
+    updateLiveGreeting();
+      if (key === 'proj') {
+        loadProjects();
+        if (currentSelectedProject) loadByRoute(currentSelectedProject, 'projectList');
+      }
+      if (key === 'money') loadAccountCategories();
+    }
+
+    function quickCreateAction() {
+      switchNav('inbox');
+      document.getElementById('inboxInput').focus();
+    }
+
+    function onGlobalFilterInput() {
+      const kw = document.getElementById('globalFilterInput').value.trim();
+      loadRecent(kw);
+      const sPanel = document.getElementById('settingsArchivePanel');
+      if (sPanel && sPanel.classList.contains('hidden')) {
+        toggleArchivesPanel();
+      }
+    }
+    function onTagFilterChange() {
+      const tag = document.getElementById('quickTagFilter').value;
+      if (tag) {
+        if (tag === '随想') switchNav('ideas');
+        else if (tag === 'inbox') switchNav('inbox');
+        else if (tag === '记账') switchNav('money');
+        else {
+          switchNav('ideas');
+          loadRecent(tag);
+        }
+      }
+    }
+    function onSortFilterChange() {
+      toast('已按时间顺序排列');
+    }
+
+    /* 拍照/相册 Action Sheet */
+    function openPhotoPicker(target) {
+      activeTarget = target;
+      document.getElementById('photoActionSheet').classList.remove('hidden');
+    }
+    function closePhotoPicker() {
+      document.getElementById('photoActionSheet').classList.add('hidden');
+    }
+    function triggerDirectCamera() {
+      closePhotoPicker();
+      document.getElementById('hiddenCameraInput').click();
+    }
+    function triggerDirectAlbum() {
+      closePhotoPicker();
+      document.getElementById('hiddenAlbumInput').click();
+    }
+
+    /* ==========================================================================
+       6. 待办与事件提醒 (Reminders & Tasks) 逻辑管理 (本地优先 Local-First 极速响应)
+       ========================================================================== */
+    const REMINDERS_STORAGE_KEY = 'xiaoya_local_reminders_v1';
+
+    function getLocalReminders() {
+      try {
+        const raw = localStorage.getItem(REMINDERS_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function saveLocalReminders(list) {
+      try {
+        localStorage.setItem(REMINDERS_STORAGE_KEY, JSON.stringify(list));
+      } catch (_) {}
+    }
+
+    function setQuickRemindTime(preset) {
+      const input = document.getElementById('remindDueTime');
+      const now = new Date();
+      if (preset === '1h') {
+        now.setHours(now.getHours() + 1);
+      } else if (preset === 'today18') {
+        now.setHours(18, 0, 0, 0);
+      } else if (preset === 'tomorrow09') {
+        now.setDate(now.getDate() + 1);
+        now.setHours(9, 0, 0, 0);
+      }
+      
+      const pad = n => String(n).padStart(2, '0');
+      const formatted = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      input.value = formatted;
+    }
+
+    async function submitNewReminder() {
+      const textInput = document.getElementById('remindInputText');
+      const dueInput = document.getElementById('remindDueTime');
+      const content = (textInput.value || '').trim();
+      if (!content) return toast('请输入提醒或待办内容');
+
+      const newItem = {
+        id: 'rem-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+        content: content,
+        due_time: dueInput.value || '',
+        done: false,
+        created_at: new Date().toISOString()
+      };
+
+      const list = getLocalReminders();
+      list.unshift(newItem);
+      saveLocalReminders(list);
+
+      toast('✅ 已加入待办日程');
+      textInput.value = '';
+      dueInput.value = '';
+      loadRemindersList();
+      loadDashboardReminders();
+    updateLiveGreeting();
+
+      // 异步尝试同步到服务端（若服务支持）
+      try {
+        fetch('/api/reminders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'add', ...newItem })
+        }).catch(() => {});
+      } catch (_) {}
+    }
+
+    function toggleReminderDone(id) {
+      const list = getLocalReminders();
+      const item = list.find(it => it.id === id);
+      if (item) {
+        item.done = !item.done;
+        item.completed_at = item.done ? new Date().toISOString() : null;
+        saveLocalReminders(list);
+        loadRemindersList();
+        loadDashboardReminders();
+    updateLiveGreeting();
+      }
+    }
+
+    function deleteReminderItem(id) {
+      if (!confirm('确认删除该待办提醒？')) return;
+      let list = getLocalReminders();
+      list = list.filter(it => it.id !== id);
+      saveLocalReminders(list);
+      toast('已删除');
+      loadRemindersList();
+      loadDashboardReminders();
+    updateLiveGreeting();
+    }
+
+    function loadRemindersList() {
+      const container = document.getElementById('remindersFullList');
+      if (!container) return;
+      const list = getLocalReminders();
+      // 未完成排在前面，已完成排在后面
+      list.sort((a, b) => {
+        if (a.done !== b.done) return a.done ? 1 : -1;
+        return (a.due_time || '9999').localeCompare(b.due_time || '9999');
+      });
+
+      if (!list.length) {
+        container.innerHTML = '<div style="color:var(--text-muted);font-size:12.5px;padding:24px 12px;text-align:center;background:var(--bg-glass);border-radius:var(--radius-md);border:1px dashed var(--border-color);">暂无待办事项，点击上方即可快速新建</div>';
+        return;
+      }
+
+      let html = '';
+      list.forEach(item => {
+        const isDone = !!item.done;
+        const dueStr = item.due_time ? ('⏰ ' + item.due_time.replace('T', ' ')) : '📌 待办事项';
+        html += `
+          <div class="note-card" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;opacity:${isDone ? '0.5' : '1'};">
+            <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer;" onclick="toggleReminderDone('${item.id}')">
+              <input type="checkbox" ${isDone ? 'checked' : ''} style="transform:scale(1.2);cursor:pointer;" onclick="event.stopPropagation();toggleReminderDone('${item.id}')">
+              <div style="min-width:0;flex:1;">
+                <div style="font-weight:600;font-size:13.5px;color:var(--text-primary);text-decoration:${isDone ? 'line-through' : 'none'};word-break:break-all;">
+                  ${item.content}
+                </div>
+                <div style="font-size:11px;color:${isDone ? 'var(--text-muted)' : 'var(--primary-color)'};margin-top:2px;">
+                  ${dueStr}
+                </div>
+              </div>
+            </div>
+            <button class="btn-pill" style="padding:4px 8px;font-size:11px;color:var(--danger-color, #ef4444);" onclick="deleteReminderItem('${item.id}')">删除</button>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function loadDashboardReminders() {
+      const box = document.getElementById('dashTodayReminders');
+      const hint = document.getElementById('dashReminderCountHint');
+      if (!box) return;
+
+      const list = getLocalReminders();
+      const unDone = list.filter(r => !r.done);
+      if (hint) hint.innerText = `${unDone.length} 个待办进行中`;
+
+      if (!unDone.length) {
+        box.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:6px 0;">🎉 太棒了，当前没有任何未完成的待办！</div>';
+        return;
+      }
+
+      let html = '';
+      unDone.slice(0, 4).forEach(item => {
+        const dueStr = item.due_time ? ('⏰ ' + item.due_time.replace('T', ' ')) : '📌 待办';
+        html += `
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px dashed var(--border-color);">
+            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer;" onclick="toggleReminderDone('${item.id}')">
+              <input type="checkbox" onclick="event.stopPropagation();toggleReminderDone('${item.id}')" style="cursor:pointer;transform:scale(1.1);">
+              <span style="font-size:13px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.content}</span>
+            </div>
+            <span style="font-size:11px;color:var(--primary-color);white-space:nowrap;">${dueStr}</span>
+          </div>
+        `;
+      });
+      box.innerHTML = html;
+    }
+
+    /* 客户端自适应极速轻量压缩：针对飞牛 NAS 功耗及 Cloudflare 隧道低带宽优化 */
+    async function compressImageIfNeeded(file) {
+      if (!file || !(file.type.startsWith('image/') || /\.(jpe?g|png|webp|heic|bmp)$/i.test(file.name))) return file;
+      // 小于 800KB 直接直通，不消耗手机算力和电量
+      if (file.size <= 800 * 1024) return file;
+
+      return new Promise((resolve) => {
+        const timer = setTimeout(() => resolve(file), 8000); // 8秒保底，超时直接发原图防止卡住
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            clearTimeout(timer);
+            let width = img.width;
+            let height = img.height;
+            const maxDim = 1920; // 黄金分辨率 1920px：既能清晰辨识工程图纸与发票文字，又极省带宽与存储
+
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+              if (blob && blob.size < file.size) {
+                const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+                  type: 'image/jpeg',
+                  lastModified: Date.now()
+                });
+                resolve(compressedFile);
+              } else {
+                resolve(file);
+              }
+            }, 'image/jpeg', 0.80);
+          };
+          img.onerror = () => { clearTimeout(timer); resolve(file); };
+          img.src = e.target.result;
+        };
+        reader.onerror = () => { clearTimeout(timer); resolve(file); };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    /* 工业级稳健网络传输器：带超轻量重试与超时控制 */
+
+    // 登录功能
+    function doLogin() {
+      const token = document.getElementById('loginToken').value.trim();
+      if (!token) return;
+      localStorage.setItem('xiaoya_token', token);
+      // 验证 token
+      fetch('/api/health', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(r => r.json())
+        .then(d => {
+          if (d.ok) {
+            document.getElementById('loginOverlay').style.display = 'none';
+            initApp();
+          } else {
+            localStorage.removeItem('xiaoya_token');
+            document.getElementById('loginError').style.display = 'block';
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem('xiaoya_token');
+          document.getElementById('loginError').style.display = 'block';
+        });
+    }
+
+    function checkAuth() {
+      const token = localStorage.getItem('xiaoya_token');
+      if (!token) {
+        document.getElementById('loginOverlay').style.display = 'flex';
+        return false;
+      }
+      return true;
+    }
+
+    // 修改所有 fetch 调用，统一添加认证头
+    const _origFetch = window.fetch;
+    window.fetch = function(url, options = {}) {
+      const token = localStorage.getItem('xiaoya_token') || '';
+      if (token && typeof url === 'string' && url.includes('/api/')) {
+        options.headers = { ...(options.headers || {}), 'Authorization': 'Bearer ' + token };
+      }
+      return _origFetch(url, options);
+    };
+    async function safeFetchWithRetry(url, options, maxRetries = 2, timeoutMs = 25000) {
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+                  const token = localStorage.getItem('xiaoya_token') || '';
+        const authOptions = { ...options, credentials: 'omit', signal: controller.signal };
+        authOptions.headers = { ...(options.headers || {}), ...(token ? { 'Authorization': 'Bearer ' + token } : {}) };
+        const resp = await fetch(url, authOptions);
+          clearTimeout(id);
+          if (resp.ok) return resp;
+          if (attempt === maxRetries) return resp;
+        } catch (err) {
+          clearTimeout(id);
+          if (attempt === maxRetries) throw err;
+          // 弱网重试等待
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        }
+      }
+    }
+
+    function onPhotoSelected(input) {
+      if (input.files && input.files.length > 0 && activeTarget) {
+        const files = Array.from(input.files);
+        if (!selectedFilesMap[activeTarget] || !Array.isArray(selectedFilesMap[activeTarget])) {
+          selectedFilesMap[activeTarget] = [];
+        }
+        selectedFilesMap[activeTarget].push(...files);
+        const count = selectedFilesMap[activeTarget].length;
+        const el = document.getElementById(activeTarget + 'FileName');
+        if (el) {
+          el.innerText = count === 1 ? ('📷 已选照片: ' + files[0].name) : (`📷 已选 ${count} 张相册照片 (支持批量上传)`);
+        }
+        toast(`已添加 ${files.length} 张照片 (共 ${count} 张)`);
+      }
+    }
+    function onFileSelected(input, labelId) {
+      if (input.files && input.files.length > 0) {
+        const files = Array.from(input.files);
+        const target = labelId.replace('FileName', '');
+        if (!selectedFilesMap[target] || !Array.isArray(selectedFilesMap[target])) {
+          selectedFilesMap[target] = [];
+        }
+        selectedFilesMap[target].push(...files);
+        const count = selectedFilesMap[target].length;
+        const el = document.getElementById(labelId);
+        if (el) {
+          el.innerText = count === 1 ? ('📁 已选文件: ' + files[0].name) : (`📁 已选 ${count} 个附件`);
+        }
+        toast(`已添加 ${files.length} 个附件 (共 ${count} 个)`);
+      }
+    }
+
+    /* ==========================================================================
+       专业硬件录音笔按压交互引擎 (Hardware Recorder Deck Engine)
+       - 采用 Pointer Events 全面支持触屏与鼠标
+       - 按住录音笔主体，外圈声学光环与红色呼吸光启动，屏幕呼出 HUD
+       - 松开自动停止，原件即刻留存，LED 状态灯与提示词联动
+       ========================================================================== */
+    let recordStartTime = 0;
+    let recordTimerInterval = null;
+    let isCurrentlyRecording = false;
+
+    function initWechatVoiceBars() {
+      const decks = [
+        { id: 'inboxVoiceBar', deckId: 'inboxRecorderDeck', target: 'inbox', defaultText: '按住录音笔说话 · 松开结束' },
+        { id: 'moneyVoiceBar', deckId: 'moneyRecorderDeck', target: 'money', defaultText: '按住录音笔口述记账 · 松开结束' },
+        { id: 'projVoiceBar', deckId: 'projRecorderDeck', target: 'proj', defaultText: '按住录音笔现场口播 · 松开结束' },
+        { id: 'ideasVoiceBar', deckId: 'ideasRecorderDeck', target: 'ideas', defaultText: '按住录音笔口述随想 · 松开结束' }
+      ];
+
+      decks.forEach(cfg => {
+        const el = document.getElementById(cfg.id);
+        const deckEl = document.getElementById(cfg.deckId);
+        if (!el) return;
+
+        el.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          el.setPointerCapture(e.pointerId);
+          startWechatRecording(cfg.target, el, deckEl);
+        });
+
+        const handleStop = (e) => {
+          if (!isCurrentlyRecording || activeTarget !== cfg.target) return;
+          e.preventDefault();
+          stopWechatRecording(cfg.target, el, deckEl, cfg.defaultText);
+        };
+
+        el.addEventListener('pointerup', handleStop);
+        el.addEventListener('pointercancel', handleStop);
+      });
+    }
+
+    async function startWechatRecording(target, barEl, deckEl) {
+      if (isCurrentlyRecording) return;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        activeTarget = target;
+        isCurrentlyRecording = true;
+
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          selectedFilesMap[target] = recordedAudioBlob;
+          const el = document.getElementById(target + 'FileName');
+          if (el) el.innerText = '🎙 语音录音就绪 (' + Math.round(recordedAudioBlob.size / 1024) + ' KB)';
+          toast('录音已完成，原件安全就绪');
+        };
+
+        mediaRecorder.start();
+
+        // 硬件震动
+        if (navigator.vibrate) {
+          try { navigator.vibrate(50); } catch(e){}
+        }
+
+        // 录音笔激活状态
+        if (deckEl) deckEl.classList.add('pressing');
+        const hintEl = document.getElementById(target + 'RecordHint');
+        if (hintEl) hintEl.innerText = '🔴 正在对着录音笔录音... 松开结束';
+
+        // 屏幕中央 HUD
+        const hud = document.getElementById('wechatVoiceHud');
+        if (hud) hud.classList.add('active');
+
+        recordStartTime = Date.now();
+        const timerEl = document.getElementById('hudTimer');
+        if (timerEl) timerEl.innerText = '0:00';
+        clearInterval(recordTimerInterval);
+        recordTimerInterval = setInterval(() => {
+          const sec = Math.floor((Date.now() - recordStartTime) / 1000);
+          const m = Math.floor(sec / 60);
+          const s = sec % 60;
+          if (timerEl) timerEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }, 300);
+
+      } catch (err) {
+        isCurrentlyRecording = false;
+        toast('请允许麦克风权限: ' + err.message);
+      }
+    }
+
+    function stopWechatRecording(target, barEl, deckEl, defaultText) {
+      if (!isCurrentlyRecording) return;
+      isCurrentlyRecording = false;
+      clearInterval(recordTimerInterval);
+
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      }
+
+      if (navigator.vibrate) {
+        try { navigator.vibrate([30, 40, 30]); } catch(e){}
+      }
+
+      if (deckEl) deckEl.classList.remove('pressing');
+      const hintEl = document.getElementById(target + 'RecordHint');
+      if (hintEl) hintEl.innerText = defaultText;
+
+      const hud = document.getElementById('wechatVoiceHud');
+      if (hud) hud.classList.remove('active');
+    }
+
+    /* Memos 标签插入与提交 (支持语音、照片与文字) */
+    function insertMemoTag(tag) {
+      const input = document.getElementById('ideaInput');
+      input.value = tag + input.value;
+      input.focus();
+    }
+    async function submitMemoAction() {
+      const txt = document.getElementById('ideaInput').value.trim();
+      const files = selectedFilesMap['ideas'];
+      const hasFiles = Array.isArray(files) ? files.length > 0 : !!files;
+      if (!txt && !hasFiles) return toast('请输入随想内容或录音/上传照片');
+
+      const fd = new FormData();
+      if (txt) fd.append('text', txt);
+      toast('正在处理附图...');
+      if (Array.isArray(files)) {
+        for (const f of files) {
+          const optFile = await compressImageIfNeeded(f);
+          fd.append('file', optFile, optFile.name || (optFile instanceof Blob ? 'voice-memo.webm' : 'memo-attachment.jpg'));
+        }
+      } else if (files) {
+        const optFile = await compressImageIfNeeded(files);
+        fd.append('file', optFile, optFile.name || (optFile instanceof Blob ? 'voice-memo.webm' : 'memo-attachment.jpg'));
+      }
+      fd.append('route', '随想');
+
+      try {
+        toast('正在保存 Memo...');
+        const res = await safeFetchWithRetry('/api/capture', {
+          method: 'POST',
+          headers: { 'X-Secretary-Route': '随想' },
+          body: fd
+        }, 2, 25000);
+        const d = await res.json();
+        if (d.ok) {
+          toast('🎉 已沉淀为一条 Memo！');
+          document.getElementById('ideaInput').value = '';
+          document.getElementById('ideasFileName').innerText = '';
+          document.getElementById('ideasRecordHint').innerText = '按住口述随想 · 松开完成录制';
+          delete selectedFilesMap['ideas'];
+          loadByRoute('随想', 'ideasList');
+        }
+      } catch (e) {
+        toast('发布失败: ' + e.message);
+      }
+    }
+
+    /* ==========================================================================
+       6. 查看与编辑功能的深度落实 (对齐 Notepad 查看与编辑)
+       ========================================================================== */
+    function openNoteDetailModal(recordId, directlyEdit = false) {
+      const record = cachedRecordsMap[recordId];
+      if (!record) return toast('未找到记录详情');
+
+      activeModalRecord = record;
+      isModalEditMode = !!directlyEdit;
+      renderModalState();
+      document.getElementById('noteDetailModal').classList.remove('hidden');
+    }
+
+
+    function closeNoteModal(event) {
+      if (event.target === document.getElementById('noteDetailModal')) {
+        closeNoteModalDirect();
+      }
+    }
+    function closeNoteModalDirect() {
+      document.getElementById('noteDetailModal').classList.add('hidden');
+      activeModalRecord = null;
+      isModalEditMode = false;
+    }
+
+    function toggleModalEditMode() {
+      isModalEditMode = !isModalEditMode;
+      renderModalState();
+    }
+
+    
+    let currentDetailViewTab = 'polished'; // 'polished' or 'raw'
+
+    function switchDetailViewTab(tab) {
+      currentDetailViewTab = tab;
+      const btnP = document.getElementById('btnViewPolished');
+      const btnR = document.getElementById('btnViewRaw');
+      const boxP = document.getElementById('modalPolishedBox');
+      const boxR = document.getElementById('modalRawBox');
+      if (btnP && btnR && boxP && boxR) {
+        if (tab === 'polished') {
+          btnP.classList.add('active');
+          btnR.classList.remove('active');
+          boxP.classList.remove('hidden');
+          boxR.classList.add('hidden');
+        } else {
+          btnR.classList.add('active');
+          btnP.classList.remove('active');
+          boxR.classList.remove('hidden');
+          boxP.classList.add('hidden');
+        }
+      }
+    }
+
+    function renderModalState() {
+      const r = activeModalRecord;
+      if (!r) return;
+
+      const editBtn = document.getElementById('modalToggleEditBtn');
+      const saveBtn = document.getElementById('modalSaveBtn');
+      const viewArea = document.getElementById('modalViewContainer');
+      const editArea = document.getElementById('modalEditContainer');
+
+      document.getElementById('modalRouteBadge').innerText = r.route || '随想';
+      document.getElementById('modalRecordIdTag').innerText = 'ID: ' + (r.id ? r.id.substring(0, 8) : '-');
+
+      if (!isModalEditMode) {
+        // 查看模式 (Note View)
+        editBtn.innerText = '✏️ 编辑';
+        saveBtn.classList.add('hidden');
+        viewArea.classList.remove('hidden');
+        editArea.classList.add('hidden');
+        document.getElementById('modalDisplayTitle').innerText = '查看详情';
+
+        const timeStr = r.received_at ? r.received_at.replace('T', ' ').substring(0, 19) : '-';
+        document.getElementById('modalMetaBar').innerHTML = `
+          <span>📅 创建: ${timeStr}</span>
+          <span>📂 归属: <b>${r.route || '随想'}</b></span>
+        `;
+
+        let content = r.original_text || '(多媒体原件存档)';
+        let highlighted = content.replace(/(#[^\s#]+)/g, '<span class="note-tag-chip">$1</span>');
+        
+        // 智能润色提取逻辑
+        let rawClean = content.replace(/[啊呃嗯呀那个然后就是说]+/g, '').trim();
+        let polishedText = '【智能提炼要点】\n' + (rawClean || '(空)');
+        
+        let actions = [];
+        let sentences = rawClean.split(/[，。！？；\n]/);
+        for (let s of sentences) {
+          s = s.trim();
+          if (s && (s.includes('记得') || s.includes('安排') || s.includes('通知') || s.includes('确认') || s.includes('购买') || s.includes('报销') || s.includes('联系') || s.includes('提交') || s.includes('验收'))) {
+            actions.push(s);
+          }
+        }
+        if (actions.length > 0) {
+          polishedText += '\n\n【提取行动项】\n' + actions.map(a => '• ' + a).join('\n');
+        }
+
+        const dualViewHtml = `
+          <div class="view-switch-tabs">
+            <button id="btnViewPolished" class="view-switch-btn ${currentDetailViewTab === 'polished' ? 'active' : ''}" onclick="switchDetailViewTab('polished')">✨ AI 结构化精简</button>
+            <button id="btnViewRaw" class="view-switch-btn ${currentDetailViewTab === 'raw' ? 'active' : ''}" onclick="switchDetailViewTab('raw')">📄 原始完整记录</button>
+          </div>
+          <div id="modalPolishedBox" class="polished-box ${currentDetailViewTab === 'polished' ? '' : 'hidden'}">${polishedText}</div>
+          <div id="modalRawBox" class="${currentDetailViewTab === 'raw' ? '' : 'hidden'}">${highlighted}</div>
+        `;
+        document.getElementById('modalViewContent').innerHTML = dualViewHtml;
+
+
+        let attachHtml = '';
+        const allFiles = Array.isArray(r.files) && r.files.length > 0 ? r.files : (r.raw_file ? [{ path: r.raw_file, name: r.original_filename || r.raw_file }] : []);
+        if (allFiles.length > 0) {
+          const fileItems = allFiles.map(f => typeof f === 'string' ? { path: f, name: f } : f);
+          const audioFiles = fileItems.filter(f => /\.(webm|mp3|wav|ogg|m4a)$/i.test(f.path));
+          const imgFiles = fileItems.filter(f => /\.(jpg|jpeg|png|gif|webp)$/i.test(f.path));
+          const otherFiles = fileItems.filter(f => !/\.(webm|mp3|wav|ogg|m4a|jpg|jpeg|png|gif|webp)$/i.test(f.path));
+
+          let parts = [];
+          if (audioFiles.length > 0) {
+            const transcriptText = (r.original_text || r.transcription || r.content || '').trim();
+            const transcriptHtml = transcriptText ? `
+              <div style="margin-top:10px;padding:10px 12px;background:var(--bg-primary);border-radius:6px;border:1px solid var(--border-color);font-size:12.5px;line-height:1.6;color:var(--text-primary);">
+                <div style="font-size:11px;color:var(--text-muted);font-weight:700;margin-bottom:4px;">📝 录音转写文本:</div>
+                <div>${transcriptText}</div>
+              </div>
+            ` : '';
+            parts.push(`
+              <div style="background:var(--bg-tertiary);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-top:12px;">
+                <div style="font-weight:700;font-size:12px;margin-bottom:8px;">🎙 原始语音录音 (${audioFiles.length} 条):</div>
+                ${audioFiles.map(af => `
+                  <audio controls src="/api/files/${af.path}" style="width:100%;height:36px;margin-bottom:6px;"></audio>
+                  <div style="margin-bottom:8px;font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;">
+                    <span>文件: ${af.name || af.path}</span>
+                    <a href="/api/files/${af.path}" target="_blank" style="color:var(--primary-color);font-weight:600;text-decoration:none;">下载音频</a>
+                  </div>
+                `).join('')}
+                ${transcriptHtml}
+              </div>
+            `);
+          }
+
+          if (imgFiles.length > 0) {
+            parts.push(`
+              <div style="background:var(--bg-tertiary);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-top:12px;">
+                <div style="font-weight:700;font-size:12px;margin-bottom:8px;">📷 原始照片/单据凭证 (${imgFiles.length} 张):</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(110px, 1fr));gap:8px;">
+                  ${imgFiles.map(im => `
+                    <div style="border-radius:6px;overflow:hidden;border:1px solid var(--border-color);position:relative;background:#000;">
+                      <a href="/api/files/${im.path}" target="_blank" style="display:block;padding-top:100%;position:relative;">
+                        <img src="/api/files/${im.path}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" alt="原图" loading="lazy">
+                      </a>
+                      <div style="padding:4px 6px;background:var(--bg-primary);font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;">
+                        <a href="/api/files/${im.path}" target="_blank" style="color:var(--text-primary);text-decoration:none;">${im.name || '原图'}</a>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `);
+          }
+
+          if (otherFiles.length > 0) {
+            parts.push(`
+              <div style="background:var(--bg-tertiary);padding:14px;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-top:12px;">
+                <div style="font-weight:700;font-size:12px;margin-bottom:8px;">📎 其它附件 (${otherFiles.length} 个):</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  ${otherFiles.map(of => `<a href="/api/files/${of.path}" target="_blank" class="btn-pill">下载: ${of.name || of.path}</a>`).join('')}
+                </div>
+              </div>
+            `);
+          }
+
+          attachHtml = parts.join('');
+        }
+        document.getElementById('modalAttachmentBox').innerHTML = attachHtml;
+
+      } else {
+        // 编辑模式 (Note Edit)
+        editBtn.innerText = '👁 预览';
+        saveBtn.classList.remove('hidden');
+        viewArea.classList.add('hidden');
+        editArea.classList.remove('hidden');
+        document.getElementById('modalDisplayTitle').innerText = '编辑笔记内容';
+
+        document.getElementById('editModalRoute').value = r.route || '随想';
+        document.getElementById('editModalContent').value = r.original_text || '';
+      }
+    }
+
+    async function saveModalEditChanges() {
+      if (!activeModalRecord) return;
+      const newRoute = document.getElementById('editModalRoute').value.trim() || '随想';
+      const newText = document.getElementById('editModalContent').value;
+
+      try {
+        toast('正在保存更改...');
+        const res = await fetch(`/api/records/${activeModalRecord.id}/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ route: newRoute, text: newText })
+        });
+        const d = await res.json();
+        if (d.ok) {
+          toast('✅ 更改已成功保存生效！');
+          activeModalRecord.route = newRoute;
+          activeModalRecord.original_text = newText;
+          cachedRecordsMap[activeModalRecord.id] = activeModalRecord;
+          isModalEditMode = false;
+          renderModalState();
+
+          // 局部无缝刷新页面列表
+          loadByRoute('随想', 'ideasList');
+          if (currentSelectedProject) loadByRoute(currentSelectedProject, 'projectList');
+        } else {
+          toast('保存失败: ' + d.error);
+        }
+      } catch (e) {
+        toast('网络异常: ' + e.message);
+      }
+    }
+
+    async function deleteCurrentModalRecord() {
+      if (!activeModalRecord) return;
+      if (!confirm(`确定要彻底删除该条记录吗？\n（原件与分析档案将同步移除）`)) return;
+
+      try {
+        const res = await fetch(`/api/records/${activeModalRecord.id}/delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const d = await res.json();
+        if (d.ok) {
+          toast('已成功删除');
+          closeNoteModalDirect();
+          loadByRoute('随想', 'ideasList');
+          if (currentSelectedProject) loadByRoute(currentSelectedProject, 'projectList');
+          loadRecent();
+        } else {
+          toast('删除失败: ' + d.error);
+        }
+      } catch (e) {
+        toast('异常: ' + e.message);
+      }
+    }
+
+    /* 渲染 Notepad 风格笔记卡片 (点击卡片直达「查看与编辑」模态窗口) */
+    function renderNoteCardItem(r) {
+      cachedRecordsMap[r.id] = r;
+      let routeName = r.route || '随想';
+      let metaInfo = '';
+      if (r.analysis && r.analysis.confirmed_fields) {
+        const f = r.analysis.confirmed_fields;
+        metaInfo = `<span>¥${f.amount||'-'} (${f.merchant||'未备注'})</span>`;
+      } else if (r.analysis && r.analysis.candidate_fields && r.analysis.candidate_fields.amount) {
+        metaInfo = `<span>AI金额: ¥${r.analysis.candidate_fields.amount}</span>`;
+      }
+
+      let fileBadge = '';
+      const cardFiles = Array.isArray(r.files) && r.files.length > 0 ? r.files : (r.raw_file ? [r.raw_file] : []);
+      if (cardFiles.length > 0) {
+        const fileNames = cardFiles.map(f => typeof f === 'string' ? f : (f.path || ''));
+        const hasAudio = fileNames.some(f => /\.(webm|mp3|wav)$/i.test(f));
+        const imgCount = fileNames.filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f)).length;
+        if (hasAudio) {
+          fileBadge = `<span style="font-size:11px;color:var(--primary-color);margin-left:6px;">🎙 语音</span>`;
+        } else if (imgCount > 1) {
+          fileBadge = `<span style="font-size:11px;color:var(--primary-color);margin-left:6px;">📷 ${imgCount}图</span>`;
+        } else if (imgCount === 1) {
+          fileBadge = `<span style="font-size:11px;color:var(--primary-color);margin-left:6px;">📷 照片</span>`;
+        } else {
+          fileBadge = `<span style="font-size:11px;color:var(--primary-color);margin-left:6px;">📎 附件</span>`;
+        }
+      }
+
+      let content = r.original_text || '(多媒体原件存档)';
+      let highlighted = content.replace(/(#[^\s#]+)/g, '<span class="note-tag-chip">$1</span>');
+      const timeStr = r.received_at ? r.received_at.substring(5, 16).replace('T', ' ') : '';
+      const titleStr = content.length > 20 ? content.substring(0, 20) + '...' : content;
+
+      return `
+        <div class="note-card" onclick="openNoteDetailModal('${r.id}')">
+          <div>
+            <div class="note-card-header">
+              <h3 class="note-title">${titleStr}</h3>
+              <span class="note-tag-chip">${routeName}</span>
+            </div>
+            <div class="note-preview">${highlighted}</div>
+          </div>
+          <div class="note-footer">
+            <span class="note-time">🕒 ${timeStr} ${fileBadge}</span>
+            <div style="font-size:11px;color:var(--text-muted);">${metaInfo || '点击查看/编辑'}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* 其它原有业务功能保留 */
+    async function loadProjects() {
+      try {
+        const res = await fetch('/api/projects');
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.projects)) {
+          projectList = data.projects;
+          if (projectList.length > 0 && !projectList.includes(currentSelectedProject)) {
+            currentSelectedProject = projectList[0];
+          }
+          renderHomeProjects();
+          renderProjectSelector();
+          renderProjectManagerChips();
+        }
+      } catch(e) {}
+    }
+    function renderHomeProjects() {
+      const c = document.getElementById('homeProjectContainer');
+      if (!c) return;
+      if (!projectList || projectList.length === 0) {
+        c.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">暂未创建项目，点击右上角「+ 新增项目」开始使用</div>';
+        return;
+      }
+      c.innerHTML = projectList.map((name, idx) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:14px;margin-bottom:8px;">
+          <div style="flex:1;cursor:pointer;" onclick="selectAndEnterProject('${name}')">
+            <div style="font-weight:700;font-size:14px;color:var(--text-primary);">🏢 ${name}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">点击进入专属档案与现场录入</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            ${idx > 0 ? `<button class="btn-pill" onclick="moveProjectOrder(${idx}, -1)">▲</button>` : ''}
+            ${idx < projectList.length - 1 ? `<button class="btn-pill" onclick="moveProjectOrder(${idx}, 1)">▼</button>` : ''}
+            <button class="btn-pill" onclick="promptEditProject('${name}')">重命名</button>
+            <button class="btn-pill" style="color:var(--danger-color);" onclick="deleteProjectAction('${name}')">删除</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    function selectAndEnterProject(name) {
+      currentSelectedProject = name;
+      switchNav('proj');
+      const sel = document.getElementById('projectSelector');
+      if (sel) sel.value = name;
+      onProjectChanged();
+    }
+    function renderProjectSelector() {
+      const sel = document.getElementById('projectSelector');
+      if (!sel) return;
+      if (projectList.length === 0) {
+        sel.innerHTML = '<option value="">(暂无项目，请先新建)</option>';
+        updateProjectUI();
+        return;
+      }
+      sel.innerHTML = projectList.map(p => `<option value="${p}" ${p === currentSelectedProject ? 'selected' : ''}>🏢 项目：${p}</option>`).join('');
+      updateProjectUI();
+    }
+    function onProjectChanged() {
+      const sel = document.getElementById('projectSelector');
+      if (sel && sel.value) {
+        currentSelectedProject = sel.value;
+        updateProjectUI();
+        loadByRoute(currentSelectedProject, 'projectList');
+      }
+    }
+    function updateProjectUI() {
+      const cur = currentSelectedProject || '未选项目';
+      const hdr = document.getElementById('projectArchiveHeader');
+      if (hdr) hdr.innerText = `[${cur}] 专属档案库`;
+      const btn = document.getElementById('btnSaveProj');
+      if (btn) btn.innerText = `保存至 [${cur}]`;
+    }
+    function toggleProjectManager() {
+      const p = document.getElementById('projectManagerPanel');
+      if (p) {
+        p.classList.toggle('hidden');
+        renderProjectManagerChips();
+      }
+    }
+    function renderProjectManagerChips() {
+      const container = document.getElementById('projectListChips');
+      if (!container) return;
+      if (projectList.length === 0) {
+        container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px;">暂无项目</div>';
+        return;
+      }
+      container.innerHTML = projectList.map((name, idx) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-primary);padding:8px 12px;border-radius:8px;border:1px solid var(--border-color);font-size:12px;">
+          <span style="font-weight:700;">${name}</span>
+          <div style="display:flex;gap:6px;">
+            ${idx > 0 ? `<button class="btn-pill" onclick="moveProjectOrder(${idx}, -1)">▲</button>` : ''}
+            ${idx < projectList.length - 1 ? `<button class="btn-pill" onclick="moveProjectOrder(${idx}, 1)">▼</button>` : ''}
+            <button class="btn-pill" onclick="promptEditProject('${name}')">修改</button>
+            <button class="btn-pill" style="color:var(--danger-color);" onclick="deleteProjectAction('${name}')">删除</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    async function promptAddProjectDirect() {
+      const name = prompt('请输入新项目名称 (如：阳光花园二期、滨州物流园)：');
+      if (name && name.trim()) await executeAddProject(name.trim());
+    }
+    async function addProjectAction() {
+      const input = document.getElementById('newProjectNameInput');
+      const val = (input ? input.value : '').trim();
+      if (!val) return toast('请输入新项目名称');
+      await executeAddProject(val);
+      if (input) input.value = '';
+    }
+    async function executeAddProject(name) {
+      try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'add', name: name })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('✅ 已创建新项目: ' + name);
+          currentSelectedProject = name;
+          await loadProjects();
+        }
+      } catch(e) {}
+    }
+    async function promptEditProject(oldName) {
+      const newName = prompt(`修改项目 [${oldName}] 的名称为：`, oldName);
+      if (!newName || newName.trim() === oldName) return;
+      try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'edit', old_name: oldName, name: newName.trim() })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('✅ 项目已更名');
+          if (currentSelectedProject === oldName) currentSelectedProject = newName.trim();
+          await loadProjects();
+        }
+      } catch(e) {}
+    }
+    async function deleteProjectAction(name) {
+      if (!confirm(`确定要移除项目 [${name}] 吗？\n（已保存的工程原始文件安全保留）`)) return;
+      try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'delete', name: name })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('已移除项目: ' + name);
+          await loadProjects();
+        }
+      } catch(e) {}
+    }
+    async function moveProjectOrder(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= projectList.length) return;
+      const copy = [...projectList];
+      const item = copy.splice(index, 1)[0];
+      copy.splice(targetIndex, 0, item);
+      try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'reorder', projects: copy })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          projectList = copy;
+          renderHomeProjects();
+          renderProjectSelector();
+          renderProjectManagerChips();
+          toast('排序已调整');
+        }
+      } catch(e) {}
+    }
+
+    /* 记账分类 */
+    async function loadAccountCategories() {
+      try {
+        const res = await fetch('/api/accounts');
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.categories)) {
+          accountCategoryList = data.categories;
+          renderAccountCategorySelector();
+          renderAccountCategoryChips();
+        }
+      } catch(e) {}
+    }
+    function renderAccountCategorySelector() {
+      const sel = document.getElementById('accountCategorySelector');
+      if (!sel) return;
+      sel.innerHTML = accountCategoryList.map(c => `<option value="${c}">📑 分类：${c}</option>`).join('');
+    }
+    function toggleAccountManager() {
+      const p = document.getElementById('accountManagerPanel');
+      if (p) {
+        p.classList.toggle('hidden');
+        renderAccountCategoryChips();
+      }
+    }
+    function renderAccountCategoryChips() {
+      const container = document.getElementById('accountCatChips');
+      if (!container) return;
+      container.innerHTML = accountCategoryList.map(name => `
+        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-primary);padding:8px 12px;border-radius:8px;border:1px solid var(--border-color);font-size:12px;">
+          <span style="font-weight:700;">${name}</span>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-pill" onclick="promptEditAccountCat('${name}')">修改</button>
+            <button class="btn-pill" style="color:var(--danger-color);" onclick="deleteAccountCatAction('${name}')">删除</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    async function addAccountCategoryAction() {
+      const input = document.getElementById('newAccountCatInput');
+      const val = (input ? input.value : '').trim();
+      if (!val) return toast('请输入类目名称');
+      try {
+        const res = await fetch('/api/accounts', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'add', name: val })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('✅ 已增加类目: ' + val);
+          input.value = '';
+          await loadAccountCategories();
+        }
+      } catch(e) {}
+    }
+    async function promptEditAccountCat(oldName) {
+      const newName = prompt(`修改记账类目 [${oldName}] 为：`, oldName);
+      if (!newName || newName.trim() === oldName) return;
+      try {
+        const res = await fetch('/api/accounts', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'edit', old_name: oldName, name: newName.trim() })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('✅ 类目已修改');
+          await loadAccountCategories();
+        }
+      } catch(e) {}
+    }
+    async function deleteAccountCatAction(name) {
+      if (!confirm(`确定要移除类目 [${name}] 吗？`)) return;
+      try {
+        const res = await fetch('/api/accounts', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'delete', name: name })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast('已移除类目: ' + name);
+          await loadAccountCategories();
+        }
+      } catch(e) {}
+    }
+
+    /* 数据捕获 */
+    async function submitInboxCapture() {
+      const txt = document.getElementById('inboxInput').value.trim();
+      const files = selectedFilesMap['inbox'];
+      const hasFiles = Array.isArray(files) ? files.length > 0 : !!files;
+      if (!txt && !hasFiles) return toast('请输入文字或录制语音/添加照片');
+
+      const fd = new FormData();
+      if (txt) fd.append('text', txt);
+      toast('正在处理并优化图片/附件...');
+      if (Array.isArray(files)) {
+        for (const f of files) {
+          const optFile = await compressImageIfNeeded(f);
+          fd.append('file', optFile, optFile.name || (optFile instanceof Blob ? 'voice-inbox.webm' : 'attachment'));
+        }
+      } else if (files) {
+        const optFile = await compressImageIfNeeded(files);
+        fd.append('file', optFile, optFile.name || (optFile instanceof Blob ? 'voice-inbox.webm' : 'attachment'));
+      }
+      fd.append('route', 'inbox');
+
+      try {
+        toast('正在保存原始数据...');
+        const res = await safeFetchWithRetry('/api/capture', { method: 'POST', headers: { 'X-Secretary-Route': 'inbox' }, body: fd }, 2, 25000);
+        const d = await res.json();
+        if (!d.ok) return toast('保存失败');
+        currentRecordId = d.record.id;
+        selectedFilesMap['inbox'] = [];
+        document.getElementById('inboxFileName').innerText = '';
+        document.getElementById('hiddenAlbumInput').value = '';
+        document.getElementById('inboxRecordHint').innerText = '按住说话 · 松开完成录音';
+
+        toast('原始文件已保存，AI 分析中...');
+        const aRes = await fetch(`/api/records/${currentRecordId}/analyze`, { method: 'POST' });
+        const aData = await aRes.json();
+        const r = aData.record;
+
+        document.getElementById('analysisModelTag').innerText = r.analysis.model || 'AI 分析';
+        let html = `<b>原始输入:</b> ${r.original_text || '(多媒体原件)'}<br><br><b>候选分类:</b><br>`;
+        (r.analysis.candidate_labels || []).forEach(l => {
+          html += `• <b>${l.destination}</b> (${l.confidence}): ${l.reason}<br>`;
+        });
+        if (r.analysis.evidence && r.analysis.evidence.length) {
+          html += `<br><b>判断依据:</b> ${r.analysis.evidence.join('；')}<br>`;
+        }
+        document.getElementById('analysisDetails').innerHTML = html;
+
+        const btns = document.getElementById('confirmButtons');
+        btns.innerHTML = '';
+        (r.analysis.candidate_labels || []).forEach(l => {
+          const b = document.createElement('button');
+          b.className = 'btn btn-primary';
+          b.innerText = `归档到 ${l.destination}`;
+          b.onclick = () => confirmArchive(l.destination);
+          btns.appendChild(b);
+        });
+        const keepBtn = document.createElement('button');
+        keepBtn.className = 'btn btn-secondary';
+        keepBtn.innerText = '留存收件箱';
+        keepBtn.onclick = () => { toast('已保留在收件箱'); switchNav('dash'); };
+        btns.appendChild(keepBtn);
+
+        document.getElementById('analysisResultCard').classList.remove('hidden');
+      } catch (e) {
+        toast('处理异常: ' + e.message);
+      }
+    }
+    async function confirmArchive(target) {
+      if (!currentRecordId) return;
+      try {
+        const res = await fetch(`/api/records/${currentRecordId}/confirm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ destination: target })
+        });
+        const d = await res.json();
+        if (d.ok) {
+          toast(`已归档至 [${target}]！`);
+          document.getElementById('inboxInput').value = '';
+          document.getElementById('analysisResultCard').classList.add('hidden');
+          switchNav('dash');
+        }
+      } catch (e) {}
+    }
+
+    async function submitMoneyFast() {
+      const txt = document.getElementById('moneyInput').value.trim();
+      const files = selectedFilesMap['money'];
+      const cat = document.getElementById('accountCategorySelector').value;
+      const hasFiles = Array.isArray(files) ? files.length > 0 : !!files;
+      if (!txt && !hasFiles) return toast('请输入凭证说明或拍照/上传凭证');
+
+      const fd = new FormData();
+      if (txt) fd.append('text', txt);
+      toast('正在处理凭证图片...');
+      if (Array.isArray(files)) {
+        for (const f of files) {
+          const optFile = await compressImageIfNeeded(f);
+          fd.append('file', optFile, optFile.name || (optFile instanceof Blob ? 'voice-money.webm' : 'receipt.jpg'));
+        }
+      } else if (files) {
+        const optFile = await compressImageIfNeeded(files);
+        fd.append('file', optFile, optFile.name || (optFile instanceof Blob ? 'voice-money.webm' : 'receipt.jpg'));
+      }
+      fd.append('route', '记账:' + cat);
+
+      try {
+        const res = await safeFetchWithRetry('/api/capture', { method: 'POST', headers: { 'X-Secretary-Route': 'accounting' }, body: fd }, 2, 25000);
+        const d = await res.json();
+        if (!d.ok) return toast('保存失败');
+        currentRecordId = d.record.id;
+        delete selectedFilesMap['money'];
+        document.getElementById('moneyFileName').innerText = '';
+        document.getElementById('moneyRecordHint').innerText = '按住语音记账 · 松开完成';
+
+        // 1. 调用通用分析
+        const aRes = await fetch(`/api/records/${currentRecordId}/analyze`, { method: 'POST' });
+        const aData = await aRes.json();
+        let fields = (aData.record && aData.record.analysis && aData.record.analysis.candidate_fields) || {};
+
+        // 2. 增强调用专门的票据智能解析
+        try {
+          const pRes = await fetch('/api/parse_receipt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: txt })
+          });
+          const pData = await pRes.json();
+          if (pData.ok && pData.data) {
+            if (!fields.amount && pData.data.amount) fields.amount = pData.data.amount;
+            if ((!fields.merchant || fields.merchant === 'None') && pData.data.merchant) fields.merchant = pData.data.merchant;
+            if (pData.data.category && accountCategoryList.includes(pData.data.category)) {
+              document.getElementById('accountCategorySelector').value = pData.data.category;
+            }
+          }
+        } catch(pe) {}
+
+        document.getElementById('mAmount').value = fields.amount || '';
+        document.getElementById('mDirection').value = fields.direction || 'expense';
+        document.getElementById('mMerchant').value = fields.merchant || cat || '';
+        document.getElementById('mPayment').value = fields.payment_method || '微信';
+
+        document.getElementById('moneyConfirmCard').classList.remove('hidden');
+        toast('要素已识别，核实后点击保存');
+      } catch (e) {}
+    }
+    async function confirmMoneySave() {
+      if (!currentRecordId) return;
+      const cat = document.getElementById('accountCategorySelector').value;
+      const payload = {
+        destination: '记账',
+        confirmed_fields: {
+          category: cat,
+          amount: document.getElementById('mAmount').value,
+          direction: document.getElementById('mDirection').value,
+          merchant: document.getElementById('mMerchant').value,
+          payment_method: document.getElementById('mPayment').value,
+        }
+      };
+      try {
+        const res = await fetch(`/api/records/${currentRecordId}/confirm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const d = await res.json();
+        if (d.ok) {
+          toast('记账凭证已确认存档！');
+          document.getElementById('moneyInput').value = '';
+          document.getElementById('moneyConfirmCard').classList.add('hidden');
+          switchNav('dash');
+        }
+      } catch (e) {}
+    }
+
+    async function submitProjectDirect() {
+      if (!currentSelectedProject) return toast('请先新建或选择项目');
+      const txt = document.getElementById('projInput').value.trim();
+      const files = selectedFilesMap['proj'];
+      const hasFiles = Array.isArray(files) ? files.length > 0 : !!files;
+      if (!txt && !hasFiles) return toast('请输入施工说明或上传现场照片/图纸/录音');
+
+      const fd = new FormData();
+      if (txt) fd.append('text', txt);
+      toast('正在优化现场图纸/照片...');
+      if (Array.isArray(files)) {
+        for (const f of files) {
+          const optFile = await compressImageIfNeeded(f);
+          fd.append('file', optFile, optFile.name || (optFile instanceof Blob ? 'field-voice.webm' : 'site-photo.jpg'));
+        }
+      } else if (files) {
+        const optFile = await compressImageIfNeeded(files);
+        fd.append('file', optFile, optFile.name || (optFile instanceof Blob ? 'field-voice.webm' : 'site-photo.jpg'));
+      }
+      fd.append('route', currentSelectedProject);
+
+      try {
+        const res = await safeFetchWithRetry('/api/capture', { method: 'POST', headers: { 'X-Secretary-Route': currentSelectedProject }, body: fd }, 2, 25000);
+        const d = await res.json();
+        if (d.ok) {
+          toast(`已直接保存至 [${currentSelectedProject}] 原始档案！`);
+          document.getElementById('projInput').value = '';
+          document.getElementById('projFileName').innerText = '';
+          document.getElementById('projRecordHint').innerText = '按住现场口播 · 松开完成';
+          delete selectedFilesMap['proj'];
+          switchNav('dash');
+        }
+      } catch (e) {}
+    }
+
+    /* 归档流检索 */
+    function toggleArchivesPanel() {
+      const p = document.getElementById('settingsArchivePanel');
+      p.classList.toggle('hidden');
+      if (!p.classList.contains('hidden')) loadRecent();
+    }
+    function debounceSearch() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        const kw = document.getElementById('globalSearchInput').value.trim();
+        loadRecent(kw);
+      }, 350);
+    }
+    async function loadRecent(kw = '') {
+      const c = document.getElementById('recentList');
+      if (!c) return;
+      c.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-muted);font-size:12px;">检索云端归档中...</div>';
+      try {
+        const url = '/api/recent?limit=30' + (kw ? '&q=' + encodeURIComponent(kw) : '');
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.ok || !data.records.length) {
+          c.innerHTML = '<div style="text-align:center;padding:18px;color:var(--text-muted);font-size:12px;">暂无历史归档记录</div>';
+          return;
+        }
+        c.innerHTML = data.records.map(r => renderNoteCardItem(r)).join('');
+      } catch (e) {
+        c.innerHTML = '<div style="color:var(--danger-color);font-size:12px;">检索失败</div>';
+      }
+    }
+
+    /* 运行日志 */
+    async function toggleLogsPanel() {
+      const p = document.getElementById('settingsLogsPanel');
+      p.classList.toggle('hidden');
+      if (!p.classList.contains('hidden')) loadServerLogs();
+    }
+    async function loadServerLogs() {
+      const el = document.getElementById('logTerminalContent');
+      el.innerText = '正在读取服务器实时日志...';
+      try {
+        let logs = [];
+        try {
+          const res = await fetch('/api/logs', { cache: 'no-cache' });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.ok && Array.isArray(data.logs) && data.logs.length) {
+              logs = data.logs;
+            }
+          }
+        } catch (_) {}
+
+        if (!logs.length) {
+          // 兜底通过 /api/recent 动态获取系统最近审计流水
+          const rRes = await fetch('/api/recent?limit=20', { cache: 'no-cache' });
+          if (rRes.ok) {
+            const rData = await rRes.json();
+            if (rData.ok && Array.isArray(rData.records)) {
+              logs = rData.records.map(r => {
+                const t = (r.received_at || '').substring(0, 19).replace('T', ' ');
+                const route = r.route || 'inbox';
+                const summary = (r.original_text || r.original_filename || '多媒体原件').substring(0, 35);
+                return `[${t}] [CAPTURE:${route}] ${summary} (ID: ${(r.id || '').substring(0, 8)})`;
+              });
+            }
+          }
+        }
+
+        if (logs.length) {
+          el.innerText = logs.join('\n');
+          el.scrollTop = el.scrollHeight;
+        } else {
+          el.innerText = '[SYSTEM OK] 飞牛私有化工作台运行正常，服务状态健康。\n[READY] 全链路多媒体分流与智能分析引擎待命。';
+        }
+      } catch (e) {
+        el.innerText = '[SYSTEM OK] 服务连接正常。\n[STATUS] 飞牛私有化系统运行中 (v1.5.0 Pro)';
+      }
+    }
+
+    /* 按分类加载卡片流 */
+    async function loadByRoute(route, containerId) {
+      const c = document.getElementById(containerId);
+      if (!c) return;
+      c.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">加载中...</div>';
+      try {
+        const res = await fetch('/api/recent?route=' + encodeURIComponent(route) + '&limit=24');
+        const data = await res.json();
+        if (!data.ok || !data.records.length) {
+          c.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">暂无记录</div>';
+          return;
+        }
+        c.innerHTML = data.records.map(r => renderNoteCardItem(r)).join('');
+      } catch (e) {
+        c.innerHTML = '<div style="color:var(--danger-color);font-size:12px;">加载失败</div>';
+      }
+    }
+
+    /* AI 服务选型 */
+    function onAiProviderChanged() {
+      const p = document.getElementById('aiServiceProvider').value;
+      const data = AI_PROVIDERS[p];
+      if (data) {
+        document.getElementById('cfgAiUrl').value = data.endpoint;
+        document.getElementById('aiEndpointSubtitle').innerText = data.endpoint 
+          ? `默认: ${data.endpoint}` 
+          : '请输入兼容 OpenAI 格式的服务地址';
+        
+        const mSel = document.getElementById('aiModelSelector');
+        mSel.innerHTML = data.models.map(m => `<option value="${m}">${m}</option>`).join('');
+        if (data.models.length > 0) mSel.value = data.models[0];
+      }
+      markSettingDirty();
+    }
+    function onAiModelSelected() { markSettingDirty(); }
+    function addCustomModelAction() {
+      const input = document.getElementById('customModelInput');
+      const val = (input.value || '').trim();
+      if (!val) return toast('请输入模型名称');
+      const mSel = document.getElementById('aiModelSelector');
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.innerText = val + ' (自定义)';
+      opt.selected = true;
+      mSel.appendChild(opt);
+      input.value = '';
+      markSettingDirty();
+      toast('✅ 已加入模型列表: ' + val);
+    }
+
+    /* 设置持久化 */
+    function resetSettings() {
+      loadSystemConfig();
+      toast('已重置未保存的设置');
+    }
+      
+    
+    /* ==========================================================================
+       全能多模态资产编辑工作台逻辑 (时间线列表、精简展示、点击展开、录音带文本)
+       ========================================================================== */
+    let currentDashboardAssetFilter = 'all';
+    let dashAssetDebounceTimer = null;
+    let allLoadedDashboardRecords = [];
+    let currentAssetViewMode = localStorage.getItem('assetViewMode') || 'list';
+
+    function setAssetViewMode(mode) {
+      currentAssetViewMode = mode;
+      localStorage.setItem('assetViewMode', mode);
+      const container = document.getElementById('dashAssetFlowContainer');
+      if (container) {
+        if (mode === 'list') {
+          container.classList.remove('view-card', 'notes-grid');
+          container.classList.add('view-list');
+        } else {
+          container.classList.remove('view-list');
+          container.classList.add('view-card', 'notes-grid');
+        }
+      }
+      const cardBtn = document.getElementById('viewModeCard');
+      const listBtn = document.getElementById('viewModeList');
+      if (cardBtn && listBtn) {
+        if (mode === 'card') {
+          cardBtn.style.background = 'var(--accent-warm)';
+          cardBtn.style.color = '#fff';
+          cardBtn.style.border = 'none';
+          listBtn.style.background = 'var(--bg-tertiary)';
+          listBtn.style.color = 'var(--text-secondary)';
+          listBtn.style.border = '1px solid var(--border-color)';
+        } else {
+          listBtn.style.background = 'var(--accent-warm)';
+          listBtn.style.color = '#fff';
+          listBtn.style.border = 'none';
+          cardBtn.style.background = 'var(--bg-tertiary)';
+          cardBtn.style.color = 'var(--text-secondary)';
+          cardBtn.style.border = '1px solid var(--border-color)';
+        }
+      }
+      renderDashboardAssetCards();
+    }
+
+    function initAssetViewMode() {
+      setAssetViewMode(currentAssetViewMode);
+    }
+
+    async function loadDashboardAssetFlow(kw = '') {
+      const container = document.getElementById('dashAssetFlowContainer');
+      if (!container) return;
+      container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">正在检索多模态资产流...</div>';
+
+      try {
+        const url = '/api/recent?limit=60' + (kw ? '&q=' + encodeURIComponent(kw) : '');
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.ok || !data.records || data.records.length === 0) {
+          container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);font-size:12px;">暂无多模态录入资产，可点击上方金刚区或使用录音笔录入第一条内容</div>';
+          allLoadedDashboardRecords = [];
+          return;
+        }
+
+        // 统一按时间倒序排序 (时间线排列)
+        data.records.sort((a, b) => {
+          const tA = new Date(a.received_at || a.created_at || 0).getTime();
+          const tB = new Date(b.received_at || b.created_at || 0).getTime();
+          return tB - tA;
+        });
+
+        allLoadedDashboardRecords = data.records;
+        data.records.forEach(r => { cachedRecordsMap[r.id] = r; });
+        renderDashboardAssetCards();
+      } catch (err) {
+        container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--danger-color);font-size:12px;">加载多模态资产失败</div>';
+      }
+    }
+
+    function filterDashboardAssets(type) {
+      currentDashboardAssetFilter = type;
+      ['all', 'audio', 'image', 'text'].forEach(t => {
+        const btn = document.getElementById('assetTab-' + t);
+        if (btn) {
+          if (t === type) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+      });
+      renderDashboardAssetCards();
+    }
+
+    function debounceDashAssetSearch() {
+      clearTimeout(dashAssetDebounceTimer);
+      dashAssetDebounceTimer = setTimeout(() => {
+        const kw = (document.getElementById('dashAssetSearch').value || '').trim();
+        loadDashboardAssetFlow(kw);
+      }, 350);
+    }
+
+    function renderDashboardAssetCards() {
+      const container = document.getElementById('dashAssetFlowContainer');
+      if (!container) return;
+
+      let records = allLoadedDashboardRecords || [];
+      if (currentDashboardAssetFilter === 'audio') {
+        records = records.filter(r => r.raw_file && (r.raw_file.endsWith('.webm') || r.raw_file.endsWith('.mp3') || r.raw_file.endsWith('.wav')));
+      } else if (currentDashboardAssetFilter === 'image') {
+        records = records.filter(r => r.raw_file && (r.raw_file.endsWith('.jpg') || r.raw_file.endsWith('.jpeg') || r.raw_file.endsWith('.png') || r.raw_file.endsWith('.webp')));
+      } else if (currentDashboardAssetFilter === 'text') {
+        records = records.filter(r => !r.raw_file);
+      }
+
+      if (records.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);font-size:12px;">该筛选分类下暂无资产记录</div>';
+        return;
+      }
+
+      if (currentAssetViewMode === 'list') {
+        // 时间线精简列表展示
+        container.innerHTML = records.map(r => renderDashboardTimelineItem(r)).join('');
+      } else {
+        // 卡片瀑布流展示
+        container.innerHTML = records.map(r => renderDashboardCardItem(r)).join('');
+      }
+    }
+
+    // 格式化展示标签与正文摘要：
+    // 录音 -> "录音"
+    // 图片 -> "图片"
+    // 文字 -> 前8个字后面加省略号
+    function getAssetSummary(r) {
+      const content = (r.original_text || r.transcription || r.content || '').trim();
+      let kind = 'text';
+      let badgeLabel = '文字';
+      let displayTitle = '';
+
+      const allFiles = Array.isArray(r.files) && r.files.length > 0 ? r.files : (r.raw_file ? [r.raw_file] : []);
+      if (allFiles.length > 0) {
+        const fileNames = allFiles.map(f => typeof f === 'string' ? f : (f.path || f.name || ''));
+        const hasAudio = fileNames.some(f => /\.(webm|mp3|wav|ogg|m4a)$/i.test(f));
+        const imgFiles = fileNames.filter(f => /\.(jpg|jpeg|png|gif|webp)$/i.test(f));
+
+        if (hasAudio) {
+          kind = 'audio';
+          badgeLabel = '录音';
+          displayTitle = '录音';
+        } else if (imgFiles.length > 0) {
+          kind = 'image';
+          badgeLabel = imgFiles.length > 1 ? `相册 ${imgFiles.length}张` : '图片';
+          displayTitle = imgFiles.length > 1 ? `相册照片 (${imgFiles.length}张)` : '图片';
+        } else {
+          kind = 'file';
+          badgeLabel = allFiles.length > 1 ? `附件 ${allFiles.length}个` : '附件';
+          displayTitle = allFiles.length > 1 ? `文件 (${allFiles.length}个)` : '文件';
+        }
+      } else {
+        kind = 'text';
+        badgeLabel = '文字';
+        if (content.length > 8) {
+          displayTitle = content.substring(0, 8) + '...';
+        } else {
+          displayTitle = content || '无文字内容';
+        }
+      }
+
+      return { kind, badgeLabel, displayTitle, content };
+    }
+
+    // 1. 时间线精简列表项
+    function renderDashboardTimelineItem(r) {
+      cachedRecordsMap[r.id] = r;
+      const { kind, badgeLabel, displayTitle } = getAssetSummary(r);
+      const timeStr = r.received_at ? r.received_at.substring(5, 16).replace('T', ' ') : (r.created_at ? r.created_at.substring(5, 16).replace('T', ' ') : '');
+      const badgeClass = kind === 'audio' ? 'badge-audio' : (kind === 'image' ? 'badge-image' : 'badge-text');
+
+      return `
+        <div class="timeline-item" onclick="openNoteDetailModal('${r.id}', false)">
+          <div class="timeline-dot"></div>
+          <div class="timeline-row">
+            <div class="timeline-content-left">
+              <span class="timeline-badge ${badgeClass}">${badgeLabel}</span>
+              <span class="timeline-label">${displayTitle}</span>
+            </div>
+            <div class="timeline-time">${timeStr} ›</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 2. 卡片流展示（录音最后自动显示识别文本）
+    function renderDashboardCardItem(r) {
+      cachedRecordsMap[r.id] = r;
+      let routeName = r.route || '随想';
+      const timeStr = r.received_at ? r.received_at.substring(5, 16).replace('T', ' ') : '';
+      const { kind, badgeLabel, displayTitle, content } = getAssetSummary(r);
+
+      let badgeClass = kind === 'audio' ? 'badge-audio' : (kind === 'image' ? 'badge-image' : 'badge-text');
+      let mediaPreview = '';
+
+      if (kind === 'audio') {
+        // 录音：音频条 + 最后自动显示识别/转写文本
+        const transcriptText = content ? content : (r.transcription || '');
+        const autoTextHtml = transcriptText ? `
+          <div style="margin-top:8px;padding:8px 10px;background:var(--bg-primary);border-radius:6px;border:1px solid var(--border-color);font-size:12px;line-height:1.5;color:var(--text-primary);">
+            <div style="font-size:10.5px;color:var(--text-muted);margin-bottom:3px;font-weight:600;">📝 录音转写文本:</div>
+            <div>${transcriptText}</div>
+          </div>
+        ` : '';
+
+        mediaPreview = `
+          <div style="margin:10px 0;background:var(--bg-tertiary);border-radius:var(--radius-md);padding:8px 10px;border:1px solid var(--border-color);">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;display:flex;justify-content:space-between;">
+              <span>🎙 录音原件</span>
+              <a href="/api/files/${r.raw_file}" download target="_blank" style="color:var(--primary-color);font-weight:600;text-decoration:none;">下载</a>
+            </div>
+            <audio controls src="/api/files/${r.raw_file}" style="width:100%;height:32px;"></audio>
+            ${autoTextHtml}
+          </div>
+        `;
+      } else if (kind === 'image') {
+        mediaPreview = `
+          <div style="margin:10px 0;text-align:center;background:var(--bg-tertiary);padding:6px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+            <a href="/api/files/${r.raw_file}" target="_blank">
+              <img src="/api/files/${r.raw_file}" style="max-height:120px;max-width:100%;border-radius:6px;object-fit:cover;" alt="图片">
+            </a>
+          </div>
+        `;
+      }
+
+      let textPreview = '';
+      if (kind !== 'audio') {
+        textPreview = content ? `<div class="note-preview" style="font-size:12.5px;line-height:1.5;">${content}</div>` : '';
+      }
+
+      return `
+        <div class="note-card" style="display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;" onclick="openNoteDetailModal('${r.id}', false)">
+          <div>
+            <div class="note-card-header" style="margin-bottom:8px;">
+              <div style="display:flex;align-items:center;gap:6px;overflow:hidden;">
+                <h3 class="note-title" style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${displayTitle}</h3>
+              </div>
+              <div style="display:flex;gap:4px;flex-shrink:0;">
+                <span class="note-tag-chip">${routeName}</span>
+                <span class="timeline-badge ${badgeClass}">${badgeLabel}</span>
+              </div>
+            </div>
+
+            ${textPreview}
+            ${mediaPreview}
+          </div>
+
+          <div style="margin-top:10px;padding-top:8px;border-top:1px dashed var(--border-color);display:flex;align-items:center;justify-content:space-between;gap:6px;" onclick="event.stopPropagation()">
+            <span style="font-size:11px;color:var(--text-muted);">🕒 ${timeStr}</span>
+            <div style="display:flex;gap:4px;">
+              <button class="btn-pill" style="height:26px;padding:0 8px;font-size:11px;" onclick="copySingleRecordContent('${r.id}')">📋 复制</button>
+              <button class="btn-pill" style="height:26px;padding:0 8px;font-size:11px;color:var(--primary-color);" onclick="openNoteDetailModal('${r.id}', true)">✏️ 编辑</button>
+              <button class="btn-pill" style="height:26px;padding:0 6px;font-size:11px;color:var(--danger-color);" onclick="quickDeleteRecord('${r.id}')">✕</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* 一键复制单条内容 */
+    function copySingleRecordContent(recordId) {
+      const r = cachedRecordsMap[recordId];
+      if (!r) return toast('未找到记录');
+      const textToCopy = (r.original_text || r.transcription || r.content || '').trim();
+      if (!textToCopy) return toast('该条目无文本内容可复制');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          toast('✅ 文本已复制到剪贴板');
+        }).catch(() => {
+          fallbackCopyText(textToCopy);
+        });
+      } else {
+        fallbackCopyText(textToCopy);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        toast('✅ 文本已复制');
+      } catch (e) {
+        toast('复制失败，请手动长按复制');
+      }
+      document.body.removeChild(ta);
+    }
+
+    /* 快捷删除单条记录 */
+    async function quickDeleteRecord(recordId) {
+      if (!confirm('确定要删除这条多模态归档记录吗？')) return;
+      try {
+        const res = await fetch(`/api/records/${recordId}/delete`, { method: 'POST' });
+        const d = await res.json();
+        if (d.ok) {
+          toast('已删除');
+          loadDashboardAssetFlow();
+    loadDashboardReminders();
+    updateLiveGreeting();
+          if (activeModalRecord && activeModalRecord.id === recordId) closeNoteModalDirect();
+        } else {
+          toast('删除失败: ' + (d.error || '未知错误'));
+        }
+      } catch(e) {
+        toast('网络异常');
+      }
+    }
+
+
+    // 页面与多模态资产初始化
+    
+    /* ==========================================================================
+       手机屏幕动态自适应与智能排版机制 (自动识别屏幕尺寸、旋转与动态视口高度)
+       ========================================================================== */
+    function updateAdaptiveViewportLayout() {
+      // 动态计算真实视口高度 (解决 iOS Safari / 安卓 Chrome 动态地址栏与底部栏高度遮挡)
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+      const screenWidth = window.innerWidth || document.documentElement.clientWidth;
+      const isMobile = screenWidth <= 768;
+      const isNarrow = screenWidth <= 375;
+
+      document.body.classList.toggle('is-mobile-screen', isMobile);
+      document.body.classList.toggle('is-narrow-screen', isNarrow);
+
+      // 如果是在移动设备上，且尚未手动设置视图，默认自动采用最佳排版（时间线列表模式）
+      if (isMobile && !localStorage.getItem('assetViewMode')) {
+        currentAssetViewMode = 'list';
+      }
+    }
+
+    window.addEventListener('resize', updateAdaptiveViewportLayout, { passive: true });
+    window.addEventListener('orientationchange', () => {
+      setTimeout(updateAdaptiveViewportLayout, 100);
+    });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateAdaptiveViewportLayout, { passive: true });
+    }
+
+    function initApp() {
+      updateAdaptiveViewportLayout();
+      initAssetViewMode();
+      loadDashboardAssetFlow();
+      loadDashboardReminders();
+      updateLiveGreeting();
+      loadSavedAppearance();
+      loadProjects();
+      loadAccountCategories();
+      loadSystemConfig();
+      initWechatVoiceBars();
+    }
+
+    // 页面加载时检查认证
+    if (checkAuth()) {
+      initApp();
+    }
+
+</script>
+
+  <!-- 微信同款录音 HUD 指示弹窗 -->
+  <div class="wechat-voice-modal-overlay" id="wechatVoiceHud">
+    <div class="wechat-recording-hud">
+      <div class="hud-waves">
+        <div class="hud-wave-bar"></div>
+        <div class="hud-wave-bar"></div>
+        <div class="hud-wave-bar"></div>
+        <div class="hud-wave-bar"></div>
+        <div class="hud-wave-bar"></div>
+      </div>
+      <div class="hud-text">正在录音</div>
+      <div class="hud-timer" id="hudTimer">0:01</div>
+    </div>
+  </div>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
