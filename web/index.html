@@ -50,6 +50,20 @@
       --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Helvetica Neue", sans-serif;
     }
 
+    /* ===== 全局精致滚动条（去网页感，更原生） ===== */
+    * { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.18) transparent; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.15); border-radius: 3px;
+      transition: background 0.2s ease;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.28); }
+    /* 深色主题下滚动条适配 */
+    html[data-theme="dark"] * , body[data-theme="dark"] * { scrollbar-color: rgba(255,255,255,0.2) transparent; }
+    html[data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); }
+    html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
     /* 主题 1：大地温润 (Warm Walnut) */
     html[data-theme="walnut"], body[data-theme="walnut"] {
       --primary-color: #b45309;
@@ -2230,9 +2244,6 @@
       </button>
       <button class="m-nav-item" id="m-nav-remind" onclick="switchNav('remind')">
         <span class="m-icon">⏰</span><span>待办提醒</span>
-      </button>
-      <button class="m-nav-item" id="m-nav-inbox" onclick="switchNav('inbox')">
-        <span class="m-icon">⚡</span><span>随手记</span>
       </button>
       <button class="m-nav-item" id="m-nav-proj" onclick="switchNav('proj')">
         <span class="m-icon">📁</span><span>项目资产</span>
