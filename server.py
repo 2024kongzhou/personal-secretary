@@ -368,6 +368,20 @@ def auto_file_record(record, rpath=None):
         return ("error", target)
 
 
+def _bg_autofile_by_id(record_id):
+    """后台线程：按 id 重新定位记录并自动归类落盘（收集后异步触发用）。"""
+    try:
+        rpath, rec = find_record(record_id)
+        if not rec:
+            return
+        if rec.get("route") != "inbox":
+            return
+        status, target = auto_file_record(rec, rpath=rpath)
+        logger.info(f"capture 自动归类[{record_id[:8]}]: {status} -> {target}")
+    except Exception as e:
+        logger.error(f"capture 自动归类异常[{record_id[:8]}]: {e}")
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "PersonalSecretary/0.5"
 
@@ -980,6 +994,13 @@ class Handler(BaseHTTPRequestHandler):
                     text = body.decode("utf-8", "replace")
 
             record = write_record(route, text, files_list=files_list)
+            # 收集箱内容：异步触发 AI 自动归类落盘（不阻塞前端响应）
+            if record.get("route") == "inbox":
+                threading.Thread(
+                    target=_bg_autofile_by_id,
+                    args=(record.get("id"),),
+                    daemon=True,
+                ).start()
             self.send_json(201, {"ok": True, "record": record})
 
         except Exception as e:
