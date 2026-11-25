@@ -1507,31 +1507,20 @@
       </div>
 
       <nav class="primary-nav">
-        <p class="nav-label">核心助手</p>
+        <p class="nav-label">常用</p>
         <button class="nav-item active" id="pc-nav-dash" onclick="switchNav('dash')">
-          <span class="nav-icon">⌂</span><span>今日聚焦</span>
-        </button>
-        <button class="nav-item" id="pc-nav-ideas" onclick="switchNav('ideas')">
-          <span class="nav-icon">📝</span><span>备忘录 (便签)</span>
-        </button>
-        <button class="nav-item" id="pc-nav-remind" onclick="switchNav('remind')">
-          <span class="nav-icon">⏰</span><span>待办与日程提醒</span>
+          <span class="nav-icon">⌂</span><span>首页</span>
         </button>
         <button class="nav-item" id="pc-nav-inbox" onclick="switchNav('inbox')">
-          <span class="nav-icon">⚡</span><span>随手速记 / 收集箱</span>
+          <span class="nav-icon">✏️</span><span>记一笔</span>
+        </button>
+        <button class="nav-item" id="pc-nav-remind" onclick="switchNav('remind')">
+          <span class="nav-icon">☑️</span><span>待办</span>
         </button>
 
-        <p class="nav-label" style="margin-top:20px;">资产与档案</p>
-        <button class="nav-item" id="pc-nav-proj" onclick="switchNav('proj')">
-          <span class="nav-icon">📁</span><span>项目现场档案</span>
-        </button>
-        <button class="nav-item" id="pc-nav-money" onclick="switchNav('money')">
-          <span class="nav-icon">🧾</span><span>记账凭证与发票</span>
-        </button>
-
-        <p class="nav-label" style="margin-top:20px;">系统管理</p>
-        <button class="nav-item" id="pc-nav-sett" onclick="switchNav('sett')">
-          <span class="nav-icon">⚙</span><span>系统设置</span>
+        <p class="nav-label" style="margin-top:20px;">我的</p>
+        <button class="nav-item" id="pc-nav-mine" onclick="switchNav('mine')">
+          <span class="nav-icon">👤</span><span>我的</span>
         </button>
       </nav>
 
@@ -2290,21 +2279,50 @@
           </div>
         </div>
       </div>
+
+      <!-- 我的：低频功能枢纽（收纳项目/发票/备忘录/设置） -->
+      <div id="section-mine" class="hidden">
+        <div style="max-width:900px;margin:0 auto;">
+          <p style="font-size:13px;color:var(--text-muted);margin:0 0 18px;">全部功能都在这里，点卡片进入</p>
+          <div class="grid-2" style="gap:14px;">
+            <div class="note-card" onclick="switchNav('proj')" style="padding:22px;">
+              <div style="font-size:32px;margin-bottom:10px;">📁</div>
+              <div style="font-size:17px;font-weight:700;color:var(--text-primary);">项目现场档案</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-top:6px;">工地照片、现场资料归档</div>
+            </div>
+            <div class="note-card" onclick="switchNav('money')" style="padding:22px;">
+              <div style="font-size:32px;margin-bottom:10px;">🧾</div>
+              <div style="font-size:17px;font-weight:700;color:var(--text-primary);">记账凭证与发票</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-top:6px;">日常流水、发票单据存档</div>
+            </div>
+            <div class="note-card" onclick="switchNav('ideas')" style="padding:22px;">
+              <div style="font-size:32px;margin-bottom:10px;">📝</div>
+              <div style="font-size:17px;font-weight:700;color:var(--text-primary);">个人备忘录</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-top:6px;">灵感随笔、便签素材</div>
+            </div>
+            <div class="note-card" onclick="switchNav('sett')" style="padding:22px;">
+              <div style="font-size:32px;margin-bottom:10px;">⚙️</div>
+              <div style="font-size:17px;font-weight:700;color:var(--text-primary);">系统设置</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-top:6px;">主题、语言、AI、存储配置</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
-    <!-- 4. 手机端底部毛玻璃 Tab 导航条 -->
+    <!-- 4. 手机端底部毛玻璃 Tab 导航条 —— 以首页为中心，只留4个核心 -->
     <nav class="mobile-bottom-nav">
       <button class="m-nav-item active" id="m-nav-dash" onclick="switchNav('dash')">
-        <span class="m-icon">⌂</span><span>今日</span>
+        <span class="m-icon">⌂</span><span>首页</span>
       </button>
-      <button class="m-nav-item" id="m-nav-ideas" onclick="switchNav('ideas')">
-        <span class="m-icon">📝</span><span>备忘录</span>
+      <button class="m-nav-item" id="m-nav-inbox" onclick="switchNav('inbox')">
+        <span class="m-icon">✏️</span><span>记一笔</span>
       </button>
       <button class="m-nav-item" id="m-nav-remind" onclick="switchNav('remind')">
-        <span class="m-icon">⏰</span><span>待办提醒</span>
+        <span class="m-icon">☑️</span><span>待办</span>
       </button>
-      <button class="m-nav-item" id="m-nav-proj" onclick="switchNav('proj')">
-        <span class="m-icon">📁</span><span>项目资产</span>
+      <button class="m-nav-item" id="m-nav-mine" onclick="switchNav('mine')">
+        <span class="m-icon">👤</span><span>我的</span>
       </button>
     </nav>
   </div>
@@ -2519,7 +2537,7 @@
 
     /* 视图导航 */
     function switchNav(key) {
-      const sections = ['dash', 'inbox', 'money', 'proj', 'ideas', 'sett', 'remind'];
+      const sections = ['dash', 'inbox', 'money', 'proj', 'ideas', 'sett', 'remind', 'mine'];
       sections.forEach(s => {
         const el = document.getElementById('section-' + s);
         if (el) el.classList.toggle('hidden', s !== key);
@@ -2532,13 +2550,14 @@
       });
 
       const meta = {
-        dash: { eyebrow: 'TODAY', title: '今日聚焦', count: '就绪' },
+        dash: { eyebrow: 'TODAY', title: '首页', count: '就绪' },
         ideas: { eyebrow: 'NOTES', title: '个人备忘录', count: '便签素材' },
-        remind: { eyebrow: 'SCHEDULE', title: '待办与事件提醒', count: '日程待办' },
-        inbox: { eyebrow: 'QUICK', title: '随手速记', count: '快速录入' },
+        remind: { eyebrow: 'SCHEDULE', title: '待办', count: '日程待办' },
+        inbox: { eyebrow: 'QUICK', title: '记一笔', count: '快速录入' },
         money: { eyebrow: 'ACCOUNTING', title: '记账与凭证', count: '发票单据' },
         proj: { eyebrow: 'PROJECTS', title: '项目现场档案', count: '现场档案' },
-        sett: { eyebrow: 'SETTINGS', title: '系统设置与管理', count: '偏好配置' }
+        sett: { eyebrow: 'SETTINGS', title: '系统设置与管理', count: '偏好配置' },
+        mine: { eyebrow: 'MINE', title: '我的', count: '全部功能' }
       };
 
       const cur = meta[key] || meta.dash;
@@ -2559,9 +2578,9 @@
       }
       if (key === 'money') loadAccountCategories();
 
-      // FAB 显示控制：速记页/设置页隐藏，其他页显示
+      // FAB 显示控制：速记页/设置页/我的页隐藏，其他页显示
       const fab = document.getElementById('globalFab');
-      if (fab) fab.style.display = (key === 'inbox' || key === 'sett') ? 'none' : 'block';
+      if (fab) fab.style.display = (key === 'inbox' || key === 'sett' || key === 'mine') ? 'none' : 'block';
     }
 
     function quickCreateAction() {
