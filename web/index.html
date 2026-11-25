@@ -1126,8 +1126,8 @@
 
       .app-shell {
         flex-direction: column;
-        padding-top: calc(54px + env(safe-area-inset-top, 0px));
-        padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+        padding-top: calc(46px + env(safe-area-inset-top, 0px));
+        padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
         min-height: 100vh;
         min-height: -webkit-fill-available;
       }
@@ -1286,6 +1286,7 @@
       }
       .m-nav-item.active { color: var(--primary-color); }
       .m-nav-item .m-icon { font-size: 18px; }
+      .m-nav-item svg.m-icon { width: 22px; height: 22px; }
 
       /* 弹窗全屏手机自适应 */
       .note-modal-overlay { 
@@ -1595,11 +1596,11 @@
             <div class="note-card" id="dailyBriefingCard" style="cursor:default;margin-bottom:14px;border-left:4px solid var(--accent-warm);">
               <div class="note-card-header" style="margin-bottom:12px;">
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <span style="font-size:16px;">🌅</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-warm)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
                   <div class="note-title" style="font-size:15px;">今日日报</div>
                   <span style="font-size:11px;color:var(--text-muted);" id="briefingUpdateTime"></span>
                 </div>
-                <button class="btn-pill" onclick="loadBriefing()" title="刷新">🔄 刷新</button>
+                <button class="btn-pill" onclick="loadBriefing()" title="刷新"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> 刷新</button>
               </div>
               <div id="briefingContent">
                 <div style="color:var(--text-muted);font-size:12px;padding:8px 0;">正在加载今日日报...</div>
@@ -2328,16 +2329,16 @@
     <!-- 4. 手机端底部毛玻璃 Tab 导航条 —— 以首页为中心，只留4个核心 -->
     <nav class="mobile-bottom-nav">
       <button class="m-nav-item active" id="m-nav-dash" onclick="switchNav('dash')">
-        <span class="m-icon">⌂</span><span>首页</span>
+        <svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>首页</span>
       </button>
       <button class="m-nav-item" id="m-nav-inbox" onclick="switchNav('inbox')">
-        <span class="m-icon">✏️</span><span>记一笔</span>
+        <svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>记一笔</span>
       </button>
       <button class="m-nav-item" id="m-nav-remind" onclick="switchNav('remind')">
-        <span class="m-icon">☑️</span><span>待办</span>
+        <svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>待办</span>
       </button>
       <button class="m-nav-item" id="m-nav-mine" onclick="switchNav('mine')">
-        <span class="m-icon">👤</span><span>我的</span>
+        <svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>我的</span>
       </button>
     </nav>
   </div>
@@ -2626,7 +2627,7 @@
       // 天气
       const w = d.weather || {};
       html += '<div style="margin-bottom:14px;">';
-      html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;">🌤 天气 · ' + (w.city || '') + '</div>';
+      html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><path d="M17.66 5.34l1.41-1.41"/></svg> 天气 · ' + (w.city || '') + '</div>';
       if (w.ok) {
         html += '<div style="font-size:13px;color:var(--text-primary);"><b>' + w.temp + '°C</b> ' + (w.desc || '') + ' · 湿度' + w.humidity + '% · ' + (w.max || '') + '/' + (w.min || '') + '°C</div>';
       } else {
@@ -2636,7 +2637,7 @@
       // 行情
       const qs = d.quotes || [];
       html += '<div style="margin-bottom:14px;">';
-      html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;">📈 行情</div>';
+      html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 行情</div>';
       if (qs.length && qs.some(q => q.ok)) {
         html += '<div style="display:flex;flex-wrap:wrap;gap:8px;">';
         qs.forEach(q => {
@@ -2650,20 +2651,28 @@
         });
         html += '</div>';
       } else {
-        html += '<div style="font-size:12px;color:var(--text-muted);">行情获取失败（数据源临时限流，稍后刷新）</div>';
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-tertiary);border-radius:8px;">';
+        html += '<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>';
+        html += '<div><div style="font-size:12px;color:var(--text-secondary);font-weight:600;">行情暂不可用</div>';
+        html += '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">数据源临时限流，点击上方刷新重试</div></div>';
+        html += '</div>';
       }
       html += '</div>';
       // 新闻
       const news = (d.news && d.news.items) || [];
       html += '<div>';
-      html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;">📰 热点新闻' + (d.news && d.news.total ? ' · ' + d.news.total + '条' : '') + '</div>';
+      html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M2 5h6a3 3 0 0 1 3 3v12a3 3 0 0 0-3-3H2z"/><path d="M22 5h-6a3 3 0 0 0-3 3v12a3 3 0 0 1 3-3h6z"/></svg> 热点新闻' + (d.news && d.news.total ? ' · ' + d.news.total + '条' : '') + '</div>';
       if (news.length) {
-        html += '<div style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;">';
+        html += '<div style="position:relative;">';
+        html += '<style>#dailyBriefingCard .news-scroll::-webkit-scrollbar{display:none;}</style>';
+        html += '<div style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;padding-bottom:2px;scrollbar-width:none;-ms-overflow-style:none;" class="news-scroll">';
         news.forEach(n => {
           html += '<div style="font-size:12.5px;color:var(--text-secondary);line-height:1.5;padding:6px 8px;background:var(--bg-tertiary);border-radius:6px;">';
           html += '<span style="color:var(--text-muted);font-size:11px;">[' + (n.time || '') + ']</span> ' + n.title;
           html += '</div>';
         });
+        html += '</div>';
+        html += '<div style="position:absolute;bottom:0;left:0;right:0;height:28px;pointer-events:none;background:linear-gradient(to bottom, rgba(255,255,255,0), var(--bg-secondary));"></div>';
         html += '</div>';
       } else {
         html += '<div style="font-size:12px;color:var(--text-muted);">新闻获取失败</div>';
