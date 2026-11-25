@@ -3,6 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <!-- 移动端适配强化：iOS Safari 不自动缩放/不识别电话号码/以移动模式渲染 -->
+  <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>小雅全能助手 · 个人工作台</title>
   <style>
     /* ==========================================================================
@@ -1487,9 +1492,20 @@
       <img src="./icon-192.png" style="width:64px;height:64px;border-radius:14px;margin-bottom:16px;" alt="小雅全能助手">
       <h2 style="color:#fff;margin:0 0 8px;font-size:20px;">小雅全能助手</h2>
       <p style="color:#86868b;margin:0 0 24px;font-size:13px;">请输入访问令牌继续</p>
-      <input type="password" id="loginToken" placeholder="访问令牌" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;background:rgba(255,255,255,0.08);color:#fff;font-size:14px;margin-bottom:12px;outline:none;">
+      <input type="password" id="loginToken" placeholder="访问令牌" autocomplete="current-password" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;background:rgba(255,255,255,0.08);color:#fff;font-size:14px;margin-bottom:12px;outline:none;">
+      <!-- 信任此设备时长选择：避免每次重复输密码 -->
+      <div style="margin-bottom:12px;text-align:left;">
+        <div style="color:#86868b;font-size:11.5px;margin-bottom:6px;">信任此设备，免登录时长</div>
+        <div id="trustDurationChips" style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button type="button" class="trust-chip" data-days="0" style="flex:1;min-width:56px;padding:7px 4px;font-size:12px;border:1px solid rgba(255,255,255,0.18);border-radius:7px;background:transparent;color:#c8cdd8;cursor:pointer;">本次</button>
+          <button type="button" class="trust-chip" data-days="3" style="flex:1;min-width:56px;padding:7px 4px;font-size:12px;border:1px solid rgba(255,255,255,0.18);border-radius:7px;background:transparent;color:#c8cdd8;cursor:pointer;">3天</button>
+          <button type="button" class="trust-chip" data-days="30" style="flex:1;min-width:56px;padding:7px 4px;font-size:12px;border:1px solid rgba(255,255,255,0.18);border-radius:7px;background:transparent;color:#c8cdd8;cursor:pointer;">1个月</button>
+          <button type="button" class="trust-chip" data-days="-1" style="flex:1;min-width:56px;padding:7px 4px;font-size:12px;border:1px solid rgba(255,255,255,0.18);border-radius:7px;background:transparent;color:#c8cdd8;cursor:pointer;">永久</button>
+        </div>
+      </div>
       <button onclick="doLogin()" style="width:100%;padding:12px;background:#0071e3;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;">登录</button>
       <p id="loginError" style="color:#ff3b30;font-size:12px;margin:12px 0 0;display:none;">令牌错误，请重试</p>
+      <p style="color:#5a6170;font-size:10.5px;margin:14px 0 0;line-height:1.4;">信任后本机免输令牌，可随时在「我的-设置」退出信任</p>
     </div>
   </div>
 
@@ -2288,10 +2304,26 @@
             </div>
 
             <!-- 底部保存按钮条 -->
-            <div style="display:flex;justify-content:flex-end;gap:12px;padding-bottom:30px;">
+            <div style="display:flex;justify-content:flex-end;gap:12px;padding-bottom:16px;">
               <button class="btn btn-secondary" onclick="resetSettings()">恢复默认</button>
               <button class="btn btn-primary" onclick="saveAllSettings()">💾 保存所有配置并立即生效</button>
             </div>
+
+            <!-- 设备信任管理：显示当前信任状态 + 退出信任 -->
+            <div class="note-card" style="cursor:default;margin-bottom:16px;">
+              <div class="note-card-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <div>
+                    <div class="note-title">设备信任与登录</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">管理本机免输令牌的信任状态</div>
+                  </div>
+                </div>
+              </div>
+              <div id="trustStatusText" style="font-size:13px;color:var(--text-secondary);margin:12px 0;">正在读取信任状态...</div>
+              <button class="btn btn-secondary" onclick="logoutTrust()" style="width:100%;">退出信任（下次需重新登录）</button>
+            </div>
+            <div style="padding-bottom:30px;"></div>
           </div>
         </div>
       </div>
@@ -2302,22 +2334,22 @@
           <p style="font-size:13px;color:var(--text-muted);margin:0 0 18px;">全部功能都在这里，点卡片进入</p>
           <div class="grid-2" style="gap:14px;">
             <div class="note-card" onclick="switchNav('proj')" style="padding:22px;">
-              <div style="font-size:32px;margin-bottom:10px;">📁</div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;margin-bottom:10px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               <div style="font-size:17px;font-weight:700;color:var(--text-primary);">项目现场档案</div>
               <div style="font-size:13px;color:var(--text-muted);margin-top:6px;">工地照片、现场资料归档</div>
             </div>
             <div class="note-card" onclick="switchNav('money')" style="padding:22px;">
-              <div style="font-size:32px;margin-bottom:10px;">🧾</div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;margin-bottom:10px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
               <div style="font-size:17px;font-weight:700;color:var(--text-primary);">记账凭证与发票</div>
               <div style="font-size:13px;color:var(--text-muted);margin-top:6px;">日常流水、发票单据存档</div>
             </div>
             <div class="note-card" onclick="switchNav('ideas')" style="padding:22px;">
-              <div style="font-size:32px;margin-bottom:10px;">📝</div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;margin-bottom:10px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
               <div style="font-size:17px;font-weight:700;color:var(--text-primary);">个人备忘录</div>
               <div style="font-size:13px;color:var(--text-muted);margin-top:6px;">灵感随笔、便签素材</div>
             </div>
             <div class="note-card" onclick="switchNav('sett')" style="padding:22px;">
-              <div style="font-size:32px;margin-bottom:10px;">⚙️</div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;margin-bottom:10px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               <div style="font-size:17px;font-weight:700;color:var(--text-primary);">系统设置</div>
               <div style="font-size:13px;color:var(--text-muted);margin-top:6px;">主题、语言、AI、存储配置</div>
             </div>
@@ -2597,6 +2629,28 @@
       // FAB 显示控制：速记页/设置页/我的页隐藏，其他页显示
       const fab = document.getElementById('globalFab');
       if (fab) fab.style.display = (key === 'inbox' || key === 'sett' || key === 'mine') ? 'none' : 'block';
+
+      // 进入设置页时刷新设备信任状态显示
+      if (key === 'sett') updateTrustStatus();
+    }
+
+    // 更新设置页的设备信任状态文案
+    function updateTrustStatus() {
+      const el = document.getElementById('trustStatusText');
+      if (!el) return;
+      const token = localStorage.getItem('xiaoya_token');
+      if (!token) { el.textContent = '当前未登录。'; return; }
+      const expiry = localStorage.getItem('xiaoya_token_expiry');
+      if (!expiry) {
+        el.textContent = '✅ 本设备已永久信任，无需重复输入令牌。';
+      } else if (expiry === 'session') {
+        el.textContent = '当前为「本次会话」信任，关闭浏览器后需重新登录。';
+      } else {
+        const days = (Number(expiry) - Date.now()) / 86400000;
+        el.textContent = days > 0
+          ? '✅ 本设备已信任，约 ' + (days >= 1 ? Math.floor(days) + ' 天' : Math.floor(days * 24) + ' 小时') + '后过期。'
+          : '信任已过期，下次访问需重新登录。';
+      }
     }
 
     function quickCreateAction() {
@@ -2942,11 +2996,35 @@
 
     /* 工业级稳健网络传输器：带超轻量重试与超时控制 */
 
+    // ===== 信任此设备时长逻辑 =====
+    let trustDays = 3; // 默认信任3天
+    function selectTrustChip(days) {
+      trustDays = days;
+      document.querySelectorAll('#trustDurationChips .trust-chip').forEach(ch => {
+        const on = String(ch.dataset.days) === String(days);
+        ch.style.background = on ? '#0071e3' : 'transparent';
+        ch.style.borderColor = on ? '#0071e3' : 'rgba(255,255,255,0.18)';
+        ch.style.color = on ? '#fff' : '#c8cdd8';
+      });
+    }
+    document.querySelectorAll('#trustDurationChips .trust-chip').forEach(ch => {
+      ch.addEventListener('click', () => selectTrustChip(ch.dataset.days));
+    });
+    selectTrustChip(3); // 默认选中3天
+
     // 登录功能
     function doLogin() {
       const token = document.getElementById('loginToken').value.trim();
       if (!token) return;
       localStorage.setItem('xiaoya_token', token);
+      // 保存信任过期时间：0=本次会话(不持久)，-1=永久，N=N天后
+      if (trustDays === -1) {
+        localStorage.removeItem('xiaoya_token_expiry'); // 永久
+      } else if (trustDays === 0) {
+        localStorage.setItem('xiaoya_token_expiry', 'session'); // 本次
+      } else {
+        localStorage.setItem('xiaoya_token_expiry', String(Date.now() + trustDays * 86400000));
+      }
       // 验证 token
       fetch('/api/health', { headers: { 'Authorization': 'Bearer ' + token } })
         .then(r => r.json())
@@ -2956,13 +3034,22 @@
             initApp();
           } else {
             localStorage.removeItem('xiaoya_token');
+            localStorage.removeItem('xiaoya_token_expiry');
             document.getElementById('loginError').style.display = 'block';
           }
         })
         .catch(() => {
           localStorage.removeItem('xiaoya_token');
+          localStorage.removeItem('xiaoya_token_expiry');
           document.getElementById('loginError').style.display = 'block';
         });
+    }
+
+    // 退出信任(供设置页调用)
+    function logoutTrust() {
+      localStorage.removeItem('xiaoya_token');
+      localStorage.removeItem('xiaoya_token_expiry');
+      document.getElementById('loginOverlay').style.display = 'flex';
     }
 
     function checkAuth() {
@@ -2972,7 +3059,16 @@
         overlay.style.display = 'flex';
         return false;
       }
-      // 已有 token：隐藏登录遮罩，直接进入工作台
+      // 校验信任是否过期
+      const expiry = localStorage.getItem('xiaoya_token_expiry');
+      if (expiry && expiry !== 'session' && Date.now() > Number(expiry)) {
+        // 已过期：清除并要求重新登录
+        localStorage.removeItem('xiaoya_token');
+        localStorage.removeItem('xiaoya_token_expiry');
+        overlay.style.display = 'flex';
+        return false;
+      }
+      // 已有有效token：隐藏登录遮罩，直接进入工作台
       overlay.style.display = 'none';
       return true;
     }
