@@ -1606,6 +1606,21 @@
               </div>
             </div>
 
+            <!-- 🌅 今日日报卡（第一屏主内容：天气+行情+新闻，数据来自 /api/briefing 真实接口） -->
+            <div class="note-card" id="dailyBriefingCard" style="cursor:default;margin-bottom:18px;border-left:4px solid var(--accent-warm);">
+              <div class="note-card-header" style="margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:16px;">🌅</span>
+                  <div class="note-title" style="font-size:15px;">今日日报</div>
+                  <span style="font-size:11px;color:var(--text-muted);" id="briefingUpdateTime"></span>
+                </div>
+                <button class="btn-pill" onclick="loadBriefing()" title="刷新">🔄 刷新</button>
+              </div>
+              <div id="briefingContent">
+                <div style="color:var(--text-muted);font-size:12px;padding:8px 0;">正在加载今日日报...</div>
+              </div>
+            </div>
+
             <!-- 今日聚焦快捷金刚区 -->
             <div class="grid-4" style="margin-bottom:18px;">
               <div class="action-tile" onclick="switchNav('ideas')">
@@ -2570,7 +2585,7 @@
 
       if (key === 'ideas') loadByRoute('随想', 'ideasList');
       if (key === 'remind') loadRemindersList();
-      if (key === 'dash') loadDashboardReminders();
+      if (key === 'dash') { loadDashboardReminders(); loadBriefing(); }
     updateLiveGreeting();
       if (key === 'proj') {
         loadProjects();
@@ -2586,6 +2601,75 @@
     function quickCreateAction() {
       switchNav('inbox');
       document.getElementById('inboxInput').focus();
+    }
+
+    /* ========== 今日日报 (调 /api/briefing 真实数据，绝不编造) ========== */
+    let briefingLoaded = false;
+    function loadBriefing() {
+      const box = document.getElementById('briefingContent');
+      if (!box) return;
+      box.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:8px 0;">正在加载今日日报...</div>';
+      fetch('/api/briefing', { headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('xiaoya_token') || '') } })
+        .then(r => r.json())
+        .then(d => {
+          if (!d.ok) { box.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">日报获取失败，请稍后刷新</div>'; return; }
+          box.innerHTML = renderBriefing(d);
+          const up = document.getElementById('briefingUpdateTime');
+          if (up) up.innerText = d.updated_at ? ('更新于 ' + d.updated_at) : '';
+          briefingLoaded = true;
+        })
+        .catch(() => { box.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">日报获取失败，请检查网络后刷新</div>'; });
+    }
+
+    function renderBriefing(d) {
+      let html = '';
+      // 天气
+      const w = d.weather || {};
+      html += '<div style="margin-bottom:14px;">';
+      html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;">🌤 天气 · ' + (w.city || '') + '</div>';
+      if (w.ok) {
+        html += '<div style="font-size:13px;color:var(--text-primary);"><b>' + w.temp + '°C</b> ' + (w.desc || '') + ' · 湿度' + w.humidity + '% · ' + (w.max || '') + '/' + (w.min || '') + '°C</div>';
+      } else {
+        html += '<div style="font-size:12px;color:var(--text-muted);">天气获取失败</div>';
+      }
+      html += '</div>';
+      // 行情
+      const qs = d.quotes || [];
+      html += '<div style="margin-bottom:14px;">';
+      html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;">📈 行情</div>';
+      if (qs.length && qs.some(q => q.ok)) {
+        html += '<div style="display:flex;flex-wrap:wrap;gap:8px;">';
+        qs.forEach(q => {
+          if (!q.ok) return;
+          const up = (q.change_pct || 0) >= 0;
+          const color = up ? '#e5484d' : '#30a46c';
+          html += '<div style="flex:1;min-width:100px;background:var(--bg-tertiary);border-radius:8px;padding:8px 10px;">';
+          html += '<div style="font-size:11px;color:var(--text-muted);">' + (q.name || '') + '</div>';
+          html += '<div style="font-size:14px;font-weight:700;color:' + color + ';">' + q.price + ' <span style="font-size:11px;">' + (up ? '+' : '') + q.change_pct + '%</span></div>';
+          html += '</div>';
+        });
+        html += '</div>';
+      } else {
+        html += '<div style="font-size:12px;color:var(--text-muted);">行情获取失败（数据源接入中）</div>';
+      }
+      html += '</div>';
+      // 新闻
+      const news = (d.news && d.news.items) || [];
+      html += '<div>';
+      html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;">📰 热点新闻' + (d.news && d.news.total ? ' · ' + d.news.total + '条' : '') + '</div>';
+      if (news.length) {
+        html += '<div style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;">';
+        news.forEach(n => {
+          html += '<div style="font-size:12.5px;color:var(--text-secondary);line-height:1.5;padding:6px 8px;background:var(--bg-tertiary);border-radius:6px;">';
+          html += '<span style="color:var(--text-muted);font-size:11px;">[' + (n.time || '') + ']</span> ' + n.title;
+          html += '</div>';
+        });
+        html += '</div>';
+      } else {
+        html += '<div style="font-size:12px;color:var(--text-muted);">新闻获取失败</div>';
+      }
+      html += '</div>';
+      return html;
     }
 
     function onGlobalFilterInput() {
