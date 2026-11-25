@@ -1591,6 +1591,21 @@
 
           <!-- 1. 工作台首页 -->
           <div id="section-dash">
+                        <!-- 🌅 今日日报卡（提到最前：用户最高优先级，第一眼看到天气+行情+新闻） -->
+            <div class="note-card" id="dailyBriefingCard" style="cursor:default;margin-bottom:14px;border-left:4px solid var(--accent-warm);">
+              <div class="note-card-header" style="margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:16px;">🌅</span>
+                  <div class="note-title" style="font-size:15px;">今日日报</div>
+                  <span style="font-size:11px;color:var(--text-muted);" id="briefingUpdateTime"></span>
+                </div>
+                <button class="btn-pill" onclick="loadBriefing()" title="刷新">🔄 刷新</button>
+              </div>
+              <div id="briefingContent">
+                <div style="color:var(--text-muted);font-size:12px;padding:8px 0;">正在加载今日日报...</div>
+              </div>
+            </div>
+
                         <!-- 晨间智能问候与状态流 -->
             <div class="note-card" style="cursor:default;margin-bottom:18px;background:linear-gradient(135deg, rgba(0, 113, 227, 0.06) 0%, rgba(56, 189, 248, 0.03) 100%);border:1px solid rgba(0, 113, 227, 0.15);padding:18px 20px;">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
@@ -1603,21 +1618,6 @@
                   <span class="btn-pill" style="font-size:11.5px;background:var(--surface-elevated);" id="todayDateStr">2026年11月2日</span>
                   <button class="btn-pill" style="font-size:11.5px;" onclick="switchNav('remind')">+ 加待办</button>
                 </div>
-              </div>
-            </div>
-
-            <!-- 🌅 今日日报卡（第一屏主内容：天气+行情+新闻，数据来自 /api/briefing 真实接口） -->
-            <div class="note-card" id="dailyBriefingCard" style="cursor:default;margin-bottom:18px;border-left:4px solid var(--accent-warm);">
-              <div class="note-card-header" style="margin-bottom:12px;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <span style="font-size:16px;">🌅</span>
-                  <div class="note-title" style="font-size:15px;">今日日报</div>
-                  <span style="font-size:11px;color:var(--text-muted);" id="briefingUpdateTime"></span>
-                </div>
-                <button class="btn-pill" onclick="loadBriefing()" title="刷新">🔄 刷新</button>
-              </div>
-              <div id="briefingContent">
-                <div style="color:var(--text-muted);font-size:12px;padding:8px 0;">正在加载今日日报...</div>
               </div>
             </div>
 
@@ -2650,7 +2650,7 @@
         });
         html += '</div>';
       } else {
-        html += '<div style="font-size:12px;color:var(--text-muted);">行情获取失败（数据源接入中）</div>';
+        html += '<div style="font-size:12px;color:var(--text-muted);">行情获取失败（数据源临时限流，稍后刷新）</div>';
       }
       html += '</div>';
       // 新闻
