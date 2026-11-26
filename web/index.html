@@ -159,6 +159,115 @@
       --border-strong: #fdba74;
     }
 
+    /* ==========================================================================
+       主题重设计 (2026-11) —— 4 套精选配色，映射到原有主题槽位
+       A 温润浅色 → warm/walnut ｜ B 现代深色 → cyber/dark
+       C 清新自然 → business     ｜ D 极简高级灰 → vibrant
+       保留原有切换/字体/字号逻辑，仅覆盖配色变量。
+       ========================================================================== */
+
+    /* A 温润浅色 (奶油底 + 暖橙 + 大圆角) */
+    html[data-theme="warm"], body[data-theme="warm"],
+    html[data-theme="walnut"], body[data-theme="walnut"] {
+      --primary-color: #ff8a4c;
+      --primary-strong: #ff6a26;
+      --primary-hover: #ff7a38;
+      --primary-light: #fff0e8;
+      --accent-color: #ff9a66;
+      --success-color: #2f9e6e;
+      --warning-color: #f0a020;
+      --danger-color: #e5484d;
+      --text-primary: #2c2620;
+      --text-secondary: #6b6156;
+      --text-muted: #a89880;
+      --border-color: #f0e8dc;
+      --border-strong: #e3d8c8;
+      --border-light: #f7f1e8;
+      --bg-primary: #ffffff;
+      --bg-secondary: #faf6ef;
+      --bg-tertiary: #f4ede2;
+      --bg-glass: rgba(255, 252, 247, 0.88);
+      --surface-elevated: #ffffff;
+      --card-shadow: 0 4px 20px rgba(180, 150, 100, 0.10);
+      --card-shadow-hover: 0 12px 32px rgba(180, 150, 100, 0.16);
+      --radius-lg: 20px;
+      --radius-xl: 24px;
+    }
+
+    /* B 现代深色 (深海军蓝 + 青蓝 + 玻璃拟态) */
+    html[data-theme="cyber"], body[data-theme="cyber"],
+    html[data-theme="dark"], body[data-theme="dark"] {
+      --primary-color: #3da5ff;
+      --primary-strong: #6bbdff;
+      --primary-hover: #2a8fe8;
+      --primary-light: rgba(61, 165, 255, 0.15);
+      --accent-color: #38d0f8;
+      --success-color: #34d399;
+      --warning-color: #fbbf24;
+      --danger-color: #ff5c6c;
+      --text-primary: #e8eef7;
+      --text-secondary: #a3b1c6;
+      --text-muted: #6b7a92;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.15);
+      --border-light: rgba(255, 255, 255, 0.04);
+      --bg-primary: #0e1420;
+      --bg-secondary: #0e1420;
+      --bg-tertiary: #1c2740;
+      --bg-glass: rgba(22, 30, 46, 0.82);
+      --surface-elevated: #161e2e;
+      --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --card-shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.55);
+    }
+
+    /* C 清新自然 (薄荷绿 + 白 + 圆润轻盈) */
+    html[data-theme="business"], body[data-theme="business"] {
+      --primary-color: #2fc98c;
+      --primary-strong: #22a872;
+      --primary-hover: #28b47c;
+      --primary-light: #e6f6ee;
+      --accent-color: #25b97d;
+      --text-primary: #1f3a2e;
+      --text-secondary: #4f6b5c;
+      --text-muted: #8fa89a;
+      --border-color: #dcefe4;
+      --border-strong: #c6e4d4;
+      --border-light: #eaf6f0;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f0faf5;
+      --bg-tertiary: #e6f6ee;
+      --bg-glass: rgba(255, 255, 255, 0.88);
+      --surface-elevated: #ffffff;
+      --card-shadow: 0 4px 18px rgba(47, 201, 140, 0.12);
+      --card-shadow-hover: 0 12px 30px rgba(47, 201, 140, 0.2);
+      --radius-lg: 22px;
+      --radius-xl: 26px;
+    }
+
+    /* D 极简高级灰 (浅灰底 + 克制留白 + 小圆角) */
+    html[data-theme="vibrant"], body[data-theme="vibrant"] {
+      --primary-color: #1a1a1a;
+      --primary-strong: #000000;
+      --primary-hover: #333333;
+      --primary-light: #f0f0f0;
+      --accent-color: #e8590c;
+      --text-primary: #1a1a1a;
+      --text-secondary: #555555;
+      --text-muted: #999999;
+      --border-color: #e6e6e6;
+      --border-strong: #d4d4d4;
+      --border-light: #f0f0f0;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f4f4f4;
+      --bg-tertiary: #ebebeb;
+      --bg-glass: rgba(255, 255, 255, 0.9);
+      --surface-elevated: #ffffff;
+      --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
+      --radius-lg: 10px;
+      --radius-xl: 12px;
+    }
+
     /* 字体大小缩放支持 */
     html[data-size="compact"], body[data-size="compact"] { --font-scale: 0.92; }
     html[data-size="normal"], body[data-size="normal"] { --font-scale: 1; }
@@ -1654,28 +1763,28 @@
             <!-- 今日聚焦快捷金刚区 -->
             <div class="grid-4" style="margin-bottom:18px;">
               <div class="action-tile" onclick="switchNav('ideas')">
-                <div class="tile-badge">📝</div>
+                <div class="tile-badge"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
                 <div>
                   <div style="font-weight:700;font-size:14px;">备忘录 / 便签</div>
                   <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">灵感随笔 · 照片素材归档</div>
                 </div>
               </div>
               <div class="action-tile" onclick="switchNav('remind')">
-                <div class="tile-badge">⏰</div>
+                <div class="tile-badge"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
                 <div>
                   <div style="font-weight:700;font-size:14px;">待办与日程提醒</div>
                   <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;" id="dashReminderCountHint">0 个待办日程</div>
                 </div>
               </div>
               <div class="action-tile" onclick="switchNav('inbox')">
-                <div class="tile-badge">⚡</div>
+                <div class="tile-badge"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
                 <div>
                   <div style="font-weight:700;font-size:14px;">随手速记</div>
                   <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">口述录音 · 快速采集</div>
                 </div>
               </div>
               <div class="action-tile" onclick="switchNav('proj')">
-                <div class="tile-badge">📁</div>
+                <div class="tile-badge"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2Z"/></svg></div>
                 <div>
                   <div style="font-weight:700;font-size:14px;">项目与记账档案</div>
                   <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">工地进度 · 票据账单</div>
@@ -1687,7 +1796,7 @@
             <div class="note-card" style="cursor:default;margin-bottom:20px;border-left:4px solid var(--primary-color);">
               <div class="note-card-header" style="margin-bottom:8px;">
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <span style="font-size:16px;">⏰</span>
+                  <span style="display:inline-flex;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
                   <div class="note-title" style="font-size:14px;">今日待办与关键日程</div>
                 </div>
                 <button class="btn-pill" onclick="switchNav('remind')">查看全部待办 ›</button>
