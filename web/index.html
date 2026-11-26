@@ -2897,17 +2897,19 @@
       html += '<div style="margin-bottom:14px;">';
       html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 行情</div>';
       if (qs.length && qs.some(q => q.ok)) {
-        html += '<div style="display:flex;flex-wrap:wrap;gap:8px;">';
-        qs.forEach(q => {
-          if (!q.ok) return;
+        // 行情区: 横排一行,竖线分隔,数值用主题强调色(对标效果图)
+        html += '<div style="display:flex;align-items:stretch;justify-content:space-between;gap:0;">';
+        const items = qs.filter(q => q.ok);
+        items.forEach((q, i) => {
           const up = (q.change_pct || 0) >= 0;
-          const color = up ? '#e5484d' : '#30a46c';
           const nm = q.name || '';
           const isMetal = (nm.indexOf('黄金') >= 0 || nm.indexOf('白银') >= 0);
-          const unit = isMetal ? ' <span style="font-size:10px;color:var(--text-muted);">元/克</span>' : '';
-          html += '<div style="flex:1;min-width:100px;background:var(--bg-tertiary);border-radius:8px;padding:8px 10px;">';
-          html += '<div style="font-size:11px;color:var(--text-muted);">' + nm + '</div>';
-          html += '<div style="font-size:14px;font-weight:700;color:' + color + ';">' + q.price + unit + ' <span style="font-size:11px;">' + (up ? '+' : '') + q.change_pct + '%</span></div>';
+          const unit = isMetal ? '<span style="font-size:9px;color:var(--text-muted);"> 元/克</span>' : '';
+          const sep = i > 0 ? 'border-left:1px solid var(--border-color);' : '';
+          html += '<div style="flex:1;text-align:center;padding:2px 4px;' + sep + '">';
+          html += '<div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">' + nm + '</div>';
+          html += '<div style="font-size:15px;font-weight:700;color:var(--accent-color);white-space:nowrap;">' + q.price + unit + '</div>';
+          html += '<div style="font-size:11px;color:' + (up ? '#e5484d' : '#30a46c') + ';margin-top:2px;">' + (up ? '▲' : '▼') + ' ' + Math.abs(q.change_pct || 0) + '%</div>';
           html += '</div>';
         });
         html += '</div>';
