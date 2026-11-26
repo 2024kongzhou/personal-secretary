@@ -1504,6 +1504,19 @@
         </div>
       </div>
       <button onclick="doLogin()" style="width:100%;padding:12px;background:#0071e3;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;">登录</button>
+      <!-- Passkey 生物识别登录：仅本机已注册人脸/指纹时显示 -->
+      <div id="passkeyLoginArea" style="display:none;margin-top:12px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="flex:1;height:1px;background:rgba(255,255,255,0.12);"></div>
+          <span style="color:#5a6170;font-size:11px;">或</span>
+          <div style="flex:1;height:1px;background:rgba(255,255,255,0.12);"></div>
+        </div>
+        <button onclick="passkeyLogin()" style="width:100%;padding:11px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:8px;color:#fff;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          人脸 / 指纹登录
+        </button>
+        <p id="passkeyLoginError" style="color:#ff3b30;font-size:11.5px;margin:8px 0 0;display:none;"></p>
+      </div>
       <p id="loginError" style="color:#ff3b30;font-size:12px;margin:12px 0 0;display:none;">令牌错误，请重试</p>
       <p style="color:#5a6170;font-size:10.5px;margin:14px 0 0;line-height:1.4;">信任后本机免输令牌，可随时在「我的-设置」退出信任</p>
     </div>
@@ -2323,6 +2336,22 @@
               <div id="trustStatusText" style="font-size:13px;color:var(--text-secondary);margin:12px 0;">正在读取信任状态...</div>
               <button class="btn btn-secondary" onclick="logoutTrust()" style="width:100%;">退出信任（下次需重新登录）</button>
             </div>
+
+            <!-- Passkey 生物识别登录：人脸/指纹 -->
+            <div class="note-card" style="cursor:default;margin-bottom:16px;">
+              <div class="note-card-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <div>
+                    <div class="note-title">人脸 / 指纹登录（Passkey）</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">本机开启后，无需输令牌，刷脸/按指纹直接登录</div>
+                  </div>
+                </div>
+              </div>
+              <div id="passkeyStatusText" style="font-size:13px;color:var(--text-secondary);margin:12px 0;">正在读取...</div>
+              <div id="passkeyActionArea"></div>
+              <p style="font-size:11px;color:var(--text-muted);margin:10px 0 0;line-height:1.4;">需通过 HTTPS 域名访问（如 m.keyi.de5.net）。人脸凭据绑定域名，换域名需重新注册。</p>
+            </div>
             <div style="padding-bottom:30px;"></div>
           </div>
         </div>
@@ -2631,7 +2660,7 @@
       if (fab) fab.style.display = (key === 'inbox' || key === 'sett' || key === 'mine') ? 'none' : 'block';
 
       // 进入设置页时刷新设备信任状态显示
-      if (key === 'sett') updateTrustStatus();
+      if (key === 'sett') { updateTrustStatus(); updatePasskeySettings(); }
     }
 
     // 更新设置页的设备信任状态文案
@@ -3050,6 +3079,162 @@
       localStorage.removeItem('xiaoya_token');
       localStorage.removeItem('xiaoya_token_expiry');
       document.getElementById('loginOverlay').style.display = 'flex';
+    }
+
+    // ========== Passkey 人脸/指纹登录 ==========
+    const _b64uToBuf = (b64) => {
+      const pad = '='.repeat((4 - b64.length % 4) % 4);
+      const bin = atob(b64.replace(/-/g, '+').replace(/_/g, '/') + pad);
+      const buf = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      return buf.buffer;
+    };
+    const _bufToB64u = (buf) => {
+      const bin = String.fromCharCode(...new Uint8Array(buf));
+      return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    };
+    const passkeySupported = () => window.PublicKeyCredential && window.isSecureContext;
+
+    // 登录：人脸/指纹验证后换取 token
+    async function passkeyLogin() {
+      const errEl = document.getElementById('passkeyLoginError');
+      errEl.style.display = 'none';
+      if (!passkeySupported()) { errEl.textContent = '此浏览器不支持人脸/指纹登录'; errEl.style.display = 'block'; return; }
+      try {
+        const beginResp = await fetch('/api/passkey/login/begin', { method: 'POST' });
+        const begin = await beginResp.json();
+        if (!begin.ok) throw new Error(begin.error || '获取登录挑战失败');
+        const opts = begin.options;
+        const cred = await navigator.credentials.get({
+          publicKey: {
+            challenge: _b64uToBuf(opts.challenge),
+            timeout: opts.timeout,
+            rpId: opts.rpId,
+            userVerification: opts.userVerification,
+            allowCredentials: (opts.allowCredentials || []).map(c => ({
+              type: c.type, id: _b64uToBuf(c.id), transports: c.transports
+            })),
+          }
+        });
+        const r = cred.response;
+        const finishResp = await fetch('/api/passkey/login/finish', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session: begin.session,
+            clientDataJSON: _bufToB64u(r.clientDataJSON),
+            authenticatorData: _bufToB64u(r.authenticatorData),
+            signature: _bufToB64u(r.signature),
+            credentialId: _bufToB64u(cred.rawId),
+            userHandle: r.userHandle ? _bufToB64u(r.userHandle) : '',
+          })
+        });
+        const fin = await finishResp.json();
+        if (!fin.ok) throw new Error(fin.error || '验证失败');
+        // 拿到 token，永久信任并进入
+        localStorage.setItem('xiaoya_token', fin.token);
+        localStorage.removeItem('xiaoya_token_expiry');
+        document.getElementById('loginOverlay').style.display = 'none';
+        initApp();
+      } catch (e) {
+        errEl.textContent = (e.name === 'NotAllowedError') ? '已取消或未通过验证' : (e.message || '登录失败');
+        errEl.style.display = 'block';
+      }
+    }
+
+    // 注册：把本机人脸/指纹绑定为本机 Passkey（需已登录）
+    async function registerPasskey() {
+      if (!passkeySupported()) { toast('此浏览器不支持 Passkey，或未通过 HTTPS 访问'); return; }
+      try {
+        const beginResp = await fetch('/api/passkey/register/begin', {
+          method: 'POST', headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('xiaoya_token') || '') }
+        });
+        const begin = await beginResp.json();
+        if (!begin.ok) throw new Error(begin.error || '获取注册挑战失败');
+        const opts = begin.options;
+        const cred = await navigator.credentials.create({
+          publicKey: {
+            challenge: _b64uToBuf(opts.challenge),
+            rp: opts.rp,
+            user: { id: _b64uToBuf(opts.user.id), name: opts.user.name, displayName: opts.user.displayName },
+            pubKeyCredParams: opts.pubKeyCredParams,
+            timeout: opts.timeout,
+            attestation: opts.attestation,
+            excludeCredentials: (opts.excludeCredentials || []).map(c => ({ type: c.type, id: _b64uToBuf(c.id) })),
+            authenticatorSelection: opts.authenticatorSelection,
+          }
+        });
+        const r = cred.response;
+        const finishResp = await fetch('/api/passkey/register/finish', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('xiaoya_token') || '') },
+          body: JSON.stringify({
+            session: begin.session,
+            clientDataJSON: _bufToB64u(r.clientDataJSON),
+            attestationObject: _bufToB64u(r.attestationObject),
+          })
+        });
+        const fin = await finishResp.json();
+        if (!fin.ok) throw new Error(fin.error || '注册失败');
+        toast('✅ 人脸/指纹登录已开启');
+        updatePasskeySettings();
+      } catch (e) {
+        toast('注册失败：' + ((e.name === 'NotAllowedError') ? '已取消' : (e.message || '未知错误')));
+      }
+    }
+
+    // 设置页：刷新 Passkey 状态
+    async function updatePasskeySettings() {
+      const statusEl = document.getElementById('passkeyStatusText');
+      const actionEl = document.getElementById('passkeyActionArea');
+      if (!statusEl || !actionEl) return;
+      if (!passkeySupported()) {
+        statusEl.textContent = '当前环境不支持（需 HTTPS 访问，如 m.keyi.de5.net）';
+        actionEl.innerHTML = '';
+        return;
+      }
+      try {
+        const resp = await fetch('/api/passkeys', { headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('xiaoya_token') || '') } });
+        const d = await resp.json();
+        const keys = (d.passkeys || []).filter(k => k.rp_id === location.hostname);
+        if (keys.length) {
+          statusEl.textContent = '✅ 本机已开启人脸/指纹登录（' + keys.length + ' 个凭据）';
+          actionEl.innerHTML = '<button class="btn btn-secondary" onclick="registerPasskey()">重新注册</button> <button class="btn btn-secondary" onclick="deleteAllPasskeys()" style="margin-left:8px;">删除全部</button>';
+        } else {
+          statusEl.textContent = '未开启。注册后本机可用人脸/指纹直接登录，无需输令牌。';
+          actionEl.innerHTML = '<button class="btn btn-primary" onclick="registerPasskey()">注册本机人脸 / 指纹</button>';
+        }
+      } catch (e) {
+        statusEl.textContent = '读取状态失败';
+      }
+    }
+    async function deleteAllPasskeys() {
+      if (!confirm('确定删除本机所有人脸/指纹登录凭据？删除后需用令牌登录。')) return;
+      try {
+        const resp = await fetch('/api/passkeys', { headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('xiaoya_token') || '') } });
+        const d = await resp.json();
+        for (const k of (d.passkeys || [])) {
+          if (k.rp_id === location.hostname) {
+            await fetch('/api/passkey/delete', {
+              method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('xiaoya_token') || '') },
+              body: JSON.stringify({ id: k.id })
+            });
+          }
+        }
+        toast('已删除');
+        updatePasskeySettings();
+      } catch (e) { toast('删除失败'); }
+    }
+
+    // 页面加载时：若本机已注册 Passkey，登录页显示人脸/指纹按钮
+    async function initPasskeyLoginButton() {
+      const area = document.getElementById('passkeyLoginArea');
+      if (!area || !passkeySupported()) return;
+      try {
+        const resp = await fetch('/api/passkey/login/begin', { method: 'POST' });
+        const d = await resp.json();
+        if (d.ok && d.options && (d.options.allowCredentials || []).length > 0) {
+          area.style.display = 'block';
+        }
+      } catch (e) { /* 静默 */ }
     }
 
     function checkAuth() {
@@ -4566,6 +4751,9 @@
     // 页面加载时检查认证
     if (checkAuth()) {
       initApp();
+    } else {
+      // 显示登录框时，检查本机是否已注册 Passkey，是则显示人脸/指纹登录按钮
+      initPasskeyLoginButton();
     }
 
 </script>

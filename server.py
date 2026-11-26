@@ -26,6 +26,7 @@ from urllib.parse import urlparse, parse_qs
 import zipfile
 import threading
 import time
+import webauthn_server as wa
 
 # ========== 配置 ==========
 DATA_DIR = pathlib.Path(os.environ.get("SECRETARY_ROOT", "/data"))
@@ -538,6 +539,9 @@ class Handler(BaseHTTPRequestHandler):
             return True  # 静态资源无需认证
         if path == "/api/health":
             return True  # 健康检查无需认证
+        # Passkey 生物识别登录：本身即认证手段，放行（注册仍需已登录）
+        if path in ("/api/passkey/login/begin", "/api/passkey/login/finish"):
+            return True
         auth_header = self.headers.get("Authorization", "")
         if auth_header.startswith("Bearer "):
             token = auth_header[7:]
@@ -620,6 +624,13 @@ class Handler(BaseHTTPRequestHandler):
                     "version": "0.5", "capture": "L0",
                     "ai_enabled": cfg.get("ai", {}).get("enabled", False)
                 })
+
+            if path == "/api/passkeys":
+                """已注册的 Passkey 列表（不含敏感公钥）"""
+                keys = wa.list_passkeys()
+                slim = [{"id": k["id"], "created_at": k.get("created_at"), "rp_id": k.get("rp_id")}
+                        for k in keys]
+                return self.send_json(200, {"ok": True, "passkeys": slim})
 
             if path == "/api/briefing":
                 """今日简报: 实时行情+天气+新闻,并行抓取,失败项如实标注"""
@@ -743,6 +754,74 @@ class Handler(BaseHTTPRequestHandler):
 
         if not self.require_auth():
             return
+
+        # ========== Passkey / WebAuthn 端点 ==========
+        def _rp_id():
+            """RP ID = 浏览器访问的主机名（Passkey 严格绑定域名）"""
+            host = (self.headers.get("Host") or "").split(":")[0]
+            return host
+
+        def _read_body():
+            length = int(self.headers.get("Content-Length", "0"))
+            if length <= 0:
+                return {}
+            return json.loads(self.rfile.read(length).decode("utf-8"))
+
+        if path == "/api/passkey/register/begin":
+            try:
+                existing = [k["id"] for k in wa.list_passkeys()]
+                opts, skey = wa.begin_registration(_rp_id(), "xiaoya", existing)
+                return self.send_json(200, {"ok": True, "options": opts, "session": skey})
+            except Exception as e:
+                logger.error(f"passkey register begin 失败: {e}")
+                return self.send_json(500, {"ok": False, "error": str(e)})
+
+        if path == "/api/passkey/register/finish":
+            try:
+                b = _read_body()
+                cred = wa.finish_registration(
+                    b.get("session", ""),
+                    b.get("clientDataJSON", ""),
+                    b.get("attestationObject", ""),
+                )
+                return self.send_json(200, {"ok": True, "credentialId": cred["id"]})
+            except Exception as e:
+                logger.error(f"passkey register finish 失败: {e}")
+                return self.send_json(400, {"ok": False, "error": str(e)})
+
+        if path == "/api/passkey/login/begin":
+            try:
+                opts, skey = wa.begin_authentication(_rp_id())
+                return self.send_json(200, {"ok": True, "options": opts, "session": skey})
+            except Exception as e:
+                logger.error(f"passkey login begin 失败: {e}")
+                return self.send_json(500, {"ok": False, "error": str(e)})
+
+        if path == "/api/passkey/login/finish":
+            try:
+                b = _read_body()
+                wa.finish_authentication(
+                    b.get("session", ""),
+                    b.get("clientDataJSON", ""),
+                    b.get("authenticatorData", ""),
+                    b.get("signature", ""),
+                    b.get("credentialId", ""),
+                    b.get("userHandle", ""),
+                )
+                # 验证通过 → 签发正式访问令牌（前端存入并进入工作台）
+                return self.send_json(200, {"ok": True, "token": AUTH_TOKEN})
+            except Exception as e:
+                logger.error(f"passkey login finish 失败: {e}")
+                return self.send_json(401, {"ok": False, "error": str(e)})
+
+        if path == "/api/passkey/delete":
+            try:
+                b = _read_body()
+                n = wa.delete_passkey(b.get("id", ""))
+                return self.send_json(200, {"ok": True, "deleted": n})
+            except Exception as e:
+                return self.send_json(400, {"ok": False, "error": str(e)})
+        # ========== Passkey 端点结束 ==========
 
         try:
             if path == "/api/auto-file":
