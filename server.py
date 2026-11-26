@@ -312,8 +312,8 @@ def _get_sparks():
     if _spark_cache["sparks"] is not None and now - _spark_cache["ts"] < 120:
         return _spark_cache["sparks"]
     final = {}
-    # 上证走势: 腾讯分钟线 → 新浪分钟线(双源容灾)
-    sh_spark = _spark_tencent("sh000001") or _spark_sina("sh000001")
+    # 上证走势: 新浪5分钟K(实测28点稳) → 腾讯分钟线兜底(双源容灾)
+    sh_spark = _spark_sina("sh000001") or _spark_tencent("sh000001")
     if len(sh_spark) >= 8:
         final["上证指数"] = _downsample(spark_arr=sh_spark)
     # 黄金/白银: 新浪日内数据点(开/高/低/现,本地直连)
