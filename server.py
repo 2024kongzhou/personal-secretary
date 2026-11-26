@@ -100,35 +100,154 @@ def _em_quote(secid):
     raise RuntimeError(f"行情获取失败 {secid}: {last_err}")
 
 QUOTE_PROXY = "http://172.17.0.1:18766/quote-api?token=xyq_2026_kongzhou"
-QUOTE_ORDER = ["上证指数", "COMEX黄金", "COMEX白银", "布伦特原油", "NYMEX原油"]
+QUOTE_ORDER = ["上证指数", "恒生指数", "腾讯控股", "COMEX黄金", "COMEX白银"]
 _quote_cache = {"ts": 0, "quotes": None}
 _spark_cache = {"ts": 0, "sparks": None}
 
 
+# ========== 本地多源容灾(A股实时,国内直连,不依赖甲骨文) ==========
+def _sh_tencent():
+    """腾讯实时: 现价v[3] 昨收v[4](GBK)"""
+    raw = _http_get_text("https://qt.gtimg.cn/q=sh000001")
+    v = re.search(r'v_sh000001="([^"]*)"', raw).group(1).split("~")
+    return {"name": "上证指数", "price": v[3], "change_pct": _safe_pct(v[3], v[4])}
+
+def _sh_sina():
+    """新浪实时: 现价f[3] 昨收f[2](GBK)"""
+    raw = _http_get_text("https://hq.sinajs.cn/list=sh000001",
+                         ref="https://finance.sina.com.cn")
+    f = re.search(r'hq_str_sh000001="([^"]*)"', raw).group(1).split(",")
+    return {"name": "上证指数", "price": f[3], "change_pct": _safe_pct(f[3], f[2])}
+
+def _sh_ths():
+    """同花顺实时: last字段 日期,今开,最高,最低,现价,... 取现价/昨收=前日现价"""
+    raw = _http_get_text("https://d.10jqka.com.cn/v6/line/hs_1A0001/01/last.js",
+                         ref="https://stockpage.10jqka.com.cn")
+    m = re.search(r'"data":"([^"]*)"', raw)
+    days = m.group(1).split(";")
+    if len(days) < 2:
+        raise ValueError("ths insufficient")
+    cur = days[-1].split(",")   # 最新日: 今开,最高,最低,现价
+    prev = days[-2].split(",")  # 前一日现价=昨收
+    return {"name": "上证指数", "price": cur[4], "change_pct": _safe_pct(cur[4], prev[4])}
+
+def _safe_pct(cur, prev):
+    try:
+        cur, prev = float(cur), float(prev)
+        return round((cur - prev) / prev * 100, 2) if prev else 0
+    except Exception:
+        return 0
+
+def _http_get_text(url, ref=None, timeout=8):
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    if ref:
+        headers["Referer"] = ref
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        raw = r.read()
+    try:
+        return raw.decode("utf-8")
+    except Exception:
+        return raw.decode("gbk", "ignore")
+
+# 上证实时3采集点: 按实测稳定度排序(腾讯最稳>新浪>同花顺)
+_SH_SOURCES = [("腾讯", _sh_tencent), ("新浪", _sh_sina), ("同花顺", _sh_ths)]
+_sh_health = {n: {"ok": 0, "fail": 0, "last_err": None} for n, _ in _SH_SOURCES}
+
+def _get_sh_local():
+    """上证实时本地多源容灾: 按序尝试,成功即返回,全部失败返回None。"""
+    for name, fn in _SH_SOURCES:
+        try:
+            d = fn()
+            if d and d.get("price"):
+                _sh_health[name]["ok"] += 1
+                d["_source"] = name
+                return d
+        except Exception as e:
+            _sh_health[name]["fail"] += 1
+            _sh_health[name]["last_err"] = str(e)[:50]
+    return None
+
+
+# ========== 港股(本地双源:腾讯/新浪,国内直连) ==========
+def _fetch_tencent_hk(code):
+    """腾讯港股实时: v_hk00700 现价v[3] 昨收v[4](GBK)"""
+    raw = _http_get_text(f"https://qt.gtimg.cn/q={code}")
+    v = re.search(r'v_\w+="([^"]*)"', raw).group(1).split("~")
+    return {"price": v[3], "prev": v[4]}
+
+def _fetch_sina_hk(code):
+    """新浪港股实时: rt_hk00700 现价f[6] 昨收f[3]"""
+    raw = _http_get_text(f"https://hq.sinajs.cn/list=rt_{code}",
+                         ref="https://finance.sina.com.cn")
+    f = re.search(r'hq_str_\w+="([^"]*)"', raw).group(1).split(",")
+    return {"price": f[6], "prev": f[3]}
+
+def _get_hk(name, code):
+    """港股单只: 本地双源容灾(腾讯→新浪)。"""
+    for fn in (_fetch_tencent_hk, _fetch_sina_hk):
+        try:
+            d = fn(code)
+            if d and d.get("price"):
+                return {"name": name, "price": str(d["price"]),
+                        "change_pct": _safe_pct(d["price"], d["prev"]), "ok": True}
+        except Exception:
+            continue
+    return {"name": name, "ok": False, "error": "获取失败"}
+
+# ========== 外盘金银(本地双源:腾讯/新浪 hf_,国内直连) ==========
+def _fetch_tencent_metal(code):
+    raw = _http_get_text(f"https://qt.gtimg.cn/q={code}")
+    v = re.search(r'v_\w+="([^"]*)"', raw).group(1).split(",")
+    return {"price": v[0], "prev": v[8]}
+
+def _fetch_sina_metal(code):
+    raw = _http_get_text(f"https://hq.sinajs.cn/list={code}",
+                         ref="https://finance.sina.com.cn")
+    f = re.search(r'hq_str_\w+="([^"]*)"', raw).group(1).split(",")
+    return {"price": f[0], "prev": f[8]}
+
+def _get_metal(name, code):
+    """金银: 本地双源容灾(腾讯→新浪)。"""
+    for fn in (_fetch_tencent_metal, _fetch_sina_metal):
+        try:
+            d = fn(code)
+            if d and d.get("price"):
+                return {"name": name, "price": str(d["price"]),
+                        "change_pct": _safe_pct(d["price"], d["prev"]), "ok": True}
+        except Exception:
+            continue
+    return {"name": name, "ok": False, "error": "获取失败"}
+
+
 def _get_quotes():
-    """实时行情 — 经甲骨文日本节点跳板(新浪+东财)。容器缓存60s,失败降级到直连东财。"""
+    """实时行情 — 全本地直连,不依赖甲骨文。
+    上证:本地三源(腾讯/新浪/同花顺);港股:本地双源(腾讯/新浪);
+    黄金/白银:本地双源(腾讯/新浪 hf_)。缓存60s。"""
     now = time.time()
     if _quote_cache["quotes"] is not None and now - _quote_cache["ts"] < 60:
         return _quote_cache["quotes"]
-    quotes = None
-    try:
-        data = _http_get_json(QUOTE_PROXY + "&mode=rt", timeout=15)
-        raw = data.get("quotes") or {}
-        quotes = []
-        for name in QUOTE_ORDER:
-            q = raw.get(name)
-            if q and q.get("ok"):
-                quotes.append({"name": name, "price": str(q.get("price")),
-                               "change_pct": q.get("change_pct"), "ok": True})
-            else:
-                quotes.append({"name": name, "ok": False, "error": "获取失败"})
-    except Exception:
-        quotes = None
-    if not quotes or not any(q.get("ok") for q in quotes):
-        quotes = _get_quotes_direct()  # 降级直连
-    if quotes and any(q.get("ok") for q in quotes):
-        _quote_cache["quotes"], _quote_cache["ts"] = quotes, now
-    return quotes
+
+    quotes = {n: {"name": n, "ok": False, "error": "获取失败"} for n in QUOTE_ORDER}
+
+    # 1) 上证: 本地三源容灾
+    sh = _get_sh_local()
+    if sh:
+        quotes["上证指数"] = {"name": "上证指数", "price": str(sh["price"]),
+                             "change_pct": sh["change_pct"], "ok": True}
+
+    # 2) 港股: 本地双源
+    quotes["恒生指数"] = _get_hk("恒生指数", "hkHSI")
+    quotes["腾讯控股"] = _get_hk("腾讯控股", "hk00700")
+
+    # 3) 黄金/白银: 本地双源
+    quotes["COMEX黄金"] = _get_metal("COMEX黄金", "hf_GC")
+    quotes["COMEX白银"] = _get_metal("COMEX白银", "hf_SI")
+
+    result = [quotes[n] for n in QUOTE_ORDER]
+    if any(q.get("ok") for q in result):
+        _quote_cache["quotes"], _quote_cache["ts"] = result, now
+    return result
 
 
 def _get_quotes_direct():
@@ -187,28 +306,88 @@ def _em_spark(secid):
     return None
 
 def _get_sparks():
-    """分时走势 — 经甲骨文日本节点跳板。容器缓存120s。名称与行情卡一致。"""
+    """分时走势 — 全本地直连(不依赖甲骨文)。
+    上证: 腾讯分钟线 → 新浪分钟线;黄金/白银: 新浪日内数据点。缓存120s。"""
     now = time.time()
     if _spark_cache["sparks"] is not None and now - _spark_cache["ts"] < 120:
         return _spark_cache["sparks"]
-    out = {}
-    try:
-        data = _http_get_json(QUOTE_PROXY + "&mode=spark", timeout=40)
-        out = data.get("sparks") or {}
-    except Exception:
-        out = {}
-    # 降采样到~28点(代理黄金/原油可能返回全天分钟线)
     final = {}
-    for name, arr in out.items():
-        if isinstance(arr, list) and len(arr) >= 8:
-            step = max(1, len(arr) // 28)
-            s = arr[::step]
-            if s[-1] != arr[-1]:
-                s.append(arr[-1])
-            final[name] = s
+    # 上证走势: 腾讯分钟线 → 新浪分钟线(双源容灾)
+    sh_spark = _spark_tencent("sh000001") or _spark_sina("sh000001")
+    if len(sh_spark) >= 8:
+        final["上证指数"] = _downsample(spark_arr=sh_spark)
+    # 黄金/白银: 新浪日内数据点(开/高/低/现,本地直连)
+    for nm, code in (("COMEX黄金", "hf_GC"), ("COMEX白银", "hf_SI")):
+        pts = _spark_sina_intraday(code)
+        if len(pts) >= 4:
+            final[nm] = pts
     if final:
         _spark_cache["sparks"], _spark_cache["ts"] = final, now
     return final
+
+
+def _downsample(spark_arr, n=28):
+    arr = spark_arr
+    if len(arr) <= n:
+        return arr
+    step = len(arr) // n
+    s = arr[::step]
+    if s[-1] != arr[-1]:
+        s.append(arr[-1])
+    return s
+
+
+def _spark_tencent(code):
+    """腾讯分钟线走势(A股/港股国内直连)。返回收盘价数组。"""
+    try:
+        raw = _http_get_text(
+            f"https://web.ifzq.gtimg.cn/appstock/app/minute/query?code={code}")
+        m = re.search(r'"data":\["([^"]*)"', raw)
+        if not m:
+            return []
+        pts = []
+        for line in m.group(1).split('","'):
+            parts = line.split(" ")
+            if len(parts) >= 2:
+                try:
+                    pts.append(float(parts[1]))
+                except Exception:
+                    pass
+        return pts
+    except Exception:
+        return []
+
+
+def _spark_sina(code):
+    """新浪5分钟K线走势(A股国内直连)。"""
+    try:
+        raw = _http_get_text(
+            "https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData"
+            f"?symbol={code}&scale=5&ma=no&datalen=28")
+        arr = json.loads(raw)
+        return [float(x["close"]) for x in arr if x.get("close")]
+    except Exception:
+        return []
+
+
+def _spark_sina_intraday(code):
+    """新浪外盘(黄金/白银)日内数据点: 昨结算→开→低→高→现,画简化日内走势。
+    hf_ 字段: [0]现 [2]开 [4]高 [5]低 [8]昨结算。"""
+    try:
+        raw = _http_get_text(f"https://hq.sinajs.cn/list={code}",
+                             ref="https://finance.sina.com.cn")
+        f = re.search(r'hq_str_\w+="([^"]*)"', raw).group(1).split(",")
+        cur, high, low, prev, opn = f[0], f[4], f[5], f[8], f[2]
+        vals = [prev, opn, low, high, cur]
+        pts = []
+        for v in vals:
+            try:
+                pts.append(float(v))
+            except Exception:
+                pass
+        return pts
+    except Exception:
+        return []
 
 def _get_weather():
     """滨州天气 - wttr.in 免费接口,真实数据"""
