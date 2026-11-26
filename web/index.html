@@ -272,6 +272,26 @@
     html[data-size="compact"], body[data-size="compact"] { --font-scale: 0.92; }
     html[data-size="normal"], body[data-size="normal"] { --font-scale: 1; }
     html[data-size="large"], body[data-size="large"] { --font-scale: 1.12; }
+
+    /* 首页底部万能捕获输入框（对齐概念图） */
+    .hero-capture { margin-top: 8px; padding: 4px 0 12px; }
+    .hero-capture-box {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--surface-elevated);
+      border: 2px solid var(--primary-color);
+      border-radius: 28px;
+      padding: 15px 20px;
+      box-shadow: var(--card-shadow-hover);
+    }
+    .hc-icon { color: var(--primary-color); display: inline-flex; flex-shrink: 0; }
+    .hc-placeholder {
+      flex: 1; font-size: 14.5px; color: var(--text-primary); font-weight: 600; line-height: 1.4;
+    }
+    .hc-hint {
+      text-align: center; font-size: 11.5px; color: var(--text-muted); margin-top: 10px;
+      letter-spacing: 0.3px;
+    }
+    [data-theme="vibrant"] .hero-capture-box { border-radius: 12px; }
     
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
@@ -1806,55 +1826,14 @@
               </div>
             </div>
 
-            <!-- 全能编辑工作台与资产管理流水 (用户核心需求：文字、语音、图片直观查看与编辑) -->
-            <div class="note-card" style="cursor:default;margin-bottom:20px;">
-              <div class="note-card-header" style="flex-wrap:wrap;gap:12px;align-items:center;">
-                <div>
-                  <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-size:18px;">📋</span>
-                    <h2 class="note-title" style="font-size:16px;">多模态资产编辑工作台</h2>
-                  </div>
-                  <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">
-                    实时汇聚所有文字、录音笔原件、现场相片与单据凭证，支持单条提取、直接编辑、快捷复制与删除
-                  </div>
-                </div>
-                <!-- 资产类型快速筛选Tab -->
-                <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                  <button class="btn-pill active" id="assetTab-all" onclick="filterDashboardAssets('all')">全部记录</button>
-                  <button class="btn-pill" id="assetTab-audio" onclick="filterDashboardAssets('audio')">🎙 录音原件</button>
-                  <button class="btn-pill" id="assetTab-image" onclick="filterDashboardAssets('image')">📷 照片单据</button>
-                  <button class="btn-pill" id="assetTab-text" onclick="filterDashboardAssets('text')">✍ 纯文本</button>
-                  <button class="btn-pill" onclick="loadDashboardAssetFlow()" title="刷新">🔄 刷新</button>
-                  <span style="flex:1;"></span>
-                  <!-- 显示模式切换 -->
-                  <button id="viewModeCard" onclick="setAssetViewMode('card')" title="卡片模式" style="background:var(--accent-warm);color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;transition:all 0.2s;">⊞ 卡片</button>
-                  <button id="viewModeList" onclick="setAssetViewMode('list')" title="列表模式" style="background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-color);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;transition:all 0.2s;">☰ 列表</button>
-                </div>
+            <!-- 底部万能捕获输入框（对齐概念图：文字/语音/照片/视频，AI自动分类） -->
+            <div class="hero-capture" onclick="switchNav('inbox')" style="cursor:pointer;">
+              <div class="hero-capture-box">
+                <span class="hc-icon" title="语音"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg></span>
+                <div class="hc-placeholder">文字 / 语音 / 照片 / 视频<br><span style="font-size:11.5px;opacity:.75;">只管丢进来，我来分类</span></div>
+                <span class="hc-icon" title="拍照"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
               </div>
-
-              <!-- 搜索与状态提示 -->
-              <div style="margin:12px 0 16px;">
-                <input type="text" id="dashAssetSearch" placeholder="快速检索正文、录音原件名、分类或 #标签..." oninput="debounceDashAssetSearch()" style="width:100%;height:38px;">
-              </div>
-
-              <!-- 工作台卡片流容器 -->
-              <div id="dashAssetFlowContainer" class="notes-grid">
-                <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">正在加载多模态资产流...</div>
-              </div>
-            </div>
-
-            <!-- 我的工程档案看板 -->
-            <div class="note-card" style="cursor:default;">
-              <div class="note-card-header">
-                <div>
-                  <div class="note-title">我的工程与项目现场</div>
-                  <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">点击直达专属项目现场，随时新增巡查档案</div>
-                </div>
-                <button class="btn btn-primary" style="height:32px;font-size:12px;" onclick="promptAddProjectDirect()">+ 新增项目</button>
-              </div>
-              <div id="homeProjectContainer">
-                <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px;">暂未创建项目，点击右上角「+ 新增项目」开始使用</div>
-              </div>
+              <div class="hc-hint">AI 自动分类到 · 提醒 / 备忘录 / 记账 / 项目</div>
             </div>
           </div>
 
