@@ -99,15 +99,43 @@ def _em_quote(secid):
                 time.sleep(0.4)
     raise RuntimeError(f"行情获取失败 {secid}: {last_err}")
 
+QUOTE_PROXY = "http://172.17.0.1:18766/quote-api?token=xyq_2026_kongzhou"
+QUOTE_ORDER = ["上证指数", "COMEX黄金", "COMEX白银", "布伦特原油", "NYMEX原油"]
+_quote_cache = {"ts": 0, "quotes": None}
+_spark_cache = {"ts": 0, "sparks": None}
+
+
 def _get_quotes():
-    """实时行情: 上证/COMEX黄金/COMEX白银/布伦特原油/NYMEX原油 — 并行抓,全部真实数据"""
-    specs = [
-        ("上证指数", "1.000001"),
-        ("COMEX黄金", "101.GC00Y"),
-        ("COMEX白银", "101.SI00Y"),
-        ("布伦特原油", "112.B00Y"),
-        ("NYMEX原油", "102.CL00Y"),
-    ]
+    """实时行情 — 经甲骨文日本节点跳板(新浪+东财)。容器缓存60s,失败降级到直连东财。"""
+    now = time.time()
+    if _quote_cache["quotes"] is not None and now - _quote_cache["ts"] < 60:
+        return _quote_cache["quotes"]
+    quotes = None
+    try:
+        data = _http_get_json(QUOTE_PROXY + "&mode=rt", timeout=15)
+        raw = data.get("quotes") or {}
+        quotes = []
+        for name in QUOTE_ORDER:
+            q = raw.get(name)
+            if q and q.get("ok"):
+                quotes.append({"name": name, "price": str(q.get("price")),
+                               "change_pct": q.get("change_pct"), "ok": True})
+            else:
+                quotes.append({"name": name, "ok": False, "error": "获取失败"})
+    except Exception:
+        quotes = None
+    if not quotes or not any(q.get("ok") for q in quotes):
+        quotes = _get_quotes_direct()  # 降级直连
+    if quotes and any(q.get("ok") for q in quotes):
+        _quote_cache["quotes"], _quote_cache["ts"] = quotes, now
+    return quotes
+
+
+def _get_quotes_direct():
+    """降级: 直连东财(容器网络恢复时用)。"""
+    specs = [("上证指数", "1.000001"), ("COMEX黄金", "101.GC00Y"),
+             ("COMEX白银", "101.SI00Y"), ("布伦特原油", "112.B00Y"),
+             ("NYMEX原油", "102.CL00Y")]
     quotes = [None] * len(specs)
     def fetch_one(i, name, secid):
         try:
@@ -118,7 +146,6 @@ def _get_quotes():
                for i, (n, s) in enumerate(specs)]
     for t in threads: t.start()
     for t in threads: t.join(timeout=20)
-    # 兜底: 超时未返回的标记失败
     for i, (n, _) in enumerate(specs):
         if quotes[i] is None:
             quotes[i] = {"name": n, "ok": False, "error": "获取超时"}
@@ -160,23 +187,28 @@ def _em_spark(secid):
     return None
 
 def _get_sparks():
-    """并行抓各指数分时走势,返回 {名称: [prices]} (名称与行情卡一致,前端按 name 匹配)"""
-    specs = [
-        ("上证指数", "1.000001"),
-        ("COMEX黄金", "101.GC00Y"),
-        ("布伦特原油", "112.B00Y"),
-    ]
+    """分时走势 — 经甲骨文日本节点跳板。容器缓存120s。名称与行情卡一致。"""
+    now = time.time()
+    if _spark_cache["sparks"] is not None and now - _spark_cache["ts"] < 120:
+        return _spark_cache["sparks"]
     out = {}
-    lock = threading.Lock()
-    def fetch(name, secid):
-        s = _em_spark(secid)
-        if s:
-            with lock:
-                out[name] = s
-    threads = [threading.Thread(target=fetch, args=(n, s)) for n, s in specs]
-    for t in threads: t.start()
-    for t in threads: t.join(timeout=10)
-    return out
+    try:
+        data = _http_get_json(QUOTE_PROXY + "&mode=spark", timeout=40)
+        out = data.get("sparks") or {}
+    except Exception:
+        out = {}
+    # 降采样到~28点(代理黄金/原油可能返回全天分钟线)
+    final = {}
+    for name, arr in out.items():
+        if isinstance(arr, list) and len(arr) >= 8:
+            step = max(1, len(arr) // 28)
+            s = arr[::step]
+            if s[-1] != arr[-1]:
+                s.append(arr[-1])
+            final[name] = s
+    if final:
+        _spark_cache["sparks"], _spark_cache["ts"] = final, now
+    return final
 
 def _get_weather():
     """滨州天气 - wttr.in 免费接口,真实数据"""
