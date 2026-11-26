@@ -2845,7 +2845,7 @@
           const up = document.getElementById('briefingUpdateTime');
           if (up) up.innerText = d.updated_at ? ('更新于 ' + d.updated_at) : '';
           briefingLoaded = true;
-          loadSparks();  // 拉行情分时走势,给迷你折线图填充
+          // loadSparks();  // 走势图已移除,不再拉取分时数据
         })
         .catch(() => { box.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">日报获取失败，请检查网络后刷新</div>'; });
     }
@@ -2902,10 +2902,12 @@
           if (!q.ok) return;
           const up = (q.change_pct || 0) >= 0;
           const color = up ? '#e5484d' : '#30a46c';
+          const nm = q.name || '';
+          const isMetal = (nm.indexOf('黄金') >= 0 || nm.indexOf('白银') >= 0);
+          const unit = isMetal ? ' <span style="font-size:10px;color:var(--text-muted);">元/克</span>' : '';
           html += '<div style="flex:1;min-width:100px;background:var(--bg-tertiary);border-radius:8px;padding:8px 10px;">';
-          html += '<div style="font-size:11px;color:var(--text-muted);">' + (q.name || '') + '</div>';
-          html += '<div style="font-size:14px;font-weight:700;color:' + color + ';">' + q.price + ' <span style="font-size:11px;">' + (up ? '+' : '') + q.change_pct + '%</span></div>';
-          html += '<div class="mkt-spark" data-name="' + (q.name || '') + '" data-up="' + (up ? 1 : 0) + '" style="margin-top:6px;height:26px;"></div>';
+          html += '<div style="font-size:11px;color:var(--text-muted);">' + nm + '</div>';
+          html += '<div style="font-size:14px;font-weight:700;color:' + color + ';">' + q.price + unit + ' <span style="font-size:11px;">' + (up ? '+' : '') + q.change_pct + '%</span></div>';
           html += '</div>';
         });
         html += '</div>';

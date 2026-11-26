@@ -207,12 +207,49 @@ def _fetch_sina_metal(code):
     f = re.search(r'hq_str_\w+="([^"]*)"', raw).group(1).split(",")
     return {"price": f[0], "prev": f[8]}
 
+_usdcny_cache = {"ts": 0, "rate": None}
+
+def _get_usdcny():
+    """美元兑人民币汇率,本地双源(腾讯→新浪)。缓存10分钟。
+    腾讯 whUSDCNY 外汇格式: v[..]="310~美元人民币~USDCNY~现价~...",现价在[3]。
+    新浪 fx_susdcny 格式: "时间,现价,...",现价在[1]。"""
+    now = time.time()
+    if _usdcny_cache["rate"] and now - _usdcny_cache["ts"] < 600:
+        return _usdcny_cache["rate"]
+    import urllib.request
+    def fetch(url, ref=None, pat=None):
+        h = {"User-Agent": "Mozilla/5.0"}
+        if ref: h["Referer"] = ref
+        raw = urllib.request.urlopen(urllib.request.Request(url, headers=h), timeout=8).read().decode("gbk", "ignore")
+        return re.search(pat, raw).group(1).split(",")
+    for url, ref, pat, idx in (
+        ("https://qt.gtimg.cn/q=whUSDCNY", None, r'v_\w+="([^"]*)"', 3),
+        ("https://hq.sinajs.cn/list=fx_susdcny", "https://finance.sina.com.cn", r'hq_str_\w+="([^"]*)"', 1),
+    ):
+        try:
+            f = fetch(url, ref, pat)
+            rate = float(f[idx])
+            if 5 < rate < 10:  # 合理区间校验
+                _usdcny_cache["rate"], _usdcny_cache["ts"] = rate, now
+                return rate
+        except Exception:
+            continue
+    return _usdcny_cache["rate"]  # 失败返回上次缓存(可能None)
+
+OZ_TO_GRAM = 31.1035  # 1金衡盎司=31.1035克
+
 def _get_metal(name, code):
-    """金银: 本地双源容灾(腾讯→新浪)。"""
+    """金银: 本地双源容灾(腾讯→新浪)。美元/盎司换算成人民币/克显示。"""
     for fn in (_fetch_tencent_metal, _fetch_sina_metal):
         try:
             d = fn(code)
             if d and d.get("price"):
+                rate = _get_usdcny()
+                if rate:
+                    gram = float(d["price"]) / OZ_TO_GRAM * rate
+                    return {"name": name, "price": str(round(gram, 2)),
+                            "change_pct": _safe_pct(d["price"], d["prev"]), "ok": True}
+                # 汇率拿不到就退回原美元价
                 return {"name": name, "price": str(d["price"]),
                         "change_pct": _safe_pct(d["price"], d["prev"]), "ok": True}
         except Exception:
