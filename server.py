@@ -100,7 +100,7 @@ def _em_quote(secid):
     raise RuntimeError(f"行情获取失败 {secid}: {last_err}")
 
 QUOTE_PROXY = "http://172.17.0.1:18766/quote-api?token=xyq_2026_kongzhou"
-QUOTE_ORDER = ["上证指数", "恒生指数", "腾讯控股", "COMEX黄金", "COMEX白银"]
+QUOTE_ORDER = ["上证指数", "恒生指数", "COMEX黄金", "COMEX白银"]
 _quote_cache = {"ts": 0, "quotes": None}
 _spark_cache = {"ts": 0, "sparks": None}
 
@@ -236,9 +236,8 @@ def _get_quotes():
         quotes["上证指数"] = {"name": "上证指数", "price": str(sh["price"]),
                              "change_pct": sh["change_pct"], "ok": True}
 
-    # 2) 港股: 本地双源
+    # 2) 港股: 本地双源(只保留恒生指数)
     quotes["恒生指数"] = _get_hk("恒生指数", "hkHSI")
-    quotes["腾讯控股"] = _get_hk("腾讯控股", "hk00700")
 
     # 3) 黄金/白银: 本地双源
     quotes["COMEX黄金"] = _get_metal("COMEX黄金", "hf_GC")
@@ -316,6 +315,10 @@ def _get_sparks():
     sh_spark = _spark_sina("sh000001") or _spark_tencent("sh000001")
     if len(sh_spark) >= 8:
         final["上证指数"] = _downsample(spark_arr=sh_spark)
+    # 港股走势: 腾讯分钟线(hkHSI恒指,国内直连)
+    hk_spark = _spark_tencent("hkHSI")
+    if len(hk_spark) >= 8:
+        final["恒生指数"] = _downsample(spark_arr=hk_spark)
     # 黄金/白银: 新浪日内数据点(开/高/低/现,本地直连)
     for nm, code in (("COMEX黄金", "hf_GC"), ("COMEX白银", "hf_SI")):
         pts = _spark_sina_intraday(code)
@@ -338,16 +341,18 @@ def _downsample(spark_arr, n=28):
 
 
 def _spark_tencent(code):
-    """腾讯分钟线走势(A股/港股国内直连)。返回收盘价数组。"""
+    """腾讯分钟线走势(A股/港股国内直连)。返回收盘价数组。
+    分钟线 data 是字符串数组: ["0930 价 成交量 额", "0931 ...", ...]"""
     try:
         raw = _http_get_text(
             f"https://web.ifzq.gtimg.cn/appstock/app/minute/query?code={code}")
-        m = re.search(r'"data":\["([^"]*)"', raw)
+        # 整个数组: "data":["...","...",...]
+        m = re.search(r'"data":\[(.*?)\]', raw, re.S)
         if not m:
             return []
         pts = []
-        for line in m.group(1).split('","'):
-            parts = line.split(" ")
+        for item in re.findall(r'"([^"]*)"', m.group(1)):
+            parts = item.split(" ")
             if len(parts) >= 2:
                 try:
                     pts.append(float(parts[1]))
