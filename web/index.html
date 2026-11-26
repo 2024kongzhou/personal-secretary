@@ -316,6 +316,80 @@
     /* 首页极简模式：隐藏搜索栏/筛选/PC顶部头（对齐概念图） */
     body.dash-mode .notes-list-toolbar,
     body.dash-mode .notes-list-header { display: none !important; }
+
+    /* ==========================================================================
+       概念图质感还原 —— 背景氛围 / 卡片圆角阴影 / 天气大字 / 标题下划线
+       按当前主题分别还原概念图 A暖橙 B深蓝玻璃 C清新绿 D高端暖黑 的气质
+       ========================================================================== */
+
+    /* 日报标题橙色小下划线（概念图 A/D 笔触） */
+    #dailyBriefingCard .note-title {
+      position: relative; display: inline-block; padding-bottom: 5px;
+    }
+    #dailyBriefingCard .note-title::after {
+      content: ''; position: absolute; left: 0; bottom: 0;
+      width: 30px; height: 3px; border-radius: 2px;
+      background: var(--primary-color);
+    }
+
+    /* 天气大字温度（概念图 B/D 大字主导） */
+    .brief-temp {
+      font-size: 34px; font-weight: 800; line-height: 1;
+      color: var(--text-primary); letter-spacing: -1px;
+    }
+
+    /* 日报聚合卡 + 各卡片：大圆角 + 柔和带色阴影，浮起来 */
+    body.dash-mode .note-card {
+      border-radius: var(--radius-xl, 20px);
+    }
+    body.dash-mode #dailyBriefingCard {
+      border-radius: var(--radius-xl, 20px);
+      border-left: none;
+      border-top: 3px solid var(--primary-color);
+    }
+
+    /* --- 背景光斑：按主题染色（覆盖默认蓝紫） --- */
+    /* A 温润浅色：暖橙光斑 */
+    body[data-theme="warm"] .bg-glow::before { background: radial-gradient(circle, rgba(255,138,76,0.5), transparent 68%); }
+    body[data-theme="warm"] .bg-glow::after  { background: radial-gradient(circle, rgba(255,183,120,0.45), transparent 68%); }
+    body[data-theme="walnut"] .bg-glow::before { background: radial-gradient(circle, rgba(255,138,76,0.5), transparent 68%); }
+    body[data-theme="walnut"] .bg-glow::after  { background: radial-gradient(circle, rgba(255,183,120,0.45), transparent 68%); }
+    /* B 现代深色：青蓝霓虹 */
+    body[data-theme="cyber"] .bg-glow::before { background: radial-gradient(circle, rgba(61,165,255,0.5), transparent 68%); }
+    body[data-theme="cyber"] .bg-glow::after  { background: radial-gradient(circle, rgba(56,208,248,0.4), transparent 68%); }
+    body[data-theme="dark"] .bg-glow::before { background: radial-gradient(circle, rgba(61,165,255,0.5), transparent 68%); }
+    body[data-theme="dark"] .bg-glow::after  { background: radial-gradient(circle, rgba(56,208,248,0.4), transparent 68%); }
+    /* C 清新自然：薄荷绿光斑 */
+    body[data-theme="business"] .bg-glow::before { background: radial-gradient(circle, rgba(47,201,140,0.45), transparent 68%); }
+    body[data-theme="business"] .bg-glow::after  { background: radial-gradient(circle, rgba(167,232,205,0.5), transparent 68%); }
+    /* D 极简高端：暖金弧光（克制） */
+    body[data-theme="vibrant"] .bg-glow::before { background: radial-gradient(circle, rgba(232,89,12,0.32), transparent 68%); }
+    body[data-theme="vibrant"] .bg-glow::after  { background: radial-gradient(circle, rgba(212,175,55,0.28), transparent 68%); }
+
+    /* --- 卡片阴影：按主题带色柔和（让卡片"浮起来"） --- */
+    body[data-theme="warm"] .note-card,
+    body[data-theme="walnut"] .note-card {
+      box-shadow: 0 14px 40px rgba(190,140,90,0.20), 0 3px 10px rgba(190,140,90,0.10);
+      border: none;
+    }
+    body[data-theme="business"] .note-card {
+      box-shadow: 0 14px 40px rgba(47,201,140,0.18), 0 3px 10px rgba(47,201,140,0.10);
+      border: none;
+      border-radius: 26px;
+    }
+    body[data-theme="vibrant"] .note-card {
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+      border: none;
+    }
+    /* B 深色：玻璃拟态卡片 */
+    body[data-theme="cyber"] .note-card,
+    body[data-theme="dark"] .note-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(18px) saturate(1.4);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 36px rgba(0,0,0,0.4);
+    }
     
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
@@ -2782,7 +2856,8 @@
       html += '<div style="margin-bottom:14px;">';
       html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><path d="M17.66 5.34l1.41-1.41"/></svg> 天气 · ' + (w.city || '') + '</div>';
       if (w.ok) {
-        html += '<div style="font-size:13px;color:var(--text-primary);"><b>' + w.temp + '°C</b> ' + (w.desc || '') + ' · 湿度' + w.humidity + '% · ' + (w.max || '') + '/' + (w.min || '') + '°C</div>';
+        html += '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:2px;"><span class="brief-temp">' + w.temp + '°</span><span style="font-size:13px;color:var(--text-secondary);">' + (w.desc || '') + '</span></div>';
+        html += '<div style="font-size:12px;color:var(--text-muted);">湿度' + w.humidity + '% · ' + (w.max || '') + '/' + (w.min || '') + '°C</div>';
       } else {
         html += '<div style="font-size:12px;color:var(--text-muted);">天气获取失败</div>';
       }
