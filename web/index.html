@@ -2845,8 +2845,38 @@
           const up = document.getElementById('briefingUpdateTime');
           if (up) up.innerText = d.updated_at ? ('更新于 ' + d.updated_at) : '';
           briefingLoaded = true;
+          loadSparks();  // 拉行情分时走势,给迷你折线图填充
         })
         .catch(() => { box.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">日报获取失败，请检查网络后刷新</div>'; });
+    }
+
+    /* 行情迷你走势图: 拉 /api/spark, 往每个 .mkt-spark 画 SVG 折线(红涨绿跌) */
+    function loadSparks() {
+      const nodes = document.querySelectorAll('#dailyBriefingCard .mkt-spark');
+      if (!nodes.length) return;
+      fetch('/api/spark', { headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('xiaoya_token') || '') } })
+        .then(r => r.json())
+        .then(d => {
+          if (!d.ok || !d.sparks) return;
+          nodes.forEach(node => {
+            const name = node.dataset.name;
+            const up = node.dataset.up === '1';
+            const arr = d.sparks[name];
+            if (!arr || arr.length < 2) return;
+            const stroke = up ? '#e5484d' : '#30a46c';
+            const min = Math.min(...arr), max = Math.max(...arr);
+            const range = (max - min) || 1;
+            const W = 100, H = 26, n = arr.length;
+            const pts = arr.map((v, i) => {
+              const x = (i / (n - 1)) * W;
+              const y = H - 3 - ((v - min) / range) * (H - 6);
+              return x.toFixed(1) + ',' + y.toFixed(1);
+            }).join(' ');
+            node.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" style="width:100%;height:26px;display:block;overflow:visible;">' +
+              '<polyline points="' + pts + '" fill="none" stroke="' + stroke + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          });
+        })
+        .catch(() => {});  // 走势失败静默,不影响行情数字展示
     }
 
     function renderBriefing(d) {
@@ -2875,6 +2905,7 @@
           html += '<div style="flex:1;min-width:100px;background:var(--bg-tertiary);border-radius:8px;padding:8px 10px;">';
           html += '<div style="font-size:11px;color:var(--text-muted);">' + (q.name || '') + '</div>';
           html += '<div style="font-size:14px;font-weight:700;color:' + color + ';">' + q.price + ' <span style="font-size:11px;">' + (up ? '+' : '') + q.change_pct + '%</span></div>';
+          html += '<div class="mkt-spark" data-name="' + (q.name || '') + '" data-up="' + (up ? 1 : 0) + '" style="margin-top:6px;height:26px;"></div>';
           html += '</div>';
         });
         html += '</div>';

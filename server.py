@@ -124,6 +124,60 @@ def _get_quotes():
             quotes[i] = {"name": n, "ok": False, "error": "获取超时"}
     return quotes
 
+def _em_spark(secid):
+    """东方财富当天分时走势 — 供迷你折线图(sparkline),用 curl 抓,返回降采样价格数组"""
+    for dom in EM_DOMAINS:
+        url = f"https://{dom}/api/qt/stock/trends2/sse?fields1=f1,f2,f3&fields2=f51,f53&iscr=0&ndays=1&secid={secid}"
+        try:
+            raw = subprocess.run(
+                ["curl", "-s", "-m", "8", "-A",
+                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36", url],
+                capture_output=True, text=True, timeout=12
+            ).stdout
+            data = json.loads(raw).get("data")
+            trends = data.get("trends") if data else None
+            if not trends:
+                continue
+            # trends 形如 ["09:30,3245.60", ...] 取价格
+            prices = []
+            for t in trends:
+                parts = t.split(",")
+                if len(parts) >= 2:
+                    try:
+                        prices.append(float(parts[1]))
+                    except ValueError:
+                        pass
+            if len(prices) < 8:
+                continue
+            # 降采样到 ~28 点,便于画折线
+            step = max(1, len(prices) // 28)
+            spark = prices[::step]
+            if spark[-1] != prices[-1]:
+                spark.append(prices[-1])
+            return spark
+        except Exception:
+            continue
+    return None
+
+def _get_sparks():
+    """并行抓各指数分时走势,返回 {名称: [prices]} (名称与行情卡一致,前端按 name 匹配)"""
+    specs = [
+        ("上证指数", "1.000001"),
+        ("COMEX黄金", "101.GC00Y"),
+        ("布伦特原油", "112.B00Y"),
+    ]
+    out = {}
+    lock = threading.Lock()
+    def fetch(name, secid):
+        s = _em_spark(secid)
+        if s:
+            with lock:
+                out[name] = s
+    threads = [threading.Thread(target=fetch, args=(n, s)) for n, s in specs]
+    for t in threads: t.start()
+    for t in threads: t.join(timeout=10)
+    return out
+
 def _get_weather():
     """滨州天气 - wttr.in 免费接口,真实数据"""
     try:
@@ -656,6 +710,15 @@ class Handler(BaseHTTPRequestHandler):
                     "news": results.get("news", {"ok": False, "items": [], "error": "获取失败"}),
                     "updated_at": datetime.now().strftime("%H:%M"),
                 })
+
+            if path == "/api/spark":
+                """各指数当天分时走势(迷你折线图数据),失败项省略"""
+                try:
+                    sparks = _get_sparks()
+                    return self.send_json(200, {"ok": True, "sparks": sparks})
+                except Exception as e:
+                    logger.warning(f"走势获取失败: {e}")
+                    return self.send_json(200, {"ok": False, "sparks": {}})
 
             if path == "/api/config":
                 cfg = load_config()
