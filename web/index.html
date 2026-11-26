@@ -292,6 +292,30 @@
       letter-spacing: 0.3px;
     }
     [data-theme="vibrant"] .hero-capture-box { border-radius: 12px; }
+
+    /* 首页问候栏（概念图：早上好 + 日期） */
+    .dash-greeting {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 6px 4px 18px;
+    }
+    .dg-hello { font-size: 24px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.5px; }
+    .dg-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
+    .dg-date { font-size: 12.5px; color: var(--text-muted); padding-bottom: 4px; }
+
+    /* 日报卡内嵌提醒清单 */
+    .brief-reminders {
+      margin-bottom: 14px; padding: 12px 14px;
+      background: var(--bg-tertiary); border-radius: 14px;
+    }
+    .br-title {
+      font-size: 11px; font-weight: 700; color: var(--text-muted);
+      letter-spacing: 0.5px; margin-bottom: 8px;
+    }
+    .brief-reminders input[type="checkbox"] { accent-color: var(--primary-color); }
+
+    /* 首页极简模式：隐藏搜索栏/筛选/PC顶部头（对齐概念图） */
+    body.dash-mode .notes-list-toolbar,
+    body.dash-mode .notes-list-header { display: none !important; }
     
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
@@ -1614,7 +1638,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="小雅助手">
 </head>
-<body data-theme="warm" data-font="heiti" data-size="normal">
+<body data-theme="warm" data-font="heiti" data-size="normal" class="dash-mode">
   <!-- 登录遮罩层 -->
   <div id="loginOverlay" style="position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(9,13,22,0.95);backdrop-filter:blur(10px);">
     <div style="background:#1a1f2e;border-radius:16px;padding:32px;width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.4);text-align:center;">
@@ -1750,8 +1774,17 @@
 
           <!-- 1. 工作台首页 -->
           <div id="section-dash">
-                        <!-- 🌅 今日日报卡（提到最前：用户最高优先级，第一眼看到天气+行情+新闻） -->
-            <div class="note-card" id="dailyBriefingCard" style="cursor:default;margin-bottom:14px;border-left:4px solid var(--accent-warm);">
+            <!-- ① 问候栏（概念图：早上好 + 日期） -->
+            <div class="dash-greeting">
+              <div>
+                <div class="dg-hello" id="liveGreetingTitle">早上好</div>
+                <div class="dg-sub" id="liveGreetingSubtitle">今天一切就绪</div>
+              </div>
+              <div class="dg-date" id="todayDateStr">11月26日</div>
+            </div>
+
+            <!-- ② 今日日报聚合大卡（提醒清单+天气+行情+要闻） -->
+            <div class="note-card" id="dailyBriefingCard" style="cursor:default;margin-bottom:16px;border-left:4px solid var(--accent-warm);">
               <div class="note-card-header" style="margin-bottom:12px;">
                 <div style="display:flex;align-items:center;gap:8px;">
                   <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-warm)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
@@ -1760,69 +1793,15 @@
                 </div>
                 <button class="btn-pill" onclick="loadBriefing()" title="刷新"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> 刷新</button>
               </div>
+              <!-- 提醒清单（在日报卡内，概念图布局） -->
+              <div class="brief-reminders">
+                <div class="br-title">今日提醒</div>
+                <div id="dashTodayReminders" style="display:flex;flex-direction:column;gap:6px;">
+                  <div style="color:var(--text-muted);font-size:12px;padding:4px 0;">正在加载待办事项...</div>
+                </div>
+              </div>
               <div id="briefingContent">
                 <div style="color:var(--text-muted);font-size:12px;padding:8px 0;">正在加载今日日报...</div>
-              </div>
-            </div>
-
-                        <!-- 晨间智能问候与状态流 -->
-            <div class="note-card" style="cursor:default;margin-bottom:18px;background:linear-gradient(135deg, rgba(0, 113, 227, 0.06) 0%, rgba(56, 189, 248, 0.03) 100%);border:1px solid rgba(0, 113, 227, 0.15);padding:18px 20px;">
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
-                <div>
-                  <div style="font-size:12px;font-weight:700;color:var(--primary-color);letter-spacing:0.5px;text-transform:uppercase;" id="liveGreetingTag">TODAY FOCUS</div>
-                  <h2 style="font-size:18px;font-weight:700;color:var(--text-primary);margin-top:4px;" id="liveGreetingTitle">早上好，今天一切就绪</h2>
-                  <div style="font-size:12.5px;color:var(--text-secondary);margin-top:4px;" id="liveGreetingSubtitle">待办日程与备忘便签已同步至飞牛私有云</div>
-                </div>
-                <div style="display:flex;gap:8px;align-items:center;">
-                  <span class="btn-pill" style="font-size:11.5px;background:var(--surface-elevated);" id="todayDateStr">2026年11月2日</span>
-                  <button class="btn-pill" style="font-size:11.5px;" onclick="switchNav('remind')">+ 加待办</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- 今日聚焦快捷金刚区 -->
-            <div class="grid-4" style="margin-bottom:18px;">
-              <div class="action-tile" onclick="switchNav('ideas')">
-                <div class="tile-badge"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
-                <div>
-                  <div style="font-weight:700;font-size:14px;">备忘录 / 便签</div>
-                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">灵感随笔 · 照片素材归档</div>
-                </div>
-              </div>
-              <div class="action-tile" onclick="switchNav('remind')">
-                <div class="tile-badge"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-                <div>
-                  <div style="font-weight:700;font-size:14px;">待办与日程提醒</div>
-                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;" id="dashReminderCountHint">0 个待办日程</div>
-                </div>
-              </div>
-              <div class="action-tile" onclick="switchNav('inbox')">
-                <div class="tile-badge"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-                <div>
-                  <div style="font-weight:700;font-size:14px;">随手速记</div>
-                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">口述录音 · 快速采集</div>
-                </div>
-              </div>
-              <div class="action-tile" onclick="switchNav('proj')">
-                <div class="tile-badge"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2Z"/></svg></div>
-                <div>
-                  <div style="font-weight:700;font-size:14px;">项目与记账档案</div>
-                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">工地进度 · 票据账单</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 今日待办与提醒直达卡片 -->
-            <div class="note-card" style="cursor:default;margin-bottom:20px;border-left:4px solid var(--primary-color);">
-              <div class="note-card-header" style="margin-bottom:8px;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <span style="display:inline-flex;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
-                  <div class="note-title" style="font-size:14px;">今日待办与关键日程</div>
-                </div>
-                <button class="btn-pill" onclick="switchNav('remind')">查看全部待办 ›</button>
-              </div>
-              <div id="dashTodayReminders" style="display:flex;flex-direction:column;gap:8px;">
-                <div style="color:var(--text-muted);font-size:12px;padding:4px 0;">正在加载待办事项...</div>
               </div>
             </div>
 
@@ -2593,7 +2572,7 @@
         const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 · 周${week}`;
         const titleEl = document.getElementById('liveGreetingTitle');
         const dateEl = document.getElementById('todayDateStr');
-        if(titleEl) titleEl.textContent = `${greet}，今天一切就绪`;
+        if(titleEl) titleEl.textContent = greet;
         if(dateEl) dateEl.textContent = dateStr;
       }catch(e){}
     }
@@ -2713,6 +2692,9 @@
         const mBtn = document.getElementById('m-nav-' + s);
         if (mBtn) mBtn.classList.toggle('active', s === key);
       });
+
+      // 首页走「概念图极简模式」：隐藏搜索栏/筛选/PC顶部头（其他 tab 照常）
+      document.body.classList.toggle('dash-mode', key === 'dash');
 
       const meta = {
         dash: { eyebrow: 'TODAY', title: '首页', count: '就绪' },
@@ -3038,7 +3020,7 @@
       if (hint) hint.innerText = `${unDone.length} 个待办进行中`;
 
       if (!unDone.length) {
-        box.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:6px 0;">🎉 太棒了，当前没有任何未完成的待办！</div>';
+        box.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:12px;padding:6px 0;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> 太棒了，当前没有任何未完成的待办！</div>';
         return;
       }
 
