@@ -281,16 +281,21 @@
     html[data-size="normal"], body[data-size="normal"] { --font-scale: 1; }
     html[data-size="large"], body[data-size="large"] { --font-scale: 1.12; }
 
-    /* 首页底部万能捕获输入框：固定悬浮在 Tab 栏上方（对齐概念图，仅首页显示） */
+    /* 首页万能捕获输入栏：固定在最底端（随时录入），4导航键在其上方 */
     .hero-capture {
       position: fixed;
-      left: 12px; right: 12px;
-      bottom: calc(132px + env(safe-area-inset-bottom, 0px)); /* 避开 60px Tab 栏(实测需≥122) */
-      z-index: 90;
-      max-width: 520px;
-      margin: 0 auto;
-      padding: 0;
+      left: 0; right: 0;
+      bottom: 0; /* 最底端固定，不受滚动影响 */
+      z-index: 110; /* 高于导航栏100，位于最底端 */
+      max-width: 100%;
+      margin: 0;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-top: 0.5px solid var(--border-color);
     }
+    .hero-capture .hc-hint { margin-top: 6px; }
     .hero-capture-box {
       display: flex; align-items: center; gap: 12px;
       background: var(--surface-elevated);
@@ -314,7 +319,7 @@
       display: flex; align-items: flex-end; justify-content: space-between;
       padding: 6px 4px 18px;
     }
-    .dg-hello { font-size: 24px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.5px; }
+    .dg-hello { font-size: 20px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.5px; }
     .dg-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
     .dg-date { font-size: 12.5px; color: var(--text-muted); padding-bottom: 4px; }
 
@@ -758,8 +763,8 @@
       margin: 0 auto;
       width: 100%;
     }
-    /* 首页底部留白：给悬浮 AI 输入栏腾出空间，避免盖住最后一条内容 */
-    #section-dash { padding-bottom: 120px; }
+    /* 首页底部留白：底部叠了 语音录入栏(约130px)+4导航键(58px)，留足空间防遮挡 */
+    #section-dash { padding-bottom: 210px; }
 
     /* 3. 卡片与网格系统 */
     /* 资产显示模式：卡片 vs 列表时间线 */
@@ -1503,16 +1508,17 @@
       /* 底部移动导航栏自适应与安全区域 */
       .mobile-bottom-nav {
         position: fixed;
-        bottom: 0; left: 0; right: 0;
+        bottom: calc(120px + env(safe-area-inset-bottom, 0px)); /* 抬到语音录入栏(最底端)正上方 */
+        left: 0; right: 0;
         z-index: 100;
-        height: calc(60px + env(safe-area-inset-bottom, 0px));
+        height: calc(58px + env(safe-area-inset-bottom, 0px));
         padding-bottom: env(safe-area-inset-bottom, 0px);
         background: rgba(255, 253, 250, 0.96);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-top: 1px solid var(--border-color);
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
+        grid-template-columns: repeat(4, 1fr); /* 4个导航键均匀铺满 */
         align-items: center;
         box-shadow: 0 -3px 16px rgba(44, 36, 29, 0.05);
       }
@@ -1870,9 +1876,8 @@
             <div class="dash-greeting">
               <div>
                 <div class="dg-hello" id="liveGreetingTitle">早上好</div>
-                <div class="dg-sub" id="liveGreetingSubtitle">今天一切就绪</div>
               </div>
-              <div class="dg-date" id="todayDateStr">11月26日</div>
+              <div class="dg-date" id="todayDateStr">11月27日</div>
             </div>
 
             <!-- ② 今日日报聚合大卡（提醒清单+天气+行情+要闻） -->
@@ -2640,14 +2645,7 @@
     </div>
   </div>
 
-  <!-- 全局悬浮速记按钮 FAB -->
-  <button id="globalFab" onclick="fabQuickCapture()" title="随手记一笔"
-    style="position:fixed;right:20px;bottom:84px;width:56px;height:56px;border-radius:50%;
-    background:linear-gradient(135deg,#0071e3,#38bdf8);color:#fff;border:none;cursor:pointer;
-    font-size:28px;line-height:56px;text-align:center;box-shadow:0 6px 20px rgba(0,113,227,0.4);
-    z-index:9000;transition:transform 0.2s ease,box-shadow 0.2s ease;display:none;"
-    onmouseover="this.style.transform='scale(1.08)';this.style.boxShadow='0 8px 26px rgba(0,113,227,0.5)'"
-    onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 6px 20px rgba(0,113,227,0.4)'">＋</button>
+  <!-- 蓝色速记 FAB 已移除：底部语音录入栏(hero-capture)固定常驻，替代其随时录入功能 -->
 
   <script>
     // 动态问候语 + 日期（修复原代码 updateLiveGreeting 未定义的 bug）
@@ -2817,10 +2815,6 @@
       }
       if (key === 'money') loadAccountCategories();
 
-      // FAB 显示控制：速记页/设置页/我的页隐藏，其他页显示
-      const fab = document.getElementById('globalFab');
-      if (fab) fab.style.display = (key === 'inbox' || key === 'sett' || key === 'mine') ? 'none' : 'block';
-
       // 进入设置页时刷新设备信任状态显示
       if (key === 'sett') { updateTrustStatus(); updatePasskeySettings(); }
     }
@@ -2899,13 +2893,17 @@
 
     function renderBriefing(d) {
       let html = '';
-      // 天气
+      // 天气（对齐概念图：卡内紧凑一行小字，图标+温度，不占大块）
       const w = d.weather || {};
       html += '<div style="margin-bottom:14px;">';
-      html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><path d="M17.66 5.34l1.41-1.41"/></svg> 天气 · ' + (w.city || '') + '</div>';
+      html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><path d="M17.66 5.34l1.41-1.41"/></svg> 天气</div>';
       if (w.ok) {
-        html += '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:2px;"><span class="brief-temp">' + w.temp + '°</span><span style="font-size:13px;color:var(--text-secondary);">' + (w.desc || '') + '</span></div>';
-        html += '<div style="font-size:12px;color:var(--text-muted);">湿度' + w.humidity + '% · ' + (w.max || '') + '/' + (w.min || '') + '°C</div>';
+        // 紧凑一行：温度 + 天气描述 + 湿度，整体小字不抢视觉
+        html += '<div style="display:flex;align-items:baseline;gap:8px;font-size:13px;color:var(--text-secondary);">';
+        html += '<span style="font-size:17px;font-weight:700;color:var(--text-primary);">' + w.temp + '°C</span>';
+        html += '<span>' + (w.desc || '') + '</span>';
+        html += '<span style="color:var(--text-muted);font-size:12px;">湿度' + w.humidity + '%</span>';
+        html += '</div>';
       } else {
         html += '<div style="font-size:12px;color:var(--text-muted);">天气获取失败</div>';
       }
@@ -2923,8 +2921,7 @@
           const nm = q.name || '';
           const isMetal = (nm.indexOf('黄金') >= 0 || nm.indexOf('白银') >= 0);
           const unit = isMetal ? '<span style="font-size:9px;color:var(--text-muted);"> 元/克</span>' : '';
-          const sep = i > 0 ? 'border-left:1px solid var(--border-color);' : '';
-          html += '<div style="flex:1;text-align:center;padding:2px 4px;' + sep + '">';
+          html += '<div style="flex:1;text-align:center;padding:2px 4px;">';
           html += '<div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">' + nm + '</div>';
           html += '<div style="font-size:15px;font-weight:700;color:var(--accent-color);white-space:nowrap;">' + q.price + unit + '</div>';
           html += '<div style="font-size:11px;color:' + (up ? '#e5484d' : '#30a46c') + ';margin-top:2px;">' + (up ? '▲' : '▼') + ' ' + Math.abs(q.change_pct || 0) + '%</div>';
