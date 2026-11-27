@@ -1822,7 +1822,8 @@
         <img src="./icon-192.png" style="width:34px;height:34px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.15);object-fit:cover;" alt="小雅全能助手">
         <strong style="font-size:15.5px;">小雅全能助手</strong>
       </div>
-      <button class="btn-pill" onclick="switchNav('sett')">⚙ 设置</button>
+      <!-- 右侧放日期（设置项已收纳到「我的」页） -->
+      <div id="headerDateStr" style="font-size:12.5px;color:var(--text-muted);white-space:nowrap;">11月27日 周五</div>
     </header>
 
     <!-- 3. 主工作区 -->
@@ -2662,8 +2663,11 @@
         const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 · 周${week}`;
         const titleEl = document.getElementById('liveGreetingTitle');
         const dateEl = document.getElementById('todayDateStr');
+        const headerDateEl = document.getElementById('headerDateStr');
         if(titleEl) titleEl.textContent = greet;
         if(dateEl) dateEl.textContent = dateStr;
+        // 顶部品牌栏右侧：简短日期（不带年份）
+        if(headerDateEl) headerDateEl.textContent = `${now.getMonth()+1}月${now.getDate()}日 周${week}`;
       }catch(e){}
     }
     // FAB 点击：跳到速记页并聚焦输入框
