@@ -289,13 +289,13 @@
       z-index: 110; /* 高于导航栏100，位于最底端 */
       max-width: 100%;
       margin: 0;
-      padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+      padding: 7px 12px calc(7px + env(safe-area-inset-bottom, 0px)); /* 压缩上下padding，降低整体高度 */
       background: var(--bg-glass);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       border-top: 0.5px solid var(--border-color);
     }
-    .hero-capture .hc-hint { margin-top: 6px; }
+    .hero-capture .hc-hint { margin-top: 4px; }
     .hero-capture-box {
       display: flex; align-items: center; gap: 12px;
       background: var(--surface-elevated);
@@ -772,8 +772,8 @@
       margin: 0 auto;
       width: 100%;
     }
-    /* 首页底部留白：底部叠了 语音录入栏(约130px)+4导航键(58px)，留足空间防遮挡 */
-    #section-dash { padding-bottom: 210px; }
+    /* 首页底部留白：底部两层固定栏(语音录入栏111+4导航键58≈169)，留足空间防遮挡 */
+    #section-dash { padding-bottom: 175px; }
 
     /* 3. 卡片与网格系统 */
     /* 资产显示模式：卡片 vs 列表时间线 */
@@ -1517,7 +1517,7 @@
       /* 底部移动导航栏自适应与安全区域 */
       .mobile-bottom-nav {
         position: fixed;
-        bottom: calc(120px + env(safe-area-inset-bottom, 0px)); /* 抬到语音录入栏(最底端)正上方 */
+        bottom: calc(53px + env(safe-area-inset-bottom, 0px)); /* 紧贴语音录入栏顶部:innerH757-heroTop646-navH58=53,零间隙 */
         left: 0; right: 0;
         z-index: 100;
         height: calc(58px + env(safe-area-inset-bottom, 0px));
@@ -1882,12 +1882,7 @@
 
           <!-- 1. 工作台首页 -->
           <div id="section-dash">
-            <!-- ① 问候栏（日期已移到顶部品牌栏，此处只保留问候语） -->
-            <div class="dash-greeting">
-              <div class="dg-hello" id="liveGreetingTitle">早上好</div>
-            </div>
-
-            <!-- ② 今日日报聚合大卡（提醒清单+天气+行情+要闻） -->
+            <!-- ① 今日日报聚合大卡（提醒清单+天气+行情+要闻）；问候语已去掉，日期在顶部品牌栏 -->
             <div class="note-card" id="dailyBriefingCard" style="cursor:default;margin-bottom:12px;border-left:4px solid var(--accent-warm);">
               <div class="note-card-header" style="margin-bottom:10px;">
                 <div style="display:flex;align-items:center;gap:8px;">
