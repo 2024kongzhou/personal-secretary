@@ -281,8 +281,16 @@
     html[data-size="normal"], body[data-size="normal"] { --font-scale: 1; }
     html[data-size="large"], body[data-size="large"] { --font-scale: 1.12; }
 
-    /* 首页底部万能捕获输入框（对齐概念图） */
-    .hero-capture { margin-top: 8px; padding: 4px 0 12px; }
+    /* 首页底部万能捕获输入框：固定悬浮在 Tab 栏上方（对齐概念图，仅首页显示） */
+    .hero-capture {
+      position: fixed;
+      left: 12px; right: 12px;
+      bottom: calc(132px + env(safe-area-inset-bottom, 0px)); /* 避开 60px Tab 栏(实测需≥122) */
+      z-index: 90;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 0;
+    }
     .hero-capture-box {
       display: flex; align-items: center; gap: 12px;
       background: var(--surface-elevated);
@@ -750,6 +758,8 @@
       margin: 0 auto;
       width: 100%;
     }
+    /* 首页底部留白：给悬浮 AI 输入栏腾出空间，避免盖住最后一条内容 */
+    #section-dash { padding-bottom: 120px; }
 
     /* 3. 卡片与网格系统 */
     /* 资产显示模式：卡片 vs 列表时间线 */
