@@ -1056,6 +1056,13 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", mimetypes.guess_type(str(file))[0] or "application/octet-stream")
             self.set_cors_headers()
+            # HTML 入口禁缓存，确保改动即时生效（根治手机端缓存旧版）
+            if fpath == "index.html" or fpath.endswith(".html"):
+                self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+                self.send_header("Pragma", "no-cache")
+                self.send_header("Expires", "0")
+            else:
+                self.send_header("Cache-Control", "public, max-age=3600")
             self.send_header("Content-Length", str(len(data)))
             self.end_headers()
             self.wfile.write(data)
