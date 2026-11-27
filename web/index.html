@@ -314,18 +314,27 @@
     }
     [data-theme="vibrant"] .hero-capture-box { border-radius: 12px; }
 
+    /* 首页模块渐入动画（加载时舒适淡入上浮） */
+    @keyframes dashFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    #section-dash .dash-greeting { animation: dashFadeIn 0.4s ease-out both; }
+    #section-dash #dailyBriefingCard { animation: dashFadeIn 0.45s ease-out 0.05s both; }
+    #section-dash .hero-capture { animation: dashFadeIn 0.4s ease-out 0.1s both; }
+
     /* 首页问候栏（概念图：早上好 + 日期） */
     .dash-greeting {
-      display: flex; align-items: flex-end; justify-content: space-between;
-      padding: 6px 4px 18px;
+      display: flex; align-items: center;
+      padding: 2px 4px 10px;
     }
-    .dg-hello { font-size: 20px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.5px; }
+    .dg-hello { font-size: 19px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.4px; }
     .dg-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
     .dg-date { font-size: 12.5px; color: var(--text-muted); padding-bottom: 4px; }
 
     /* 日报卡内嵌提醒清单 */
     .brief-reminders {
-      margin-bottom: 14px; padding: 12px 14px;
+      margin-bottom: 10px; padding: 10px 12px;
       background: var(--bg-tertiary); border-radius: 14px;
     }
     .br-title {
@@ -1873,17 +1882,14 @@
 
           <!-- 1. 工作台首页 -->
           <div id="section-dash">
-            <!-- ① 问候栏（概念图：早上好 + 日期） -->
+            <!-- ① 问候栏（日期已移到顶部品牌栏，此处只保留问候语） -->
             <div class="dash-greeting">
-              <div>
-                <div class="dg-hello" id="liveGreetingTitle">早上好</div>
-              </div>
-              <div class="dg-date" id="todayDateStr">11月27日</div>
+              <div class="dg-hello" id="liveGreetingTitle">早上好</div>
             </div>
 
             <!-- ② 今日日报聚合大卡（提醒清单+天气+行情+要闻） -->
-            <div class="note-card" id="dailyBriefingCard" style="cursor:default;margin-bottom:16px;border-left:4px solid var(--accent-warm);">
-              <div class="note-card-header" style="margin-bottom:12px;">
+            <div class="note-card" id="dailyBriefingCard" style="cursor:default;margin-bottom:12px;border-left:4px solid var(--accent-warm);">
+              <div class="note-card-header" style="margin-bottom:10px;">
                 <div style="display:flex;align-items:center;gap:8px;">
                   <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-warm)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
                   <div class="note-title" style="font-size:15px;">今日日报</div>
@@ -2899,7 +2905,7 @@
       let html = '';
       // 天气（对齐概念图：卡内紧凑一行小字，图标+温度，不占大块）
       const w = d.weather || {};
-      html += '<div style="margin-bottom:14px;">';
+      html += '<div style="margin-bottom:10px;">';
       html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><path d="M17.66 5.34l1.41-1.41"/></svg> 天气</div>';
       if (w.ok) {
         // 紧凑一行：温度 + 天气描述 + 湿度，整体小字不抢视觉
@@ -2914,7 +2920,7 @@
       html += '</div>';
       // 行情
       const qs = d.quotes || [];
-      html += '<div style="margin-bottom:14px;">';
+      html += '<div style="margin-bottom:10px;">';
       html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 行情</div>';
       if (qs.length && qs.some(q => q.ok)) {
         // 行情区: 横排一行,竖线分隔,数值用主题强调色(对标效果图)
