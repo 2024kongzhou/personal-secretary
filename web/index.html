@@ -2840,13 +2840,17 @@
 
     /* ========== 今日日报 (调 /api/briefing 真实数据，绝不编造) ========== */
     let briefingLoaded = false;
-    function loadBriefing() {
+    function loadBriefing(retry = 2) {
       const box = document.getElementById('briefingContent');
       if (!box) return;
       box.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:8px 0;">正在加载今日日报...</div>';
-      fetch('/api/briefing', { headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('xiaoya_token') || '') } })
+      // 8秒超时：手机网络抖动时自动中止，走 catch 重试
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 8000);
+      fetch('/api/briefing', { headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('xiaoya_token') || '') }, signal: ctrl.signal })
         .then(r => r.json())
         .then(d => {
+          clearTimeout(timer);
           if (!d.ok) { box.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">日报获取失败，请稍后刷新</div>'; return; }
           box.innerHTML = renderBriefing(d);
           const up = document.getElementById('briefingUpdateTime');
@@ -2854,7 +2858,12 @@
           briefingLoaded = true;
           // loadSparks();  // 走势图已移除,不再拉取分时数据
         })
-        .catch(() => { box.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">日报获取失败，请检查网络后刷新</div>'; });
+        .catch(() => {
+          clearTimeout(timer);
+          // 网络抖动自动重试（最多2次），避免一次抖动就失败
+          if (retry > 0) { setTimeout(() => loadBriefing(retry - 1), 1200); return; }
+          box.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">日报获取失败，请检查网络后刷新</div>';
+        });
     }
 
     /* 行情迷你走势图: 拉 /api/spark, 往每个 .mkt-spark 画 SVG 折线(红涨绿跌) */
